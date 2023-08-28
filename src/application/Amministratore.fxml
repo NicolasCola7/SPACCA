@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AmministratoreController">
+   <children>
+      <Button layoutX="148.0" layoutY="136.0" mnemonicParsing="false" onAction="#gestioneGiocatori" prefHeight="62.0" prefWidth="113.0" text="Gestione giocatori" />
+      <Button layoutX="356.0" layoutY="141.0" mnemonicParsing="false" onAction="#gestionePartite" prefHeight="52.0" prefWidth="89.0" text="Nuova Partita" />
+      <Label layoutX="205.0" layoutY="21.0" prefHeight="52.0" prefWidth="189.0" text="AMMINISTRATORE">
+         <font>
+            <Font size="22.0" />
+         </font>
+      </Label>
+      <Button layoutX="22.0" layoutY="21.0" mnemonicParsing="false" onAction="#goToHome" text="Home" />
+   </children>
+</AnchorPane>
