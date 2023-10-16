@@ -1,5 +1,5 @@
 import java.util.Random;
-public class Character {
+public class Character{
 	
 	public Random rand;
 	private String name;
