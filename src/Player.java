@@ -7,7 +7,7 @@ public class Player {
 	private ArrayList<Card>  hand;
 	private ArrayList<StaticCard>  board;
 	private int score;
-	private Gun gun;
+	private Weapon wp;
 	private boolean passed;
 	
 	
@@ -18,7 +18,7 @@ public class Player {
 		character = c;
 		hand = new ArrayList<Card>();	
 		board = new ArrayList<StaticCard>();
-		gun = null;
+		wp = null;
 		passed = false;
 	}
 	
@@ -26,12 +26,24 @@ public class Player {
 	
 	//return true if player has missCard
 	public boolean hasMiss() {
-		MissCard m  = new MissCard();
-		return hand.contains(m);
+		boolean check = false;
+		for(int i = 0;i<hand.size();i++) {
+			if(hand.get(i) instanceof MissCard) {
+				
+				check = true;
+				break;
+				
+				}
+			else 
+				check =  false;
+				
+		}
+		return check;
+		
 	}
 	public boolean hasRing() {
 		RingCard r = new RingCard();
-		return hand.contains(r);
+		return board.contains(r);
 	}
 	
 	//add card to hand
@@ -53,9 +65,9 @@ public class Player {
 		else return false;
 	}
 	//equipe gun to gun slot
-	public boolean equipeGun(Gun g) {
-		if(g!=null) {
-			gun = g;
+	public boolean equipeGun(Weapon wp) {
+		if(wp!=null) {
+			this.wp = wp;
 			return true;
 		}
 		else 
@@ -63,19 +75,28 @@ public class Player {
 			
 	}
 	public double getAttackPower() {
-		if(gun!=null) {
-			return gun.getAttackPower() + character.getAttack();
+		if(wp!=null) {
+			return wp.getAttackPower() + character.getAttack();
 		}
 		else
 			return character.getAttack();
 	}
 	//remove card from player hand
 	public boolean removeCardFromHand(Card c) {
-		if(c!=null && hand.contains(c) && !hand.isEmpty()) {
-			hand.remove(c);
-			return true;
+		boolean check = false;
+		if(!hand.isEmpty()) {
+		for(int i=0;i<hand.size();i++) {
+			if(hand.get(i).equals(c)) {
+				hand.remove(i);
+				check = true;
+				break;
+			}
+			else 
+				check = false;
+			}
+	
 		}
-		else return false;
+		return check;
 	}
 	//remove card from player hand by index
 	public boolean removeCard(int index) {

@@ -14,6 +14,11 @@ public class Deck {
 		rand = new Random();
 		
 	}
+	public void Add(Card c) {
+		cards.add(c);
+		
+	}
+
 	public Card Draw() {
 		
 		if(!cards.isEmpty()) {
@@ -29,7 +34,7 @@ public class Deck {
 	public void shuffle() {
 		if(cards.size()!=0) {
 		for(int i = 0;i<cards.size();i++) {
-			int n = rand.nextInt();
+			int n = rand.nextInt(0,cards.size());
 			cards.set(i, cards.get(n));
 			cards.set(n,cards.get(i));
 		}
@@ -41,7 +46,7 @@ public class Deck {
 				discardCards.remove(i);
 				}
 			for(int i = 0;i<cards.size();i++) {
-				int n = rand.nextInt();
+				int n = rand.nextInt(0,cards.size());
 				cards.set(i, cards.get(n));
 				cards.set(n,cards.get(i));
 			}

@@ -1,10 +1,10 @@
 
-public class CommonSwardCard extends Gun{
+public class CommonSwardCard extends Weapon{
 
 	
 	
 	public CommonSwardCard() {
-		super("CommonSwardCard",7.0);
+		super("CommonSwardCard",Seed.PC,7.0);
 		
 	}
 	public boolean equipe(Player a) {

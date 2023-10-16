@@ -1,10 +1,10 @@
 
-public class MjolnirCard extends Gun{
+public class MjolnirCard extends Weapon{
 
 	
 	
 	public MjolnirCard() {
-	super("MjolnirCard",14.0);
+	super("MjolnirCard",Seed.MV,14.0);
 		
 	}
 	public boolean equipe(Player a) {

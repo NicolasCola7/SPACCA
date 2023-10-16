@@ -2,19 +2,20 @@
 public class Card {
 
 	private String name;
-	private String type;
-	
-	public Card(String n,String t) {
+	private Type type;
+	private Seed seed;
+	public Card(String n,Type t, Seed seed) {
 		
 		name = n;
 		type = t;
+		this.seed = seed;
 			
 	}
 	
 	public String getName() {
 		return name;
 	}
-	public String getType() {
+	public Type getType() {
 		return type;
 	}
 	

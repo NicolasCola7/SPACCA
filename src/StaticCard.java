@@ -1,9 +1,9 @@
 
 public class StaticCard extends Card{
 
-	private String name;
 	
-	public StaticCard(String n) {
-		super(n,"StaticCard");
+	
+	public StaticCard(String n,Seed seed) {
+		super(n,Type.StaticCard,seed);
 	}
 }

@@ -2,7 +2,7 @@
 public class SauronEyeCard extends ActionCard{
 	
 	public SauronEyeCard() {
-		super("SauronEye");
+		super("SauronEye",Seed.SA);
 		
 	}
 	

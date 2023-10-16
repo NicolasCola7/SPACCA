@@ -4,7 +4,7 @@ public class HealingPotionCard extends ActionCard{
 	private double healRate;
 	
 	public HealingPotionCard() {
-		super("HealingPotionCard");
+		super("HealingPotionCard",Seed.SA);
 		healRate = 15;
 	}
 	public boolean getEffect(Player a) {

@@ -1,10 +1,10 @@
 
-public class PirateSaberCard extends Gun{
+public class PirateSaberCard extends Weapon{
 
 	
 	
 	public PirateSaberCard() {
-		super("PirateSaberCard",10.0);
+		super("PirateSaberCard",Seed.PC,10.0);
 		
 	
 	}

@@ -3,7 +3,7 @@ public class GauntletCard extends ActionCard{
 
 	
 	public GauntletCard() {
-		super("GauntletCard");
+		super("GauntletCard",Seed.MV);
 			
 	}
 	public boolean getEffect(Player a,Player b) {

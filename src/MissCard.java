@@ -1,8 +1,8 @@
 
-public class MissCard extends Card{
+public class MissCard extends ActionCard{
 
 	public MissCard() {
-		super("MissCard","PassiveCard");
+		super("MissCard",Seed.MV);
 		
 	}
 	

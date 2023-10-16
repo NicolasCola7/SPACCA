@@ -1,10 +1,10 @@
 
-public class ElderWandCard extends Gun{
+public class ElderWandCard extends Weapon{
 
 	
 	
 	public ElderWandCard() {
-		super("ElderWandCard",15.0);
+		super("ElderWandCard",Seed.HP,15.0);
 		
 	}
 	public boolean equipe(Player a) {

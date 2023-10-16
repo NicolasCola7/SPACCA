@@ -1,10 +1,10 @@
 
-public class KingsSwardCard extends Gun{
+public class KingsSwardCard extends Weapon{
 
 	
 	
 	public KingsSwardCard() {
-		super("KingsSwardCard",12.0);
+		super("KingsSwardCard",Seed.SA,12.0);
 		
 	}
 	public boolean equipe(Player a) {
