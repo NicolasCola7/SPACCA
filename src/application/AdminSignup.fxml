@@ -11,7 +11,7 @@
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AdminSignupController">
    <children>
       <Button layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#goToHome" text="Home" />
-      <Button layoutX="275.0" layoutY="269.0" mnemonicParsing="false" onAction="#signup" text="Registrati" />
+      <Button fx:id="registerButton" layoutX="275.0" layoutY="269.0" mnemonicParsing="false" onAction="#signup" text="Registrati" />
       <Label layoutX="158.0" layoutY="138.0" text="Username" />
       <Label layoutX="160.0" layoutY="182.0" text="Password" />
       <PasswordField fx:id="psw" layoutX="226.0" layoutY="178.0" />

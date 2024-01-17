@@ -20,7 +20,7 @@
       <ChoiceBox fx:id="selectedPlayer" layoutX="214.0" layoutY="122.0" prefWidth="150.0" />
       <Label layoutX="107.0" layoutY="182.0" prefHeight="17.0" prefWidth="107.0" text="Nuovo username:" />
       <TextField fx:id="newPlayerName" layoutX="215.0" layoutY="178.0" />
-      <Button layoutX="394.0" layoutY="122.0" mnemonicParsing="false" onAction="#deletePlayer" text="Elimina" />
-      <Button layoutX="396.0" layoutY="178.0" mnemonicParsing="false" onAction="#renamePlayer" text="Modifica" />
+      <Button fx:id="deleteButton" layoutX="394.0" layoutY="122.0" mnemonicParsing="false" onAction="#deletePlayer" text="Elimina" />
+      <Button fx:id="modifyButton" layoutX="396.0" layoutY="178.0" mnemonicParsing="false" onAction="#renamePlayer" text="Modifica" />
    </children>
 </AnchorPane>

@@ -4,13 +4,17 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 import java.util.Scanner;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -21,13 +25,15 @@ import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
-public class NewPlayerController {
+public class NewPlayerController implements Initializable {
 	private Scene scene;
 	private Stage stage;
 	private Parent root;
-	
+	@FXML
+	private Button addButton;
 	@FXML
 	private TextField playerUsername;
 	@FXML
@@ -36,6 +42,11 @@ public class NewPlayerController {
 	private String adminUsername;
 	private File playersList;
 	private ArrayList<String> players;
+	
+	@Override
+	public void initialize(URL arg0, ResourceBundle arg1) {
+		 addButton.disableProperty().bind(Bindings.isEmpty(playerUsername.textProperty()));
+	}
 	
 	public void goToHome(ActionEvent event) throws IOException {
 		Alert alert=new Alert(AlertType.CONFIRMATION);
@@ -60,12 +71,12 @@ public class NewPlayerController {
 
 	public void addPlayer(ActionEvent event) throws IOException {
 		
-		Scanner scan = new Scanner(new File("./Files/AdminAttuale.csv"));
+		Scanner scan = new Scanner(new File("./Files/ConfigurationFiles/AdminAttuale.csv"));
         while (scan.hasNextLine()) {
         	String line=scan.nextLine();
         	adminUsername=line;
         }
-        playersList=new File("./Files/"+adminUsername+"ListaGiocatori.csv");
+        playersList=new File("./Files/ConfigurationFiles/"+adminUsername+"ListaGiocatori.csv");
 		scan = new Scanner(playersList);
 		players=new ArrayList<String>();
 		while(scan.hasNextLine()) {
@@ -90,4 +101,5 @@ public class NewPlayerController {
         	}
         
 	}
+	
 }

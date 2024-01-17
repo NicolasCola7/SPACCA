@@ -5,31 +5,42 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URL;
+import java.util.ResourceBundle;
 import java.util.Scanner;
 
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-public class AdminSignupController {
+public class AdminSignupController implements Initializable {
 	private Scene scene;
 	private Stage stage;
 	private Parent root;
-	@FXML
-	private PasswordField psw;
-	@FXML
-	private PasswordField pswCheck;
-	@FXML
-	private TextField username;
-	@FXML
-	private Text errorMsg;
+	@FXML private PasswordField psw;
+	@FXML private PasswordField pswCheck;
+	@FXML private TextField username;
+	@FXML private Text errorMsg;
+	@FXML private Button registerButton;
+	
+	@Override
+	public void initialize(URL arg0, ResourceBundle arg1) {
+		registerButton.disableProperty().bind(
+				Bindings.isEmpty(username.textProperty()).or(
+				Bindings.isEmpty(psw.textProperty()).or(
+				Bindings.isEmpty(pswCheck.textProperty()))));
+		
+	}
 	
 	public void goToHome(ActionEvent event) throws IOException {
 		root = FXMLLoader.load(getClass().getResource("home.fxml"));
@@ -42,7 +53,7 @@ public class AdminSignupController {
 		boolean checkUser=true;
 		boolean checkPsw=true;
 		try {
-		Scanner scf = new Scanner(new File("./Files/Login.csv"));
+		Scanner scf = new Scanner(new File("./Files/ConfigurationFiles/Login.csv"));
         while (scf.hasNextLine()) {
         	String[] line= scf.nextLine().split(",");
         	if(line[0].equals(username.getText())) {
@@ -73,4 +84,5 @@ public class AdminSignupController {
 			errorMsg.setVisible(true);
 			
 	}
+	
 }

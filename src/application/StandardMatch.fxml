@@ -22,7 +22,7 @@
       <Label layoutX="334.0" layoutY="97.0" text="Numero giocatori:" />
       <ChoiceBox fx:id="numberOfPlayerSelection" layoutX="440.0" layoutY="93.0" prefHeight="25.0" prefWidth="40.0" />
       <ListView fx:id="playersSelection" layoutX="86.0" layoutY="122.0" prefHeight="255.0" prefWidth="200.0" />
-      <Button layoutX="347.0" layoutY="349.0" mnemonicParsing="false" onAction="#confirm" text="Conferma" />
+      <Button fx:id="confirmButton" layoutX="347.0" layoutY="349.0" mnemonicParsing="false" onAction="#confirm" text="Conferma" />
       <CheckBox fx:id="botCheck" layoutX="446.0" layoutY="167.0" mnemonicParsing="false" />
       <Label layoutX="338.0" layoutY="167.0" text="Completa con bot:" />
       <Label layoutX="334.0" layoutY="241.0" text="Codice partita:" />

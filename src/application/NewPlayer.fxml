@@ -17,7 +17,7 @@
       </Label>
       <Label layoutX="166.0" layoutY="158.0" prefHeight="17.0" prefWidth="58.0" text="Username:" />
       <TextField fx:id="playerUsername" layoutX="225.0" layoutY="154.0" />
-      <Button layoutX="268.0" layoutY="209.0" mnemonicParsing="false" onAction="#addPlayer" text="Aggiungi" />
+      <Button fx:id="addButton" layoutX="268.0" layoutY="209.0" mnemonicParsing="false" onAction="#addPlayer" text="Aggiungi" />
       <Label fx:id="msg" layoutX="211.0" layoutY="271.0" prefHeight="17.0" prefWidth="184.0" text="Username già in uso!" textFill="RED" visible="false" />
    </children>
 </AnchorPane>
