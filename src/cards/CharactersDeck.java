@@ -31,6 +31,6 @@ public class CharactersDeck {
 		Collections.shuffle(charactersDeck);
 	}
 	public Character getCharacter() {
-		return charactersDeck.getFirst();
+		return charactersDeck.removeFirst();
 	}
 }

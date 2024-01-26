@@ -11,8 +11,7 @@ public class Deck {
 	private Scanner scan;
 	private LinkedList<Card> deck;
 	private ArrayList<Card> stockpile;
-	private Random rand;
-	private final int numberOfCards=110;
+	private final int numberOfCards;;
 
 	public Deck() {
 		deck = new LinkedList<Card>();
@@ -22,6 +21,7 @@ public class Deck {
 		this.buildWeaponCards();
 		this.buildEventCards();
 		this.shuffle();
+		numberOfCards=deck.size();
 	}
 	
 	//build static cards
@@ -32,8 +32,6 @@ public class Deck {
 			while(scan.hasNextLine()) {
 				String[] line=scan.nextLine().split(",");
 				String name=line[0];
-				String seed=line[1];
-				//int duration=Integer.parseInt(line[2]);
 				int copy=Integer.parseInt(line[2]);
 				Seed s=null;
 				switch (name) {
@@ -41,16 +39,11 @@ public class Deck {
 			    	for(int i=0;i<copy;i++)
 					      deck.add(new RingCard());
 			        break;
-			        
-			  /*  case "Energetic Shield":
-			    	for(int i=0;i<copy;i++)
-					      deck.add(new EnergeticShieldCard());
-			    	 break;*/
 			    case "Horcrux":
 			    	for(int i=0;i<copy;i++)
 					      deck.add(new HorcruxCard());
 			        break;
-			    case "Black widow's Poison":
+			    case "Black Widow's Poison":
 			    	for(int i=0;i<copy;i++)
 					      deck.add(new BlackWidowsPoisonCard());
 			        break;
@@ -91,7 +84,7 @@ public class Deck {
 					      deck.add(new AttackCard()); 
 			        break;
 
-			    case "infinity's Gauntlet":
+			    case "Infinity's Gauntlet":
 			    	for(int i=0;i<copy;i++) 
 					      deck.add(new GauntletCard()); 
 			    	 break;
@@ -160,48 +153,23 @@ public class Deck {
 		}
 	}
 	private void buildEventCards()  {
-		/*try {
-			File eventCards=new File("./Files/CardsFiles/EventCards.csv");
-			scan=new Scanner(eventCards);
-			while(scan.hasNextLine()) {
-				String[] line=scan.nextLine().split(",");
-				String name=line[0];
-				int copy=Integer.parseInt(line[1]);
-				Seed s=Seed.NS;
-				switch (name) {
-			    case "":
-			    	for(int i=0;i<copy;i++) 
-					      deck.add(new Card()); 
-			        break;
-
-			    case "":
-			    	for(int i=0;i<copy;i++) 
-					      deck.add(new Card()); 
-			    	 break;
-			    case "":
-			    	for(int i=0;i<copy;i++) 
-					      deck.add(new Card()); 
-			        break;
-			}
-		}catch(FileNotFoundException e) {
-			System.out.println("File not found");
-		}*/
+		
 		deck.add(new IdentityTheftCard());
 		deck.add(new DoomsdayCard());
 		deck.add(new MiracleCard());
 	}
 	
-	public Card drawCard() {
+	public Card drawCard() { // pescare una carta dal deck
 		if (!this.isEmpty()) {
 			return deck.removeFirst();
 		}
-		else {
+		else { // se il deck è vuoto viene rimpiazzato dalla pila degli scarti
 			this.replaceDeckWithStockpile();
 			return this.drawCard();
 		}		
 	}
 	
-	// shuffle deck
+	// mischia il mazzo
 	private void shuffle() {
 		Collections.shuffle(deck);
 	}
@@ -221,7 +189,7 @@ public class Deck {
 		
 	}
 	
-	public ArrayList<Card> drawHand(){
+	public ArrayList<Card> drawHand(){ //metodo per pescare la mano a inizio partita
 		ArrayList<Card> hand=new ArrayList<Card>(5);
 		for(int i=0;i<5;i++)
 			hand.add(drawCard());
@@ -232,14 +200,15 @@ public class Deck {
 		return deck.size()==0;
 	}
 	
-	private void replaceDeckWithStockpile() {
+	private void replaceDeckWithStockpile() { //rimpiazza il mazzo con la pila degli scarti
 		if (this.isEmpty()) {
 			deck.addAll(stockpile);
+			stockpile.removeAll(stockpile);
 			this.shuffle();
 		}
 	}
 	
-	public void addToStockPile(Card c) {
+	public void addToStockPile(Card c) { //aggiunge una carta alla pila degli scart
 		stockpile.add(c);
 	}
 	

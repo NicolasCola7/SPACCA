@@ -8,9 +8,8 @@ public class HealingPotionCard extends ActionCard{
 		healRate = 15;
 	}
 	
-	public void onUse(Player attackingPlayer,Player targetPlayer,Deck deck) {
-		targetPlayer.getCharacter().increaseLife(healRate);
-		targetPlayer.getHand().remove(this);
+	public void onUse(Player attackingPlayer,Deck deck) { //permette di aggiungere 15 p.ti vita
+		attackingPlayer.getCharacter().increaseLife(healRate);
 		deck.addToStockPile(this);
 	}
 }

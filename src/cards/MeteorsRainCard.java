@@ -1,15 +1,17 @@
 package cards;
 
+import java.util.Random;
+
 public class MeteorsRainCard extends ActionCard {
 	public MeteorsRainCard() {
 		super("MeteorsRainCard",Seed.SW);
 	}
-	public void onUse(Player attackingPlayer,Player targetPlayer,Deck deck) {
+	public void onUse(Player attackingPlayer,Player targetPlayer,Deck deck) { //distrugge una carta casuale nella board dell'avversario
 		StaticCard[] board=targetPlayer.getBoard();
-		board[0]=null;
-		board[1]=null;
+		Random rand=new Random();
+		int i=rand.nextInt(1);
+		board[i]=null;
 		deck.addToStockPile(this);
-		attackingPlayer.getHand().remove(this);
 	}
 }
 

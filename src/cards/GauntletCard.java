@@ -2,43 +2,18 @@ package cards;
 import java.util.ArrayList;
 import java.util.Random;
 public class GauntletCard extends ActionCard{
-
-	
 	public GauntletCard() {
 		super("GauntletCard",Seed.MV);
 			
 	}
-	/*
-	public boolean getEffect(Player a,Player b) {
-		Random rand = new Random();
-		int indexCard = rand.nextInt();
-		Card c = b.getHand().get(indexCard);
-		
-			if(a.addCardTH(c)) {
-				b.removeCard(indexCard);
-				a.addCardTH(c);
-				return true;
-			}
-			else 
-				return false;
-	}
-	public boolean discard(Player a) {
-		GauntletCard gc = new GauntletCard();
-		
-		if(a.discardCardFromHand(gc)) {
-			a.discardCardFromHand(gc);
-			return true;
-		}
-		else 
-			return false;
-	}
-	*/
-	public void onUse(Player attackingPlayer,Player targetPlayer, Deck deck) {
+	public Card onUse(Player attackingPlayer,Player targetPlayer, Deck deck) { //permetrte di scartare una carta casuale dalla mano dell'avversario
 		ArrayList<Card> tH=targetPlayer.getHand();
 		ArrayList<Card> aH=attackingPlayer.getHand();
-		int x=(int)(1+Math.random()*tH.size()-1);
-		deck.addToStockPile(tH.remove(x));
+		Random random = new Random();
+	     int i=random.nextInt(tH.size());
+	     Card discarded=tH.get(i);
+		deck.addToStockPile(discarded);
 		deck.addToStockPile(this);
-		aH.remove(this);
+		return discarded;
 	}
 }

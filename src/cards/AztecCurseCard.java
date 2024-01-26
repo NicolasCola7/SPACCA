@@ -1,5 +1,5 @@
 package cards;
-public class AztecCurseCard extends StaticCard{
+public class AztecCurseCard extends StaticCard{ //se nella board, quando si viene attaccati la precisione dell'attaccatnte cala
 
 	public AztecCurseCard() {
 		super("AztecCurseCard",Seed.PC);

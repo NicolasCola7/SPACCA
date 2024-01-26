@@ -3,16 +3,18 @@ package cards;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class BoardingCard extends ActionCard{
+public class BoardingCard extends ActionCard{ //permette di rubare una carta casuale dalla mano dell'avversario
 
 	public BoardingCard() {
 		super("BoardingCard",Seed.PC);
 	}
-	public void onUse(Player attackingPlayer,Player targetPlayer,int i, Deck deck) {
+	public Card onUse(Player attackingPlayer,Player targetPlayer, Deck deck) {
 		ArrayList<Card> tH=targetPlayer.getHand();
 		ArrayList<Card> aH=attackingPlayer.getHand();
-		aH.add(tH.remove(i));
-		deck.addToStockPile(this);
-		aH.remove(this);
+		 Random random = new Random();
+	     int i=random.nextInt(tH.size());
+	     Card stolen=tH.get(i);
+	     deck.addToStockPile(this);
+		return stolen;
 	}
 }

@@ -9,6 +9,7 @@ import java.util.ResourceBundle;
 import java.util.Scanner;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -69,12 +70,12 @@ public class PlayerController implements Initializable{
 		if(checkGameCode(gameCode.getText())==true) {
 			
 			//start match 
-		 	FXMLLoader loader = new FXMLLoader();
-		 	loader.setLocation(getClass().getResource("Game.fxml"));
+		 	FXMLLoader loader = new FXMLLoader(getClass().getResource("Game.fxml"));
+		 	
             try {
 				Parent gameScene = loader.load();
 				Scene scene=new Scene(gameScene);
-	            GameController gameController=loader.getController();
+				GameController gameController=loader.getController();
 	            gameController.setGameCode(gameCode.getText());
 	            gameController.setAdminUsername(adminUsername);
 	            // Create a new stage

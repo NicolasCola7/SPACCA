@@ -2,7 +2,7 @@ package cards;
 public class ShieldCard extends StaticCard{
 
 	public ShieldCard() {
-		super("CaptainAmericasShieldCard",Seed.NS);	
+		super("ShieldCard",Seed.NS);	
 	}
 	
 }
