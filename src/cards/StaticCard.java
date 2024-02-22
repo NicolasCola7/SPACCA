@@ -1,6 +1,9 @@
 package cards;
-public class StaticCard extends Card{
 
+import java.io.Serializable;
+
+public class StaticCard extends Card {
+	
 	private int turnDuration;
 	// per ora ho eliminato la durata per semplicità
 	public StaticCard(String n,Seed s) {

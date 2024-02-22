@@ -1,17 +1,18 @@
 package cards;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Scanner;
 
-public class Deck {
-	private Scanner scan;
+public class Deck implements Serializable{
+
+	private transient Scanner scan;
 	private LinkedList<Card> deck;
 	private ArrayList<Card> stockpile;
-	private final int numberOfCards;;
 
 	public Deck() {
 		deck = new LinkedList<Card>();
@@ -21,7 +22,6 @@ public class Deck {
 		this.buildWeaponCards();
 		this.buildEventCards();
 		this.shuffle();
-		numberOfCards=deck.size();
 	}
 	
 	//build static cards
@@ -39,9 +39,9 @@ public class Deck {
 			    	for(int i=0;i<copy;i++)
 					      deck.add(new RingCard());
 			        break;
-			    case "Horcrux":
+			    case "EnchantedMirror":
 			    	for(int i=0;i<copy;i++)
-					      deck.add(new HorcruxCard());
+					      deck.add(new EnchantedMirrorCard());
 			        break;
 			    case "Black Widow's Poison":
 			    	for(int i=0;i<copy;i++)
@@ -160,7 +160,7 @@ public class Deck {
 	}
 	
 	public Card drawCard() { // pescare una carta dal deck
-		if (!this.isEmpty()) {
+		if (!deck.isEmpty()) {
 			return deck.removeFirst();
 		}
 		else { // se il deck è vuoto viene rimpiazzato dalla pila degli scarti
@@ -176,9 +176,9 @@ public class Deck {
 	
 	//draw a card from the deck and check if its seed equals a certain seed
 	public boolean drawAndCheck(Seed s) {
-		if (!this.isEmpty()) {
+		if (!deck.isEmpty()) {
 			Card c=deck.removeFirst();
-			this.addToStockPile(c);
+			deck.addLast(c);
 			return c.getSeed().equals(s);
 		}
 		
@@ -196,12 +196,8 @@ public class Deck {
 		return hand;
 	}
 	
-	private boolean isEmpty() {
-		return deck.size()==0;
-	}
-	
 	private void replaceDeckWithStockpile() { //rimpiazza il mazzo con la pila degli scarti
-		if (this.isEmpty()) {
+		if (deck.isEmpty()) {
 			deck.addAll(stockpile);
 			stockpile.removeAll(stockpile);
 			this.shuffle();

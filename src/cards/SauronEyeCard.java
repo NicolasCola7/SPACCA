@@ -1,5 +1,6 @@
 package cards;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 public class SauronEyeCard extends ActionCard{

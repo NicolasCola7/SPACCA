@@ -15,14 +15,14 @@
       <Label layoutX="158.0" layoutY="138.0" text="Username" />
       <Label layoutX="160.0" layoutY="182.0" text="Password" />
       <PasswordField fx:id="psw" layoutX="226.0" layoutY="178.0" />
-      <PasswordField fx:id="pswCheck" layoutX="226.0" layoutY="224.0" />
+      <PasswordField fx:id="confirmPsw" layoutX="226.0" layoutY="224.0" />
       <Label layoutX="107.0" layoutY="228.0" text="Conferma Password" />
       <Label layoutX="110.0" layoutY="39.0" text="Registrazione Amministratore">
          <font>
             <Font size="29.0" />
          </font>
       </Label>
-      <TextField fx:id="username" layoutX="225.0" layoutY="134.0" />
+      <TextField fx:id="adminUsername" layoutX="225.0" layoutY="134.0" />
       <Text fx:id="errorMsg" fill="#ef0707" layoutX="140.0" layoutY="103.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username già in uso o password di conferma errata, riprova!" visible="false" />
    </children>
 </AnchorPane>

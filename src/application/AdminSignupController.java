@@ -28,17 +28,17 @@ public class AdminSignupController implements Initializable {
 	private Stage stage;
 	private Parent root;
 	@FXML private PasswordField psw;
-	@FXML private PasswordField pswCheck;
-	@FXML private TextField username;
+	@FXML private PasswordField confirmPsw;
+	@FXML private TextField adminUsername;
 	@FXML private Text errorMsg;
 	@FXML private Button registerButton;
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		registerButton.disableProperty().bind(
-				Bindings.isEmpty(username.textProperty()).or(
+				Bindings.isEmpty(adminUsername.textProperty()).or(
 				Bindings.isEmpty(psw.textProperty()).or(
-				Bindings.isEmpty(pswCheck.textProperty()))));
+				Bindings.isEmpty(confirmPsw.textProperty()))));
 		
 	}
 	
@@ -53,26 +53,30 @@ public class AdminSignupController implements Initializable {
 		boolean checkUser=true;
 		boolean checkPsw=true;
 		try {
-		Scanner scf = new Scanner(new File("./Files/ConfigurationFiles/Login.csv"));
-        while (scf.hasNextLine()) {
-        	String[] line= scf.nextLine().split(",");
-        	if(line[0].equals(username.getText())) {
-        		checkUser=false;
-        	}
-        }
+			Scanner scan = new Scanner(new File("./Files/ConfigurationFiles/Login.csv"));
+	        while (scan.hasNextLine()) {
+	        	String[] line= scan.nextLine().split(",");
+	        	if(line[0].equals(adminUsername.getText())) {
+	        		checkUser=false;
+	        		break;
+	        	}
+	        }
 		}
 		catch(FileNotFoundException e) {
 			System.out.println("File not found");
 		}
-		if(!psw.getText().equals(pswCheck.getText())) {
+		
+		if(!psw.getText().equals(confirmPsw.getText())) {
 			checkPsw=false;
 		}
-		if(checkUser==true && checkPsw==true) {
-			FileWriter fw = new FileWriter("./Files/Login.csv", true);
-    		PrintWriter pw = new PrintWriter(fw);
-    		pw.print(username.getText()+","+psw.getText());
-    		pw.println();
-    		pw.close();
+		
+		if(checkUser && checkPsw) {
+			addNewAdmin();
+    		createPlayersList();
+    		updateCurrentAdmin();
+    		createClassicGamesLeaderboard();
+    		createTournamentsLeaderboard();
+    		
 			root = FXMLLoader.load(getClass().getResource("Admin.fxml"));
 			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 			scene=new Scene(root);
@@ -84,5 +88,49 @@ public class AdminSignupController implements Initializable {
 			errorMsg.setVisible(true);
 			
 	}
-	
+	private void createPlayersList() {
+		try {
+			PrintWriter playersList=new PrintWriter("./Files/ConfigurationFiles/"+adminUsername.getText()+"ListaGiocatori.csv");
+			playersList.close();
+		} catch (FileNotFoundException e) {// 
+			e.printStackTrace();
+		}
+	}
+	private void updateCurrentAdmin() {
+		PrintWriter actualAdmin;
+		try {
+			actualAdmin = new PrintWriter("./Files/ConfigurationFiles/AdminAttuale.csv");
+			actualAdmin.println(adminUsername.getText());
+			actualAdmin.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	private void addNewAdmin() {
+		try {
+			FileWriter fw = new FileWriter("./Files/ConfigurationFiles/Login.csv", true);
+			PrintWriter pw = new PrintWriter(fw);
+			pw.print(adminUsername.getText()+","+psw.getText());
+			pw.println();
+			pw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	private void createTournamentsLeaderboard() {
+		try {
+			PrintWriter playersList=new PrintWriter("./Files/ConfigurationFiles/"+adminUsername.getText()+"TournamenstLeaderboard.csv");
+			playersList.close();
+		} catch (FileNotFoundException e) {// 
+			e.printStackTrace();
+		}
+	}
+	private void createClassicGamesLeaderboard() {
+		try {
+			PrintWriter playersList=new PrintWriter("./Files/ConfigurationFiles/"+adminUsername.getText()+"ClassicGamesLeaderboard.csv");
+			playersList.close();
+		} catch (FileNotFoundException e) {// 
+			e.printStackTrace();
+		}
+	}
 }

@@ -1,19 +1,27 @@
 
 package cards;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
 
 
-public class Game {
+public class Game implements Serializable{
+
+	private static final long serialVersionUID = 5021983098796754824L;
 	private Deck deck;
 	private CharactersDeck chDeck;
 	private ArrayList<Player> players;
@@ -21,9 +29,16 @@ public class Game {
 	private ArrayList<String> playersNames;
 	private  int nOfPlayers;;
 	private String admin;
-	private  File datas=new File("./Files/ConfigurationFiles/GamesDatas.csv");
-	private Alert alert;
+	private  transient File datas=new File("./Files/ConfigurationFiles/GamesDatas.csv");
+	private transient Alert alert;
 	private int turn;
+	private int currentPlayer;
+	private transient SimpleBooleanProperty hasDrawed;
+	private transient SimpleBooleanProperty hasAttacked;
+	private transient SimpleBooleanProperty hasDiscarded;
+	private boolean hasDrawedValue;
+	private boolean hasAttackedValue;
+	private boolean hasDiscardedValue;
 	
 	public Game(String code, String admin) {
 		gameCode=code;
@@ -33,6 +48,11 @@ public class Game {
 		insertPlayers();
 		buildPlayersHands();
 		turn=1;
+		currentPlayer=0;
+		hasDrawedValue=false;
+		hasDiscardedValue=false;
+		hasAttackedValue=false;
+		initializeProperties();
 	}
 	private void buildPlayersHands() {
 		players=new ArrayList<Player>();
@@ -64,7 +84,7 @@ public class Game {
 		}
 	}
 	
-	private void eliminatePlayer(int i) {
+	public void eliminatePlayer(int i) {
 		players.remove(i);
 		playersNames.remove(i);
 		nOfPlayers--;
@@ -88,6 +108,8 @@ public class Game {
 		ActionCard submittedActionCard=(ActionCard)attackingPlayer.getHand().get(submittedCard);
 		switch(submittedActionCard.getName()) {
 			case "AttackCard":{
+				hasAttackedValue=true;
+				hasAttacked.set(hasAttackedValue);
 				AttackCard ac=new AttackCard();
 				ac.onUse(attackingPlayer,targetPlayer, deck);
 				if(targetPlayer.getCharacter().getCurrentLife()<=0) {// caso in cui con l'attacco si elimina un giocatore
@@ -96,9 +118,10 @@ public class Game {
 					alert.setTitle("Messaggio informativo");
 					alert.setHeaderText(null);
 					alert.setContentText("Hai eliminato "+targetPlayer.getUsername()+".");
+					alert.showAndWait();
 				}
 				if(attackingPlayer.getCharacter().getCurrentLife()<=0) { // caso in cui l'attaccate venga eliminato dal veleno di vedova nera
-					this.eliminatePlayer(currentPlayer);
+					//this.eliminatePlayer(currentPlayer);
 					alert=new Alert(Alert.AlertType.INFORMATION);
 					alert.setTitle("Messaggio informativo");
 					alert.setHeaderText(null);
@@ -110,19 +133,24 @@ public class Game {
 			case "SauronEyeCard":{
 				SauronEyeCard sec=new SauronEyeCard();
 				sec.onUse(players, attackingPlayer, deck);
-				ArrayList<String> eliminated=new ArrayList<String>();
-				for(int i=0;i<players.size();i++) { // controllo se ho eliminato qualce giocatore utilizzano l'occhio di sauron
-					if(players.get(i).getCharacter().getCurrentLife()<=0 && players.get(i).getUsername()!=attackingPlayer.getUsername()) {
-						eliminated.add(players.get(i).getUsername());
+				String eliminated="";
+				int index=0;
+				while(index<players.size()){ // controllo se ho eliminato qualce giocatore utilizzano l'occhio di sauron
+					if(players.get(index).getCharacter().getCurrentLife()<=0 && players.get(index).getUsername()!=attackingPlayer.getUsername()) {
+						eliminated=(eliminated.length()>1 ? eliminated+","+players.get(index).getUsername():players.get(index).getUsername());
+						this.eliminatePlayer(index);
+						index=(index==0?0:index-1);
 					}
+					else
+						index++;
 				}
 				alert=new Alert(Alert.AlertType.INFORMATION);
 				alert.setTitle("Messaggio informativo");
 				alert.setHeaderText(null);
-				if(eliminated.size()!=0) 
-					alert.setContentText("Hai inflitto 15 p.ti danno ha tutti i giocatori, e hai eliminato "+eliminated.toString());
+				if(eliminated.length()>1) 
+					alert.setContentText("Hai inflitto 20 p.ti danno a tutti i giocatori, e hai eliminato "+eliminated);
 				else
-					alert.setContentText("Hai inflitto 15 p.ti danno ha tutti i giocatori!");
+					alert.setContentText("Hai inflitto 20 p.ti danno ha tutti i giocatori!");
 				alert.showAndWait();
 				
 				break;
@@ -161,6 +189,7 @@ public class Game {
 				break;
 			}
 		}
+		this.currentPlayer=currentPlayer;
 		attackingPlayer.getHand().remove(submittedCard);	
 	}
 	public boolean submitStaticCard(int submittedCard, int player) {// per static cards
@@ -185,6 +214,7 @@ public class Game {
 			else
 				check=false;
 		}
+		this.currentPlayer=player;
 		return check;
 	}
 	public boolean submitWeaponCard(int submittedCard, int player) { // per weapon cards
@@ -210,6 +240,7 @@ public class Game {
 			else
 				check=false;
 		}
+		this.currentPlayer=player;
 		return check;
 	}
 	public void submitEventCard(int submittedCard, int player, int target) { // per event cards
@@ -239,17 +270,24 @@ public class Game {
 				break;
 			}
 		}
+		this.currentPlayer=player;
 		currentPlayer.getHand().remove(submittedCard);
 	}
 	public void discardCard(int currentPlayer,int selectedCard) { //scarta una carta
 		deck.addToStockPile(this.getCurrentPlayersHand(currentPlayer).remove(selectedCard));
+		this.currentPlayer=currentPlayer;
+		hasDiscardedValue=true;
+		hasDiscarded.set(hasDiscardedValue); //HasDiscarded diventa true in modo che il giocatore corrente non possa scartare più di una carta
 	}
 	public void changeTurn() {//cambio turno
 		turn++;
 	}
 	public Card drawCard(int currentPlayer) {//metodo per pescare la carta e aggiungerla alla mano 
 		Card c=deck.drawCard();
+		this.currentPlayer=currentPlayer;
 		this.getCurrentPlayersHand(currentPlayer).add(c);
+		hasDrawedValue=true;
+		hasDrawed.set(hasDrawedValue); // hasDrawed diventa true cosi che il giocatore non possa pescare più di una carta per turno in quanto viene disattivato il bottone per pescare
 		return c;
 	}
 	public ArrayList<Card> getCurrentPlayersHand(int currentPlayer){// ritorna la mano del gicatore corrente
@@ -273,7 +311,37 @@ public class Game {
 	public int getTurn() {
 		return turn;
 	}
-	
-			
+	public int getCurrentPlayer() {
+		return currentPlayer;
+	}
+	public void setCurrentPlayer(int currentPlayer) {
+		this.currentPlayer=currentPlayer;
+	}
+	public SimpleBooleanProperty getHasDrawed() {
+		return hasDrawed;
+	}
+	public SimpleBooleanProperty getHasAttacked() {
+		return hasAttacked;
+	}
+	public SimpleBooleanProperty getHasDiscarded() {
+		return hasDiscarded;
+	}
+	public void setHasDrawed(boolean value) {
+		hasDrawedValue=value;
+		hasDrawed.set(hasDrawedValue);
+	}
+	public void setHasAttacked(boolean value) {
+		hasAttackedValue=value;
+		hasAttacked.set(hasAttackedValue);
+	}
+	public void setHasDiscarded(boolean value) {
+		hasDiscardedValue=value;
+		hasDiscarded.set(hasDiscardedValue);
+	}
+	public void initializeProperties() {
+		hasDrawed=new SimpleBooleanProperty(hasDrawedValue);
+		hasDiscarded=new SimpleBooleanProperty(hasDiscardedValue);
+		hasAttacked=new SimpleBooleanProperty(hasAttackedValue);
+	}
 }
 	

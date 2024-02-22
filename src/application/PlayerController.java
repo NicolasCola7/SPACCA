@@ -78,12 +78,9 @@ public class PlayerController implements Initializable{
 				GameController gameController=loader.getController();
 	            gameController.setGameCode(gameCode.getText());
 	            gameController.setAdminUsername(adminUsername);
-	            // Create a new stage
-	            Stage gameStage = new Stage();
-	            gameStage.setTitle("Game");
-	            gameStage.setScene(scene);
-	            // Show the new stage
-	            gameStage.show();
+				stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+				stage.setScene(scene);
+				stage.show();
             } catch (IOException e) {
 				System.out.println("File not found");
 				e.printStackTrace();

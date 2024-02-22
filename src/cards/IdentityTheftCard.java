@@ -1,6 +1,8 @@
 package cards;
 
-public class IdentityTheftCard extends EventCard{
+import java.io.Serializable;
+
+public class IdentityTheftCard extends EventCard {
 	public IdentityTheftCard() {
 		super("IdentityTheftCard",Seed.NS);
 	}

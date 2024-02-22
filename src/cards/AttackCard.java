@@ -12,7 +12,7 @@ public class AttackCard extends ActionCard{
 	private boolean firstCheck(Character aC, Character tC) {
 		
 		// primo controllo per l'esito dell'attacco
-		if(aC.rollPrecision() && !tC.rollLuck())  // se la precisione dell'ttaccante è true e la fortuna dell'attaccato è false l'attacco può essere eseguito
+		if(aC.rollPrecision())  // se la precisione dell'ttaccante è true e la fortuna dell'attaccato è false l'attacco può essere eseguito
 			return true;
 		else if(!aC.rollPrecision()){// se la precisione è false, l'attacco non è eseguito
 			Alert alert=new Alert(Alert.AlertType.INFORMATION);
@@ -54,8 +54,8 @@ public class AttackCard extends ActionCard{
 		Character tC=targetPlayer.getCharacter();
 		deck.addToStockPile(this); 
 	
-		 if(targetPlayer.hasRing()) {//casio in cui l'attaccato abbia l'anello nella board
-			tC.increaseLuck(1); //aumenta la fortuna dell' attaccato grazuie all'anello
+		 if(attackingPlayer.hasRing()) {//caso in cui l'attaccato abbia l'anello nella board
+			tC.increasePrecision(1); //aumenta la fortuna dell' attaccato grazuie all'anello
 			
 			if(firstCheck(aC,tC) && secondCheck(attackingPlayer, targetPlayer,deck)) { //eseguo i due controlli, se sono entrambi true, l'attacco parte
 				Alert alert=new Alert(Alert.AlertType.INFORMATION);
@@ -64,7 +64,17 @@ public class AttackCard extends ActionCard{
 				alert.setContentText("Attacco eseguito con successo!");
 				alert.showAndWait();
 				tC.decreaseLife(attackingPlayer.getAttackPower()); //diminusco la vita dell'attaccato
-				tC.resetLuck(); //resetto la fortuna dell'attaccato che era aumentata grazie all'anello
+				tC.resetPrecision(); //resetto la fortuna dell'attaccato che era aumentata grazie all'anello
+			}
+			if(targetPlayer.hasEnchantedMirror()) {//se l'attacco è partito e l'attaccato ha lo specchio incantato, l'attaccante si autocolpisce danni
+				EnchantedMirrorCard em=new EnchantedMirrorCard();
+				em.getEffect(attackingPlayer);
+				targetPlayer.removeFromBoardInPosition(0);
+				Alert alert=new Alert(Alert.AlertType.INFORMATION);
+				alert.setTitle("Messaggio informativo");
+				alert.setHeaderText(null);
+				alert.setContentText("Sei stato incantato dallo specchio, ti sei autocolpito!");
+				alert.showAndWait();
 			}
 		}
 		
@@ -80,24 +90,46 @@ public class AttackCard extends ActionCard{
 				tC.decreaseLife(attackingPlayer.getAttackPower());
 				aC.resetPrecision();
 			}
+			if(targetPlayer.hasEnchantedMirror()) {//se l'attacco è partito e l'attaccato ha lo specchio incantato, l'attaccante si autocolpisce danni
+				EnchantedMirrorCard em=new EnchantedMirrorCard();
+				em.getEffect(attackingPlayer);
+				targetPlayer.removeFromBoardInPosition(0);
+				Alert alert=new Alert(Alert.AlertType.INFORMATION);
+				alert.setTitle("Messaggio informativo");
+				alert.setHeaderText(null);
+				alert.setContentText("Sei stato incantato dallo specchio, ti sei autocolpito!");
+				alert.showAndWait();
+			}
 		}
 	
 		else { //caso in cui l'attaccato non ha  anello ne maledizione azteca
 			if(firstCheck(aC,tC) && secondCheck(attackingPlayer, targetPlayer,deck)) {
+				tC.decreaseLife(attackingPlayer.getAttackPower());
+				Alert alert=new Alert(Alert.AlertType.INFORMATION);
+				alert.setTitle("Messaggio informativo");
+				alert.setHeaderText(null);
+				alert.setContentText("Attacco eseguito con successo!");
+				alert.showAndWait();
 				if(targetPlayer.hasBlackWidowsPoison()) {//se l'attacco è partito e l'attaccato ha il veleno di vedova nera, l'attaccante subisce 5 danni
 					BlackWidowsPoisonCard bwp=new BlackWidowsPoisonCard();
 					bwp.getEffect(attackingPlayer);
-					Alert alert=new Alert(Alert.AlertType.INFORMATION);
 					alert.setTitle("Messaggio informativo");
 					alert.setHeaderText(null);
-					alert.setContentText("Attacco eseguito con successo! Ma sei anche stato avvelenato dal veleno di vedova nera, hai perso 5 punti vita.");
+					alert.setContentText("Sei anche stato avvelenato dal veleno di vedova nera, hai perso 5 punti vita.");
 					alert.showAndWait();
-					tC.decreaseLife(attackingPlayer.getAttackPower());
+				}
+				if(targetPlayer.hasEnchantedMirror()) {//se l'attacco è partito e l'attaccato ha lo specchio incantato, l'attaccante si autocolpisce danni
+					EnchantedMirrorCard em=new EnchantedMirrorCard();
+					em.getEffect(attackingPlayer);
+					targetPlayer.removeFromBoardInPosition(0);
+					alert.setTitle("Messaggio informativo");
+					alert.setHeaderText(null);
+					alert.setContentText("Sei stato incantato dallo specchio, ti sei autocolpito!");
+					alert.showAndWait();
 				}
 			}
 		}
 	}
-
 }
 		
 	

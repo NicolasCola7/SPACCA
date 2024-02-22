@@ -1,6 +1,7 @@
 package application;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -32,19 +33,16 @@ public class NewPlayerController implements Initializable {
 	private Scene scene;
 	private Stage stage;
 	private Parent root;
-	@FXML
-	private Button addButton;
-	@FXML
-	private TextField playerUsername;
-	@FXML
-	private Label msg;
-	private String nomeFile;
+	@FXML private Button addButton;
+	@FXML private TextField playerUsername;
+	@FXML private Label msg;
 	private String adminUsername;
 	private File playersList;
 	private ArrayList<String> players;
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
+		getCurrentAdmin();
 		 addButton.disableProperty().bind(Bindings.isEmpty(playerUsername.textProperty()));
 	}
 	
@@ -70,24 +68,18 @@ public class NewPlayerController implements Initializable {
 	}
 
 	public void addPlayer(ActionEvent event) throws IOException {
-		
-		Scanner scan = new Scanner(new File("./Files/ConfigurationFiles/AdminAttuale.csv"));
-        while (scan.hasNextLine()) {
-        	String line=scan.nextLine();
-        	adminUsername=line;
-        }
+		String name=playerUsername.getText();
         playersList=new File("./Files/ConfigurationFiles/"+adminUsername+"ListaGiocatori.csv");
-		scan = new Scanner(playersList);
+		Scanner scan = new Scanner(playersList);
 		players=new ArrayList<String>();
 		while(scan.hasNextLine()) {
 			String player=scan.nextLine();
 			players.add(player);	
 		}
-        	if(!players.contains(playerUsername.getText())) {
-        		FileWriter fw = new FileWriter(playersList, true);
-				PrintWriter pw = new PrintWriter(fw);
-				pw.println(playerUsername.getText());
-				pw.close();
+        	if(!players.contains(name)) {
+        		addToPlayersList();
+        		addToClassicGamesLeaderboard(name);
+        		addToTournamentsLeaderboard(name);
 				msg.setVisible(true);
 				msg.setText("Giocatore aggiunto correttamente!");
 				msg.setTextFill(Color.GREEN);
@@ -99,7 +91,48 @@ public class NewPlayerController implements Initializable {
 				msg.setTextFill(Color.RED);
 				playerUsername.clear();
         	}
-        
 	}
-	
+	private void addToPlayersList() {
+		try {
+			FileWriter fw = new FileWriter(playersList, true);
+			PrintWriter pw = new PrintWriter(fw);
+			pw.println(playerUsername.getText());
+			pw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	private void getCurrentAdmin() {	
+		try {
+			Scanner scan = new Scanner(new File("./Files/ConfigurationFiles/AdminAttuale.csv"));
+			  while (scan.hasNextLine()) {
+		        	String line=scan.nextLine();
+		        	adminUsername=line;
+		        }
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	private void addToClassicGamesLeaderboard(String player) {
+		File leaderboard=new File("./Files/ConfigurationFiles/"+adminUsername+"ClassigGamesLeaderboard.csv");
+		try {
+			FileWriter fw = new FileWriter(leaderboard, true);
+			PrintWriter pw = new PrintWriter(fw);
+			pw.println(player+","+0);
+			pw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	private void addToTournamentsLeaderboard(String player) {
+		File leaderboard=new File("./Files/ConfigurationFiles/"+adminUsername+"TournamentsLeaderboard.csv");
+		try {
+			FileWriter fw = new FileWriter(leaderboard, true);
+			PrintWriter pw = new PrintWriter(fw);
+			pw.println(player+","+0);
+			pw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

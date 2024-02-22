@@ -1,4 +1,5 @@
 package cards;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -9,14 +10,17 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
-public class Player {
-
+public class Player implements Serializable{
+	
 	private String username;
 	private Character character;
 	private StaticCard[] board;
 	private WeaponCard equipedWeapon;
 	private int attackPower;
 	private ArrayList<Card> hand;
+	private int position;
+	private int classicGamesWon;
+	private int tournamentsWon;
 	
 	public Player(String name,Character ch) {
 		username = name;
@@ -42,14 +46,14 @@ public class Player {
 	public boolean addToBoard(StaticCard sc) { //si potrebbe fare che quando vine chiamato il metodo e ritorna false, si mostra un alert che chiede se si vuole sostituire la carta già posizionata con quella nuovo
 		boolean check=true;
 		if(board[0]==null && board[1]==null) {
-			if(sc instanceof ShieldCard || sc instanceof HologramCard)
+			if(sc instanceof ShieldCard || sc instanceof HologramCard || sc instanceof EnchantedMirrorCard)
 				board[0]=sc;
 			else
 				board[1]=sc;
 			return true;
 		}
 		else if(board[0]==null && board[1]!=null) {
-			if(sc instanceof ShieldCard || sc instanceof HologramCard) {
+			if(sc instanceof ShieldCard || sc instanceof HologramCard || sc instanceof EnchantedMirrorCard) {
 				board[0]=sc;
 				check=true;
 			}
@@ -58,7 +62,7 @@ public class Player {
 			return check;
 		}
 		else if(board[0]!=null && board[1]==null) {
-			if(sc instanceof ShieldCard || sc instanceof HologramCard)
+			if(sc instanceof ShieldCard || sc instanceof HologramCard || sc instanceof EnchantedMirrorCard)
 				check=false;
 			else {
 				check=true;
@@ -90,7 +94,7 @@ public class Player {
 	}
 	public StaticCard removeFromBoard(StaticCard sc) {
 		StaticCard temp=null;
-		if(sc instanceof ShieldCard || sc instanceof HologramCard) {
+		if(sc instanceof ShieldCard || sc instanceof HologramCard || sc instanceof EnchantedMirrorCard) {
 			temp=board[0];
 			board[0]=null;
 		}
@@ -123,8 +127,8 @@ public class Player {
 			return false;
 	}
 				
-	public boolean hasHorcrux() {
-		if(board[1]!=null && board[1] instanceof HorcruxCard) 
+	public boolean hasEnchantedMirror() {
+		if(board[0]!=null && board[0] instanceof EnchantedMirrorCard) 
 			return true;
 		else
 			return false;
@@ -156,6 +160,23 @@ public class Player {
 			return true;
 		else
 			return false;
-	
+	}
+	public int getPosition() {
+		return position;
+	}
+	public void setPosition(int position) {
+		this.position = position;
+	}
+	public int getClassicGamesWon() {
+		return classicGamesWon;
+	}
+	public void increaseClassicGamesWon() {
+		classicGamesWon++;
+	}
+	public int getTournamentsWon() {
+		return tournamentsWon;
+	}
+	public void increaseTournamentsWon() {
+		tournamentsWon++;
 	}
 }	

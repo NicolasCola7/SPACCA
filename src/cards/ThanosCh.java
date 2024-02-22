@@ -1,7 +1,10 @@
 package cards;
-public class ThanosCh extends Character{
+
+import java.io.Serializable;
+
+public class ThanosCh extends Character {
 
 	public ThanosCh() {
-		super("Thanos",Seed.MV,70,10,6,5);
+		super("Thanos",Seed.MV,70,10,6);
 	}
 }

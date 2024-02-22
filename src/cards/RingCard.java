@@ -9,7 +9,7 @@ public class RingCard extends StaticCard{
 		rand = new Random();
 	}
 	public void getEffect(Player targetPlayer) {
-		targetPlayer.getCharacter().increaseLuck(1);
+		
 	}
 	
 }

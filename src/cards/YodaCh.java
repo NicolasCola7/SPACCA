@@ -1,7 +1,10 @@
 package cards;
-public class YodaCh extends Character{
+
+import java.io.Serializable;
+
+public class YodaCh extends Character {
 
 	public YodaCh() {
-		super("Yoda",Seed.SW,90,9,8,0);
+		super("Yoda",Seed.SW,90,9,8);
 	}
 }

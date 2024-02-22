@@ -1,12 +1,13 @@
 package cards;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Scanner;
 
 
-public class CharactersDeck {
+public class CharactersDeck implements Serializable{
 	private LinkedList<Character> charactersDeck;
 	
 	public CharactersDeck(){

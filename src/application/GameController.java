@@ -1,6 +1,5 @@
 /*TODO
  * chiarire gli attributi precisione e fortuna nei personaggi e relativi metodi
- * controllare quando viene eliminato un giocatore o attaccando, o con la carta occhio di suron oppure con il veleno, e vedere come adattare il currentPlayer(es se attacco e vengo eliminato dal veleno, elimino anche l'altro giocatore oppure no
  * gestire nella classe game e GameGontroller la carta statica HorcruxCard
  * pausa partita e salvataggio
  * leaderboard
@@ -26,6 +25,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -35,6 +35,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -43,7 +44,12 @@ import javafx.stage.Stage;
 
 import java.beans.EventHandler;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,7 +64,7 @@ public class GameController implements Initializable{
 	private String  adminUsername;
 	private Game game;
 	private int currentPlayer;
-	private int nOfPlayers;
+	private int actualNumberOfPlayers;
 	private SimpleBooleanProperty hasDrawed;
 	private SimpleBooleanProperty hasAttacked;
 	private SimpleBooleanProperty hasDiscarded;
@@ -75,7 +81,7 @@ public class GameController implements Initializable{
 	@FXML private Button submitPlayerButton;
 	@FXML private Button characterInfosButton;
 	@FXML private Button playersInfosButton;
-	@FXML private Button boardButton;
+	@FXML private Button boardInfosButton;
 	@FXML private HBox cardsBox;
 	@FXML private VBox infoBox;
 	
@@ -83,26 +89,37 @@ public class GameController implements Initializable{
 	private final Insets MARGIN =new Insets(10, 2, 10, 2); // sono le spaziature tra le carte
 	private ArrayList<ToggleButton> currentPlayerHand;
 	private ArrayList<String> players;
+	private Scene scene;
+	private Stage stage;
+	private Parent root;
 	
 	public void setGameCode(String code) { // metodo che viene chiamato dal playerController per settare il gameCode
 		gameCode=code;
 	}
+	
 	public void setAdminUsername(String name) { //metodo che viene chiamato dal playerController per settare l'adminUsername
 		adminUsername=name;
 	}
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) { // inizializza la partita 
-		
-		Platform.runLater(() -> { // metodo da capire meglio, serve a ritardare le istruzioni al suo interno dato che quando si passano dati da un altro controller (PlayerController in questo caso)  il metodo initialize viene eseguito prima dei metodi utilizzati nel controller che passa i dati,in guesto caso setGameCode() e setAdminUsername()
-			game=new Game(gameCode,adminUsername);
-			currentPlayer=0;
-			initializeCardsBox(currentPlayer);
+		Platform.runLater(() -> {// metodo da capire meglio, serve a ritardare le istruzioni al suo interno dato che quando si passano dati da un altro controller (PlayerController in questo caso)  il metodo initialize viene eseguito prima dei metodi utilizzati nel controller che passa i dati,in guesto caso setGameCode() e setAdminUsername()
+			if(isSerialized("./Files/ConfigurationFiles/"+gameCode+".ser")){
+				game=deserialize("./Files/ConfigurationFiles/"+gameCode+".ser");
+				currentPlayer=game.getCurrentPlayer();
+				game.initializeProperties();
+				initializeCardsBox(currentPlayer);
+				}
+			else {
+				game=new Game(gameCode,adminUsername);
+				currentPlayer=0;
+				initializeCardsBox(currentPlayer);
+			}
 	    });  
 	}
 	private void initializeCardsBox(int currentPlayer) { // inizializza la UI del giocatore corrente
 		currentPlayerHand=new ArrayList<ToggleButton>();
-		nOfPlayers=game.getNOfPlayers();
+		actualNumberOfPlayers=game.getNOfPlayers();
 		players=game.getPlayers();
 		turnLabel.setText(game.getTurn()+"° turno");
 		playerUsernameLabel.setText("Username:"+game.getPlayer(currentPlayer).getUsername());
@@ -113,12 +130,12 @@ public class GameController implements Initializable{
 			addToCardsBox(btn);
 		}
 		setBindings();
-		System.out.println(group.selectedToggleProperty().getName());
+		
 	}
 	private void setBindings() { // serve a fare in modo che i bottoni vengano disattivati e attivati  in determinate situazioni
-		hasDrawed=new SimpleBooleanProperty(false);
-		hasAttacked=new SimpleBooleanProperty(false);
-		hasDiscarded=new SimpleBooleanProperty(false);
+		hasDrawed=game.getHasDrawed();
+		hasAttacked=game.getHasAttacked();
+		hasDiscarded=game.getHasDiscarded();
 		isSelected=new SimpleBooleanProperty(false);
 		isSelectedAttackCard=new SimpleBooleanProperty(false);
 		
@@ -133,7 +150,6 @@ public class GameController implements Initializable{
 		
     	drawCardButton.disableProperty().bind(hasDrawed); //disattiva il bottone per pescare se ha già pescato
 		discardCardButton.disableProperty().bind(hasDiscarded.or(isSelected)); //disattiva il bottone per scartare se il giocatore ha già scartato una carta o non ne ha selezionata alcuna
-		//submitPlayerButton.disableProperty().bind(hasDiscarded.not()); //disattiva il bottone per passare se il giocatore non ha scartato una carta
 		submitCardButton.disableProperty().bind(isSelected.or(hasAttacked.and(isSelectedAttackCard)));//disattiva il bottone per giocare una carta se non c'è alcuna carta selezionata, oppure se il giocatore ha già attaccato e la carta selezionata è una carta attacco
 	}
 	
@@ -160,8 +176,8 @@ public class GameController implements Initializable{
 							 "Arma equipaggiata:"+(game.getPlayer(currentPlayer).getEquipedWeapon()==null?"nessuna":game.getPlayer(currentPlayer).getEquipedWeapon().getName())+"\n"+
 							 "Potenza d'attacco:"+game.getPlayer(currentPlayer).getAttackPower()+"\n"+
 							 "Vita:"+character.getCurrentLife()+"\n"+
-							 "Precisione:"+character.getCurrentPrecision()+"\n"+
-							 "Fortuna:"+character.getCurrentLuck()+"\n");
+							 "Precisione:"+character.getCurrentPrecision()+"\n");
+							 
 		alert.showAndWait();
 	}
 	
@@ -190,14 +206,14 @@ public class GameController implements Initializable{
 		Card drawedCard=game.drawCard(currentPlayer);
 		ToggleButton btn=new ToggleButton(drawedCard.getName());
 		addToCardsBox(btn); // aggiunge la carta pescata alla UI del giocatore corrente
-		hasDrawed.set(true); // hasDrawed diventa true cosi che il giocatore non possa pescare più di una carta per turno in quanto viene disattivato il bottone per pescare
+		
 	}
 	
 	public void discardCard(ActionEvent event)throws IOException{ //per scartare una carta
 		ToggleButton btn=(ToggleButton) group.getSelectedToggle();
 		game.discardCard(currentPlayer,currentPlayerHand.indexOf(btn));
 		removeFromCardsBox(btn);// rimuove la carta scartata dalla UI del giocatore corrente
-		hasDiscarded.set(true); //HasDiscarde diventa false in odo che il giocatore corrente non possa scartare più di una carta
+		
 	}
 
 	public void submitCard(ActionEvent event)throws IOException{ // per giocare una carta
@@ -207,10 +223,10 @@ public class GameController implements Initializable{
 		ArrayList<String> toAttack=new ArrayList<String>(); // lista dei giocatori che possono essere attaccati
 		toAttack.addAll(players);
 		toAttack.remove(currentPlayer);
-		
+		int targetPlayer=0;
 		if(submittedCard instanceof ActionCard ) {
 			
-			if(submittedCard instanceof HealingPotionCard|| submittedCard instanceof SauronEyeCard ) { // in questo caso nel metodo passo 2 volte currentPlayer perchè per queste 2 carte non serve passare il target Player
+			if(submittedCard instanceof HealingPotionCard || submittedCard instanceof SauronEyeCard ) { // in questo caso nel metodo passo 2 volte currentPlayer perchè per queste 2 carte non serve passare il target Player
 				game.submitActionCard(submittedCardIndex, currentPlayer,currentPlayer);
 				 removeFromCardsBox(btn);
 			}
@@ -220,24 +236,15 @@ public class GameController implements Initializable{
 				dialog.setTitle("Selezione");
 		        dialog.setHeaderText("Seleziona un giocatore:");
 		        Optional<String> result = dialog.showAndWait();
-		        int targetPlayer=players.indexOf(dialog.getSelectedItem());
+		        targetPlayer=players.indexOf(dialog.getSelectedItem());
 		        if(result.isPresent() || result.get()!=null ) { //il metodo submitActionCard viene chiamato solo se viene selezionato un giocatore da attaccare
 		        	game.submitActionCard(submittedCardIndex, currentPlayer,targetPlayer);
 		        	 removeFromCardsBox(btn);
-		 			if(submittedCard instanceof AttackCard ) { // se era una carta attacco hasAttacked diventa true in modo che se la prossima carta selezionata  è una carta attacco, il bottone per usarla viene disattivato
-			        	hasAttacked.set(true);
-			        	if(game.getPlayer(targetPlayer).getCharacter().getCurrentLife()<=0 && targetPlayer<currentPlayer)// vede se con l'attacco ho eliminato l'avversario, e se l'ho fatto e lui era prima di me, scalo l'indice del giocatore corrente di uno
-			        		currentPlayer--;
-		 			}
-		        }
-		        else
-		        	System.out.print("");
-		        if(submittedCard instanceof BoardingCard) { // in questo caso aggiorno la mano per vedere la carta rubata dalla mano dell'avversario selezionato
+		      
+		        if(submittedCard instanceof BoardingCard) // in questo caso aggiorno la mano per vedere la carta rubata dalla mano dell'avversario selezionato
 		        	refreshCardsBox(currentPlayer);
-		        }
-		        
+		        }		
 			}
-	        		
 		}
 		else if(submittedCard instanceof EventCard) {
 			
@@ -246,18 +253,15 @@ public class GameController implements Initializable{
 				 removeFromCardsBox(btn);
 			}
 			else {
-				
 				ChoiceDialog<String> dialog = new ChoiceDialog<>(toAttack.get(0),toAttack);
 				dialog.setTitle("Selezione");
 		        dialog.setHeaderText("Seleziona un giocatore:");
-		        int targetPlayer=players.indexOf(dialog.getSelectedItem());
 		        Optional<String> result = dialog.showAndWait();
+		        targetPlayer=players.indexOf(dialog.getSelectedItem());
 		        if(result.isPresent() || result.get()!=null ) {
 		        	game.submitEventCard(submittedCardIndex, currentPlayer,targetPlayer);
 		        	 removeFromCardsBox(btn);
 		        }
-		        if(submittedCard instanceof DoomsdayCard && targetPlayer<currentPlayer)  // vede se con l'attacco ho eliminato l'avversario, e se l'ho fatto e lui era prima di me, scalo l'indice del giocatore corrente di uno
-	        		currentPlayer--;
 			}
 		}
 		else if(submittedCard instanceof WeaponCard) {
@@ -270,20 +274,52 @@ public class GameController implements Initializable{
 				 removeFromCardsBox(btn);
 			}
 		}
+		
+	/*  System.out.println("target:"+targetPlayer);
+		System.out.println("current:"+currentPlayer);
+		System.out.println("current size:"+actualNumberOfPlayers);
+		System.out.println("real size:"+players.size()); */
+	
+		if(players.size()<actualNumberOfPlayers && targetPlayer<currentPlayer) {//controllo che serve per quando viene eliminato un giocatore che in ordine di giocata è prima del giocatore corrente
+			if(currentPlayer==actualNumberOfPlayers-1 || actualNumberOfPlayers>3)
+				currentPlayer=currentPlayer-(actualNumberOfPlayers-players.size());
+			else
+				currentPlayer--;
+		}
+		
+		if(game.getPlayer(currentPlayer).getCharacter().getCurrentLife()<=0) {//serve a gestire il caso in cui il giocatore corrente venga eliminato dal veleno di vedova nera
+			game.eliminatePlayer(currentPlayer);
+			if(currentPlayer==actualNumberOfPlayers-1 || players.size()<actualNumberOfPlayers) {
+				
+				if(players.size()==0) { // gestisco l'eccezione del caso in gli ultimi 2 giocatori si eliminano a vicenda
+					try {
+						throw new NoWinnerException("Partita terminata in pareggio, non ci sono vincitori!");
+					}catch(NoWinnerException exception) {
+						Alert alert=new Alert(Alert.AlertType.INFORMATION);
+						alert.setTitle("Messaggio informativo");
+						alert.setHeaderText(null);
+						alert.setContentText(exception.getMessage());
+						alert.showAndWait();
+						disableButtons();	
+					}
+				}
+				else
+					updateCurrentPlayer(currentPlayer);
+			}
+			else
+				refreshCardsBox(currentPlayer);
+		}
+		
 		if(game.isGameOver()) //controlla se è rimasto solo un giocatore 
 			endGame(currentPlayer);
 	}
 	
 	public void submitPlayer(ActionEvent event)throws IOException{ //passa la giocata al prossimo giocatore
-		nOfPlayers=game.getNOfPlayers();
-		if(currentPlayer==nOfPlayers-1) {
-			currentPlayer=0;
-			game.changeTurn();
-		}
-		else
-			currentPlayer++;
-		refreshCardsBox(currentPlayer);
-	
+		updateCurrentPlayer(currentPlayer);
+		game.setCurrentPlayer(currentPlayer);
+		game.setHasAttacked(false);
+		game.setHasDiscarded(false);
+		game.setHasDrawed(false);
 	}
 	
 	private void removeFromCardsBox(ToggleButton btn) { //rimuove una determinata carta/bottone dalla UI
@@ -302,25 +338,118 @@ public class GameController implements Initializable{
 		HBox.setMargin(btn, MARGIN);
 	}
 	
+	private void updateCurrentPlayer(int currentPlayer) {
+		actualNumberOfPlayers=game.getNOfPlayers();
+		if(currentPlayer>=actualNumberOfPlayers-1) {
+			this.currentPlayer=0;
+			game.changeTurn();
+		}
+		else
+			this.currentPlayer++;
+		refreshCardsBox(this.currentPlayer);
+	}
+	
 	private void refreshCardsBox(int currentPlayer) { //aggiorna la UI
 		group.getToggles().clear();
 		cardsBox.getChildren().clear();
 		currentPlayerHand.clear();
 		initializeCardsBox(currentPlayer);
 	}
+	
 	private void endGame(int currentPlayer) { //termina il gioco
 		Alert alert=new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle("Messaggio informativo");
 		alert.setHeaderText(null);
-		alert.setContentText("Congratulazioni "+players.get(currentPlayer)+", hai vinto la partita!");
-		alert.showAndWait();
+		if(players.size()==0) {
+			try {
+				
+				throw new NoWinnerException("Partita terminata in pareggio, non ci sono vincitori!");
+				
+	        } catch ( NoWinnerException e) {
+				alert.setContentText(e.getMessage());
+				alert.showAndWait();
+		    }
+		}
+		else {
+			alert.setContentText("Congratulazioni "+players.get(currentPlayer)+", hai vinto la partita!");
+			alert.showAndWait();
+		}
+		disableButtons();
+	}
+	private void disableButtons() {
 		submitCardButton.setDisable(true);
 		drawCardButton.setDisable(true);
 		submitPlayerButton.setDisable(true);
 		discardCardButton.setDisable(true);
 		characterInfosButton.setDisable(true);
 		playersInfosButton.setDisable(true);
-		boardButton.setDisable(true);
+		boardInfosButton.setDisable(true);
 	}
 	
+	public void serialize(String filename) {
+		
+        try {
+            FileOutputStream fileOut = new FileOutputStream(filename);
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(game);
+            out.close();
+            fileOut.close();
+            System.out.println("serialized successfully");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    // Static method to deserialize the GameController
+    public  Game deserialize(String filename) {
+       Game game = null;
+        try {
+            FileInputStream fileIn = new FileInputStream(filename);
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            game = (Game) in.readObject();
+            in.close();
+            fileIn.close();
+            System.out.println("deserialized successfully");
+           
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return game;
+    }
+    private  boolean isSerialized(String filename) {
+        File file = new File(filename);
+        return file.exists();
+    }
+    public void saveAndQuit(ActionEvent event) throws IOException{
+    	String serializationFile="./Files/ConfigurationFiles/"+gameCode+".ser";
+    	serialize(serializationFile);
+    	Alert alert=new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("Logout");
+		alert.setHeaderText("Stai per uscire dalla partita!");
+		alert.setContentText("Sei sicuro di voler continuare?");
+		if(alert.showAndWait().get()==ButtonType.OK) {
+			root = FXMLLoader.load(getClass().getResource("home.fxml"));
+			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+			scene=new Scene(root);
+			stage.setScene(scene);
+			stage.show();
+		}
+	}
+   public void save(ActionEvent event) throws IOException{
+	   serialize("./Files/ConfigurationFiles/"+gameCode+".ser");
+   }
+   
+   public void quit(ActionEvent event) throws IOException{
+		Alert alert=new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("Logout");
+		alert.setHeaderText("Stai per uscire dalla partita senza salvare i progressi!");
+		alert.setContentText("Sei sicuro di voler continuare?");
+		if(alert.showAndWait().get()==ButtonType.OK) {
+			root = FXMLLoader.load(getClass().getResource("home.fxml"));
+			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+			scene=new Scene(root);
+			stage.setScene(scene);
+			stage.show();
+		}
+   }
 }

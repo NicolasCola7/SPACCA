@@ -39,29 +39,17 @@ public class EditExistingController implements Initializable {
 	private ArrayList<String> players;
 	private String adminUsername;
 	private File playersList;
-	private Scanner scan;
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-		players=new ArrayList<String>();
-		try {
-			scan = new Scanner(new File("./Files/ConfigurationFiles/AdminAttuale.csv"));
+		getCurrentAdmin();
+		getPlayersNames();
+		Leaderboard classicGamesLeaderboard=new Leaderboard("./Files/ConfigurationFiles/"+adminUsername+"ClassicGamesLeaderboard.csv");
+		Leaderboard tournamentsLeaderboard=new Leaderboard("./Files/ConfigurationFiles/"+adminUsername+"TournamentsLeaderboard.csv");
 		
-        while (scan.hasNextLine()) {
-        	String line=scan.nextLine();
-        	adminUsername=line;
-        }
-        playersList=new File("./Files/ConfigurationFiles/"+adminUsername+"ListaGiocatori.csv");
-		scan = new Scanner(playersList);
-		while(scan.hasNextLine()) {
-			players.add(scan.nextLine());
-		}
 		selectedPlayer.getItems().addAll(players);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
 		deleteButton.disableProperty().bind(selectedPlayer.valueProperty().isNull());
-		modifyButton.disableProperty().bind(Bindings.isNull(selectedPlayer.valueProperty()).or(Bindings.isEmpty(newPlayerName.textProperty())));
+		modifyButton.disableProperty().bind(selectedPlayer.valueProperty().isNull().or(newPlayerName.textProperty().isEmpty()));
 
 	}
 	public void goToHome(ActionEvent event) throws IOException {
@@ -92,46 +80,65 @@ public class EditExistingController implements Initializable {
 		alert.setHeaderText("Stai per eliminare il giocatore selezionato");
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if (alert.showAndWait().get()== ButtonType.OK) {
-			 if (selectedName != null) {
-				 	selectedPlayer.getSelectionModel().clearSelection();
-		            players.remove(selectedName);
-		            selectedPlayer.getItems().remove(selectedName);
-		            saveNamesToFile();
-		            
-		        }
+		 	selectedPlayer.getSelectionModel().clearSelection();
+            players.remove(selectedName);
+            selectedPlayer.getItems().remove(selectedName);
+            updatePlayersList();
 		}
 	}
-	 private void saveNamesToFile() {
-	        try {
-	        	PrintWriter pw=new PrintWriter(playersList);
-	            for (String name : players) {
-	                pw.println(name);
-	            }
-	        	pw.close();
-	        } catch (IOException e) {
-	            e.printStackTrace();
-	        }
-	    }
+	
 	public void renamePlayer(ActionEvent event) {
 		String selectedName = selectedPlayer.getSelectionModel().getSelectedItem();
-		 if (selectedName != null && !players.contains(newPlayerName.getText())) {
-			 	selectedPlayer.getSelectionModel().clearSelection();
-	            players.remove(selectedName);
-	            selectedPlayer.getItems().remove(selectedName);  
-            	players.add(newPlayerName.getText());
-            	selectedPlayer.getItems().add(newPlayerName.getText());
-            	saveNamesToFile();
-            	newPlayerName.clear();
+		 if (!players.contains(newPlayerName.getText())) {
+		 	selectedPlayer.getSelectionModel().clearSelection();
+            players.remove(selectedName);
+            selectedPlayer.getItems().remove(selectedName);  
+        	players.add(newPlayerName.getText());
+        	selectedPlayer.getItems().add(newPlayerName.getText());
+        	updatePlayersList();
+        	newPlayerName.clear();
         }
         else {
-	        	alert = new Alert(Alert.AlertType.WARNING);
-	        	alert.setTitle("Errore");
-	        	alert.setHeaderText("Impossibile modificare nome del giocatore selezionato:");
-	        	alert.setContentText("Esiste già un giocatore con lo stesso nome!");
-	        	alert.showAndWait();
-	        	newPlayerName.clear();
+        	alert = new Alert(Alert.AlertType.WARNING);
+        	alert.setTitle("Errore");
+        	alert.setHeaderText("Impossibile modificare nome del giocatore selezionato:");
+        	alert.setContentText("Esiste già un giocatore con lo stesso nome!");
+        	alert.showAndWait();
+        	newPlayerName.clear();
         }
 	}
-	
-	
+	 private void updatePlayersList() {
+        try {
+        	PrintWriter pw=new PrintWriter(playersList);
+            for (String name : players) {
+                pw.println(name);
+            }
+        	pw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+	private void getCurrentAdmin() {	
+		try {
+			Scanner scan = new Scanner(new File("./Files/ConfigurationFiles/AdminAttuale.csv"));
+			  while (scan.hasNextLine()) {
+		        	String line=scan.nextLine();
+		        	adminUsername=line;
+		        }
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	private void getPlayersNames() {
+		players=new ArrayList<String>();
+		playersList=new File("./Files/ConfigurationFiles/"+adminUsername+"ListaGiocatori.csv");
+		try {
+			Scanner scan = new Scanner(playersList);
+			while(scan.hasNextLine()) {
+				players.add(scan.nextLine());
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
 }

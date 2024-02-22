@@ -1,5 +1,8 @@
 package cards;
-public class WeaponCard extends Card{
+
+import java.io.Serializable;
+
+public class WeaponCard extends Card {
 
 	private int damage;
 	
