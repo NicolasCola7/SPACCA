@@ -33,7 +33,7 @@ public class LoginAdminController implements Initializable{
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-		 loginButton.disableProperty().bind(Bindings.isEmpty(adminUsername.textProperty()).or(Bindings.isEmpty(psw.textProperty())));
+		 loginButton.disableProperty().bind(adminUsername.textProperty().isEmpty().or(psw.textProperty().isEmpty()));
 
 	}
 	public void goToHome(ActionEvent event) throws IOException {

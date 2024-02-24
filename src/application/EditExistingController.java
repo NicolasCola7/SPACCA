@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 
+import cards.GameType;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
@@ -39,13 +40,16 @@ public class EditExistingController implements Initializable {
 	private ArrayList<String> players;
 	private String adminUsername;
 	private File playersList;
+	private Leaderboard classicGamesLeaderboard;
+	private Leaderboard tournamentsLeaderboard;
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		getCurrentAdmin();
 		getPlayersNames();
-		Leaderboard classicGamesLeaderboard=new Leaderboard("./Files/ConfigurationFiles/"+adminUsername+"ClassicGamesLeaderboard.csv");
-		Leaderboard tournamentsLeaderboard=new Leaderboard("./Files/ConfigurationFiles/"+adminUsername+"TournamentsLeaderboard.csv");
+		
+		classicGamesLeaderboard=new Leaderboard(adminUsername,GameType.CLASSIC);
+		tournamentsLeaderboard=new Leaderboard(adminUsername,GameType.TOURNAMENT);
 		
 		selectedPlayer.getItems().addAll(players);
 		deleteButton.disableProperty().bind(selectedPlayer.valueProperty().isNull());
@@ -84,6 +88,8 @@ public class EditExistingController implements Initializable {
             players.remove(selectedName);
             selectedPlayer.getItems().remove(selectedName);
             updatePlayersList();
+            classicGamesLeaderboard.deleteFromLeaderboard(selectedName);
+            tournamentsLeaderboard.deleteFromLeaderboard(selectedName);
 		}
 	}
 	
@@ -96,6 +102,8 @@ public class EditExistingController implements Initializable {
         	players.add(newPlayerName.getText());
         	selectedPlayer.getItems().add(newPlayerName.getText());
         	updatePlayersList();
+        	classicGamesLeaderboard.renamePlayerInLeaderboard(selectedName,newPlayerName.getText());
+            tournamentsLeaderboard.renamePlayerInLeaderboard(selectedName,newPlayerName.getText());
         	newPlayerName.clear();
         }
         else {
@@ -141,4 +149,6 @@ public class EditExistingController implements Initializable {
 			e.printStackTrace();
 		}
 	}
+	
+	
 }

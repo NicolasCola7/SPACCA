@@ -43,7 +43,7 @@ public class NewPlayerController implements Initializable {
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		getCurrentAdmin();
-		 addButton.disableProperty().bind(Bindings.isEmpty(playerUsername.textProperty()));
+		 addButton.disableProperty().bind(playerUsername.textProperty().isEmpty());
 	}
 	
 	public void goToHome(ActionEvent event) throws IOException {
@@ -114,7 +114,7 @@ public class NewPlayerController implements Initializable {
 		}
 	}
 	private void addToClassicGamesLeaderboard(String player) {
-		File leaderboard=new File("./Files/ConfigurationFiles/"+adminUsername+"ClassigGamesLeaderboard.csv");
+		File leaderboard=new File("./Files/ConfigurationFiles/"+adminUsername+"ClassicGamesLeaderboard.csv");
 		try {
 			FileWriter fw = new FileWriter(leaderboard, true);
 			PrintWriter pw = new PrintWriter(fw);

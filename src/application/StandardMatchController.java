@@ -53,6 +53,7 @@ import java.util.Arrays;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 
+import cards.GameType;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -81,44 +82,28 @@ public class StandardMatchController implements Initializable {
 	@FXML private ChoiceBox<Integer> numberOfPlayerSelection;
 	@FXML private CheckBox botCheck;
 	@FXML private TextField gameCode;
-	@FXML private Alert alert;
 	@FXML private Button confirmButton;
 	private ArrayList<String> players;
 	private String adminUsername;
 	private File playersList;
-	private Scanner scan;
+	private int numberOfPlayers;
+	private ArrayList<String> gamePlayers;
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-		players=new ArrayList<String>();
-		try {
-			scan = new Scanner(new File("./Files/ConfigurationFiles/AdminAttuale.csv"));
+		getCurrentAdmin();
+	    populatePlayersList();   
+		numberOfPlayerSelection.getItems().addAll(2,3,4,5); 
+		Leaderboard classicGamesLeaderboard=new Leaderboard(adminUsername,GameType.CLASSIC);
 		
-	        while (scan.hasNextLine()) {
-	        	String riga=scan.nextLine();
-	        	adminUsername=riga;
-	        }
-	        playersList=new File("./Files/ConfigurationFiles/"+adminUsername+"ListaGiocatori.csv");
-			scan = new Scanner(playersList);
-			while(scan.hasNextLine()) {
-				players.add(scan.nextLine());
-			}
-		
-		playersSelection.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-		playersSelection.getItems().addAll(players);
-		numberOfPlayerSelection.getItems().addAll(2,3,4,5);  
-		} catch (FileNotFoundException e) {
-			System.out.println("File not found");
-			e.printStackTrace();
-		}
 		confirmButton.disableProperty().bind(
-					Bindings.isEmpty(gameCode.textProperty())
-				.or(Bindings.isNull(numberOfPlayerSelection.valueProperty()))
-				.or(Bindings.isEmpty(playersSelection.getSelectionModel().getSelectedItems())));
+				gameCode.textProperty().isEmpty().or(
+				numberOfPlayerSelection.valueProperty().isNull().or(
+				playersSelection.getSelectionModel().selectedItemProperty().isNull())));
 	}
 	
 	public void goToHome(ActionEvent event) throws IOException {
-		alert=new Alert(AlertType.CONFIRMATION);
+		Alert alert=new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Logout");
 		alert.setHeaderText("Stai per effettuare il logout!");
 		alert.setContentText("Sei sicuro di voler continuare?");
@@ -138,46 +123,16 @@ public class StandardMatchController implements Initializable {
 		stage.show();
 	}
 	
-	private boolean gameCodeCheck(String code){
-		boolean check=true;
-		try {
-			scan=new Scanner(new File("./Files/ConfigurationFiles/GamesDatas.csv"));
-		
-		while(scan.hasNextLine()) {
-			String[] gameInfos=scan.nextLine().split(",");
-			if(gameInfos[2].equals(code))
-				check=false;
-			else
-				check=true;
-		}
-		} catch (FileNotFoundException e) {
-			System.out.println("File not found");
-			e.printStackTrace();
-		}
-		return check;
-	}
-	public void confirm(ActionEvent e) {
-		int numberOfPlayers=numberOfPlayerSelection.getSelectionModel().getSelectedItem();
-		ArrayList<String> gamePlayers=new ArrayList<String>( numberOfPlayers);
+	public void confirm(ActionEvent e) throws IOException {
+		numberOfPlayers=numberOfPlayerSelection.getSelectionModel().getSelectedItem();
+		gamePlayers=new ArrayList<String>( numberOfPlayers);
 		gamePlayers.addAll(playersSelection.getSelectionModel().getSelectedItems());
 		if((botCheck.isSelected() && gamePlayers.size()!= numberOfPlayers) || (!botCheck.isSelected() && gamePlayers.size()== numberOfPlayers) && gameCodeCheck(gameCode.getText())) {
 			for(int i=gamePlayers.size();i< numberOfPlayers;i++)
 				gamePlayers.add(i,"bot");
-			
-			try {
-				FileWriter writer = new FileWriter(new File("./Files/ConfigurationFiles/GamesDatas.csv"),true);
-			
-				PrintWriter pw=new PrintWriter(writer);
-				String datas=adminUsername+",classic,"+gameCode.getText()+","+numberOfPlayers+","+gamePlayers.get(0);
-				for(int i=1;i< numberOfPlayers;i++)
-					datas+=","+gamePlayers.get(i);
-				pw.println(datas);
-				pw.close();
-				gameCode.clear();
-				botCheck.setSelected(false);
-				playersSelection.getSelectionModel().clearSelection();
-				numberOfPlayerSelection.getSelectionModel().clearSelection();
-				alert=new Alert(AlertType.CONFIRMATION);
+				addToGamesDatasFile();
+				
+				Alert alert=new Alert(AlertType.CONFIRMATION);
 				alert.setTitle("Attenzione!");
 				alert.setHeaderText("Partita creata correttamente:");
 				alert.setContentText("Vuoi tornare alla home?");
@@ -188,25 +143,86 @@ public class StandardMatchController implements Initializable {
 					stage.setScene(scene);
 					stage.show();
 				}
-			} catch (IOException e1) {
-				System.out.println("File not found");
-				e1.printStackTrace();
-			}
+			
 		}
 		else if(!botCheck.isSelected() && gamePlayers.size()!= numberOfPlayers) {
-			alert = new Alert(Alert.AlertType.ERROR);
+			Alert alert = new Alert(Alert.AlertType.ERROR);
 			alert.setTitle("Errore");
 			alert.setHeaderText("Giocatori selezionati insufficienti o troppi:");
 			alert.setContentText("Seleziona "+numberOfPlayers+" giocatori per continuare!");
 			alert.showAndWait();
 		}
 		else if(gameCodeCheck(gameCode.getText())==false) {
-			alert = new Alert(Alert.AlertType.ERROR);
+			Alert alert = new Alert(Alert.AlertType.ERROR);
 			alert.setTitle("Errore");
 			alert.setHeaderText("Codice partita già uso:");
 			alert.setContentText("Inserisci un nuovo codice partita!");
 			alert.showAndWait();
 			gameCode.clear();
+		}
+	}
+	private void getCurrentAdmin() {	
+		try {
+			Scanner scan = new Scanner(new File("./Files/ConfigurationFiles/AdminAttuale.csv"));
+			  while (scan.hasNextLine()) {
+		        	String line=scan.nextLine();
+		        	adminUsername=line;
+		        }
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	private void populatePlayersList() {
+		players=new ArrayList<String>();
+		playersList=new File("./Files/ConfigurationFiles/"+adminUsername+"ListaGiocatori.csv");
+	
+		try {
+			Scanner scan = new Scanner(playersList);
+			while(scan.hasNextLine()) {
+				players.add(scan.nextLine());
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		playersSelection.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		playersSelection.getItems().addAll(players);
+	}
+	
+	private boolean gameCodeCheck(String code){
+		boolean check=true;
+		File file=new File("./Files/ConfigurationFiles/GamesDatas.csv");
+		
+		if(file.length()!=0) {
+			try {
+				Scanner scan=new Scanner(file);
+				while(scan.hasNextLine()) {
+					String[] gameInfos=scan.nextLine().split(",");
+					if(gameInfos[2].equals(code))
+						check=false;
+					else
+						check=true;
+				}
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+		return check;
+	}
+	private void addToGamesDatasFile() {
+		try {
+			FileWriter writer = new FileWriter(new File("./Files/ConfigurationFiles/GamesDatas.csv"),true);
+			PrintWriter pw=new PrintWriter(writer);
+			String datas=adminUsername+",classic,"+gameCode.getText()+","+numberOfPlayers+","+gamePlayers.get(0);
+			for(int i=1;i< numberOfPlayers;i++)
+				datas+=","+gamePlayers.get(i);
+			pw.println(datas);
+			pw.close();
+			gameCode.clear();
+			botCheck.setSelected(false);
+			playersSelection.getSelectionModel().clearSelection();
+			numberOfPlayerSelection.getSelectionModel().clearSelection();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 }

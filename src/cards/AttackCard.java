@@ -63,7 +63,6 @@ public class AttackCard extends ActionCard{
 				alert.setHeaderText(null);
 				alert.setContentText("Attacco eseguito con successo!");
 				alert.showAndWait();
-				tC.decreaseLife(attackingPlayer.getAttackPower()); //diminusco la vita dell'attaccato
 				tC.resetPrecision(); //resetto la fortuna dell'attaccato che era aumentata grazie all'anello
 			}
 			if(targetPlayer.hasEnchantedMirror()) {//se l'attacco è partito e l'attaccato ha lo specchio incantato, l'attaccante si autocolpisce danni
@@ -76,6 +75,8 @@ public class AttackCard extends ActionCard{
 				alert.setContentText("Sei stato incantato dallo specchio, ti sei autocolpito!");
 				alert.showAndWait();
 			}
+			else 
+				tC.decreaseLife(attackingPlayer.getAttackPower()); //diminusco la vita dell'attaccato
 		}
 		
 		else if(targetPlayer.hasAztecCurse()) {// caso in cui l'attaccato abbia la maledizione azteca nella board
@@ -87,7 +88,6 @@ public class AttackCard extends ActionCard{
 				alert.setHeaderText(null);
 				alert.setContentText("Attacco eseguito con successo!");
 				alert.showAndWait();
-				tC.decreaseLife(attackingPlayer.getAttackPower());
 				aC.resetPrecision();
 			}
 			if(targetPlayer.hasEnchantedMirror()) {//se l'attacco è partito e l'attaccato ha lo specchio incantato, l'attaccante si autocolpisce danni
@@ -100,11 +100,12 @@ public class AttackCard extends ActionCard{
 				alert.setContentText("Sei stato incantato dallo specchio, ti sei autocolpito!");
 				alert.showAndWait();
 			}
+			else
+				tC.decreaseLife(attackingPlayer.getAttackPower());
 		}
 	
 		else { //caso in cui l'attaccato non ha  anello ne maledizione azteca
 			if(firstCheck(aC,tC) && secondCheck(attackingPlayer, targetPlayer,deck)) {
-				tC.decreaseLife(attackingPlayer.getAttackPower());
 				Alert alert=new Alert(Alert.AlertType.INFORMATION);
 				alert.setTitle("Messaggio informativo");
 				alert.setHeaderText(null);
@@ -127,6 +128,8 @@ public class AttackCard extends ActionCard{
 					alert.setContentText("Sei stato incantato dallo specchio, ti sei autocolpito!");
 					alert.showAndWait();
 				}
+				else
+					tC.decreaseLife(attackingPlayer.getAttackPower());
 			}
 		}
 	}

@@ -39,7 +39,7 @@ public class Deck implements Serializable{
 			    	for(int i=0;i<copy;i++)
 					      deck.add(new RingCard());
 			        break;
-			    case "EnchantedMirror":
+			    case "Enchanted Mirror":
 			    	for(int i=0;i<copy;i++)
 					      deck.add(new EnchantedMirrorCard());
 			        break;

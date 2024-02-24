@@ -17,7 +17,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
-
+import application.Leaderboard;
 
 public class Game implements Serializable{
 
@@ -39,6 +39,8 @@ public class Game implements Serializable{
 	private boolean hasDrawedValue;
 	private boolean hasAttackedValue;
 	private boolean hasDiscardedValue;
+	private GameType gameType;
+	private  transient Leaderboard leaderboard;
 	
 	public Game(String code, String admin) {
 		gameCode=code;
@@ -53,6 +55,10 @@ public class Game implements Serializable{
 		hasDiscardedValue=false;
 		hasAttackedValue=false;
 		initializeProperties();
+		if(gameType.equals(GameType.TOURNAMENT))
+			leaderboard=new Leaderboard(admin,GameType.TOURNAMENT);
+		else
+			leaderboard=new Leaderboard(admin,GameType.CLASSIC);
 	}
 	private void buildPlayersHands() {
 		players=new ArrayList<Player>();
@@ -67,7 +73,7 @@ public class Game implements Serializable{
 			while(scan.hasNextLine()) {
 				String[] line=scan.nextLine().split(",");
 				if(line[2].equals(gameCode)) {
-					
+					gameType=(line[1]=="tournament"?GameType.TOURNAMENT:GameType.CLASSIC);
 					nOfPlayers=Integer.parseInt(line[3]);
 					playersNames=new ArrayList<String>(nOfPlayers);
 					for(int i=0;i<nOfPlayers;i++) {
@@ -317,6 +323,9 @@ public class Game implements Serializable{
 	public void setCurrentPlayer(int currentPlayer) {
 		this.currentPlayer=currentPlayer;
 	}
+	public Leaderboard getLeaderboard() {
+		return leaderboard;
+	}
 	public SimpleBooleanProperty getHasDrawed() {
 		return hasDrawed;
 	}
@@ -342,6 +351,9 @@ public class Game implements Serializable{
 		hasDrawed=new SimpleBooleanProperty(hasDrawedValue);
 		hasDiscarded=new SimpleBooleanProperty(hasDiscardedValue);
 		hasAttacked=new SimpleBooleanProperty(hasAttackedValue);
+	}
+	public GameType getGameType() {
+		return gameType;
 	}
 }
 	

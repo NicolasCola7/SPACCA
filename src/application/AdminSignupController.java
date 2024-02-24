@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 
+import cards.GameType;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -35,10 +36,9 @@ public class AdminSignupController implements Initializable {
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-		registerButton.disableProperty().bind(
-				Bindings.isEmpty(adminUsername.textProperty()).or(
-				Bindings.isEmpty(psw.textProperty()).or(
-				Bindings.isEmpty(confirmPsw.textProperty()))));
+		registerButton.disableProperty().bind(adminUsername.textProperty().isEmpty().or(
+				psw.textProperty().isEmpty().or(
+				confirmPsw.textProperty().isEmpty())));
 		
 	}
 	
@@ -74,8 +74,8 @@ public class AdminSignupController implements Initializable {
 			addNewAdmin();
     		createPlayersList();
     		updateCurrentAdmin();
-    		createClassicGamesLeaderboard();
-    		createTournamentsLeaderboard();
+    		Leaderboard classicGamesLeaderboard=new Leaderboard(adminUsername.getText(),GameType.CLASSIC);
+    		Leaderboard tournamentsLeaderboard=new Leaderboard(adminUsername.getText(),GameType.TOURNAMENT);
     		
 			root = FXMLLoader.load(getClass().getResource("Admin.fxml"));
 			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
@@ -117,20 +117,5 @@ public class AdminSignupController implements Initializable {
 			e.printStackTrace();
 		}
 	}
-	private void createTournamentsLeaderboard() {
-		try {
-			PrintWriter playersList=new PrintWriter("./Files/ConfigurationFiles/"+adminUsername.getText()+"TournamenstLeaderboard.csv");
-			playersList.close();
-		} catch (FileNotFoundException e) {// 
-			e.printStackTrace();
-		}
-	}
-	private void createClassicGamesLeaderboard() {
-		try {
-			PrintWriter playersList=new PrintWriter("./Files/ConfigurationFiles/"+adminUsername.getText()+"ClassicGamesLeaderboard.csv");
-			playersList.close();
-		} catch (FileNotFoundException e) {// 
-			e.printStackTrace();
-		}
-	}
+	
 }

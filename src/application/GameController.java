@@ -1,9 +1,4 @@
 /*TODO
- * chiarire gli attributi precisione e fortuna nei personaggi e relativi metodi
- * gestire nella classe game e GameGontroller la carta statica HorcruxCard
- * pausa partita e salvataggio
- * leaderboard
- * gestire fine partita(ritorno alla home e assegnazione di punteggi per la leaderbord)
  * implementare il bot
  * torneo
  * grafica
@@ -19,6 +14,8 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -33,22 +30,29 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Labeled;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.beans.EventHandler;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
@@ -57,6 +61,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.Scanner;
 
 
 public class GameController implements Initializable{
@@ -89,9 +94,6 @@ public class GameController implements Initializable{
 	private final Insets MARGIN =new Insets(10, 2, 10, 2); // sono le spaziature tra le carte
 	private ArrayList<ToggleButton> currentPlayerHand;
 	private ArrayList<String> players;
-	private Scene scene;
-	private Stage stage;
-	private Parent root;
 	
 	public void setGameCode(String code) { // metodo che viene chiamato dal playerController per settare il gameCode
 		gameCode=code;
@@ -117,7 +119,7 @@ public class GameController implements Initializable{
 			}
 	    });  
 	}
-	private void initializeCardsBox(int currentPlayer) { // inizializza la UI del giocatore corrente
+	private void initializeCardsBox(int currentPlayer) {// inizializza la UI del giocatore corrente
 		currentPlayerHand=new ArrayList<ToggleButton>();
 		actualNumberOfPlayers=game.getNOfPlayers();
 		players=game.getPlayers();
@@ -165,7 +167,7 @@ public class GameController implements Initializable{
 		alert.showAndWait();	
 	}
 	
-	public void seeCharacterInfos(ActionEvent event) throws IOException{ //permette di vedere le informazioni relative al personaggio del giocatore corrente
+	public void seeCharacterInfos(ActionEvent event) throws IOException{//permette di vedere le informazioni relative al personaggio del giocatore corrente
 		Character character=game.getPlayer(currentPlayer).getCharacter();
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle("Informazione");
@@ -275,19 +277,23 @@ public class GameController implements Initializable{
 			}
 		}
 		
-	/*  System.out.println("target:"+targetPlayer);
+	    System.out.println("target:"+targetPlayer);
 		System.out.println("current:"+currentPlayer);
 		System.out.println("current size:"+actualNumberOfPlayers);
-		System.out.println("real size:"+players.size()); */
+		System.out.println("real size:"+players.size()); 
 	
 		if(players.size()<actualNumberOfPlayers && targetPlayer<currentPlayer) {//controllo che serve per quando viene eliminato un giocatore che in ordine di giocata è prima del giocatore corrente
-			if(currentPlayer==actualNumberOfPlayers-1 || actualNumberOfPlayers>3)
+			if(currentPlayer==actualNumberOfPlayers-1 || actualNumberOfPlayers>3) {
 				currentPlayer=currentPlayer-(actualNumberOfPlayers-players.size());
-			else
+			}
+			else {
 				currentPlayer--;
+			}
+			game.setCurrentPlayer(currentPlayer);
+			actualNumberOfPlayers=game.getNOfPlayers();
 		}
 		
-		if(game.getPlayer(currentPlayer).getCharacter().getCurrentLife()<=0) {//serve a gestire il caso in cui il giocatore corrente venga eliminato dal veleno di vedova nera
+		if(game.getPlayer(currentPlayer).getCharacter().getCurrentLife()<=0) {//serve a gestire il caso in cui il giocatore corrente venga eliminato dal veleno di vedova nera o dallo specchio
 			game.eliminatePlayer(currentPlayer);
 			if(currentPlayer==actualNumberOfPlayers-1 || players.size()<actualNumberOfPlayers) {
 				
@@ -300,7 +306,13 @@ public class GameController implements Initializable{
 						alert.setHeaderText(null);
 						alert.setContentText(exception.getMessage());
 						alert.showAndWait();
+						deleteSerializationFile();
 						disableButtons();	
+					}
+					if(game.getGameType().equals(GameType.CLASSIC))
+						deleteGameFromGamesDatasFile();
+					else {
+						//TODO gestire in caso di torneo
 					}
 				}
 				else
@@ -316,7 +328,6 @@ public class GameController implements Initializable{
 	
 	public void submitPlayer(ActionEvent event)throws IOException{ //passa la giocata al prossimo giocatore
 		updateCurrentPlayer(currentPlayer);
-		game.setCurrentPlayer(currentPlayer);
 		game.setHasAttacked(false);
 		game.setHasDiscarded(false);
 		game.setHasDrawed(false);
@@ -346,6 +357,7 @@ public class GameController implements Initializable{
 		}
 		else
 			this.currentPlayer++;
+		game.setCurrentPlayer(this.currentPlayer);
 		refreshCardsBox(this.currentPlayer);
 	}
 	
@@ -360,20 +372,11 @@ public class GameController implements Initializable{
 		Alert alert=new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle("Messaggio informativo");
 		alert.setHeaderText(null);
-		if(players.size()==0) {
-			try {
-				
-				throw new NoWinnerException("Partita terminata in pareggio, non ci sono vincitori!");
-				
-	        } catch ( NoWinnerException e) {
-				alert.setContentText(e.getMessage());
-				alert.showAndWait();
-		    }
-		}
-		else {
-			alert.setContentText("Congratulazioni "+players.get(currentPlayer)+", hai vinto la partita!");
-			alert.showAndWait();
-		}
+		alert.setContentText("Congratulazioni "+players.get(currentPlayer)+", hai vinto la partita!");
+		alert.showAndWait();
+		assignScore(players.get(currentPlayer));
+		deleteGameFromGamesDatasFile();
+		deleteSerializationFile();
 		disableButtons();
 	}
 	private void disableButtons() {
@@ -416,10 +419,17 @@ public class GameController implements Initializable{
         }
         return game;
     }
+    
     private  boolean isSerialized(String filename) {
         File file = new File(filename);
         return file.exists();
     }
+    
+    private void assignScore(String currentPlayerName) {
+    	if(currentPlayerName!="bot")
+    		game.getLeaderboard().increaseScore(currentPlayerName);
+    }
+    
     public void saveAndQuit(ActionEvent event) throws IOException{
     	String serializationFile="./Files/ConfigurationFiles/"+gameCode+".ser";
     	serialize(serializationFile);
@@ -428,13 +438,14 @@ public class GameController implements Initializable{
 		alert.setHeaderText("Stai per uscire dalla partita!");
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
-			root = FXMLLoader.load(getClass().getResource("home.fxml"));
-			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-			scene=new Scene(root);
-			stage.setScene(scene);
-			stage.show();
+			Stage stage = (Stage) ((MenuItem) event.getTarget()).getParentPopup().getOwnerWindow();
+	        Parent root = FXMLLoader.load(getClass().getResource("home.fxml"));
+	        Scene scene = new Scene(root);
+	        stage.setScene(scene);
+	        stage.show();
 		}
 	}
+    
    public void save(ActionEvent event) throws IOException{
 	   serialize("./Files/ConfigurationFiles/"+gameCode+".ser");
    }
@@ -445,11 +456,82 @@ public class GameController implements Initializable{
 		alert.setHeaderText("Stai per uscire dalla partita senza salvare i progressi!");
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
-			root = FXMLLoader.load(getClass().getResource("home.fxml"));
-			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-			scene=new Scene(root);
-			stage.setScene(scene);
-			stage.show();
+			Stage stage = (Stage) ((MenuItem) event.getTarget()).getParentPopup().getOwnerWindow();
+	        Parent root = FXMLLoader.load(getClass().getResource("home.fxml"));
+	        Scene scene = new Scene(root);
+	        stage.setScene(scene);
+	        stage.show();
 		}
+   }
+   
+   public void showLeaderboard(ActionEvent event)throws IOException{
+       TableView<LeaderboardData> leaderboard = new TableView<>();
+       TableColumn<LeaderboardData,Integer> positionColumn = new TableColumn<>("POSIZIONE");
+       TableColumn<LeaderboardData,String> nameColumn = new TableColumn<>("NOME");
+       TableColumn<LeaderboardData,Integer> scoreColumn = new TableColumn<>("VITTORIE");
+       
+       leaderboard.getColumns().addAll(positionColumn, nameColumn,scoreColumn);
+       
+       positionColumn.setCellValueFactory(new PropertyValueFactory<LeaderboardData,Integer>("position"));
+       nameColumn.setCellValueFactory(new PropertyValueFactory<LeaderboardData,String>("name"));
+       scoreColumn.setCellValueFactory(new PropertyValueFactory<LeaderboardData,Integer>("score"));
+      
+       ObservableList<LeaderboardData> data = getDataFromLeaderboardFile();
+       leaderboard.setItems(data);
+       
+       VBox vbox = new VBox(leaderboard);
+       
+       Scene scene = new Scene(vbox, 300, 200);
+       Stage popupLeaderboard = new Stage();
+       popupLeaderboard.setTitle("Leaderboard");
+       popupLeaderboard.setScene(scene);
+       popupLeaderboard.show();
+   }
+   
+   private  ObservableList<LeaderboardData> getDataFromLeaderboardFile() {
+	   ObservableList<LeaderboardData> data = FXCollections.observableArrayList();
+	   try {
+		   File leaderboardFile=new File("./Files/ConfigurationFiles/"+adminUsername+game.getGameType().toString()+"sLeaderboard.csv");
+		   Scanner scan=new Scanner(leaderboardFile);
+		   int position=1;
+		   while(scan.hasNextLine()){
+			   String[] line=scan.nextLine().split(",");
+			   String name=line[0];
+			   int score=Integer.parseInt(line[1]);
+			   data.add(new LeaderboardData(position,name,score));
+			   position++;
+		   }
+ 
+       } catch (FileNotFoundException e) {
+           e.printStackTrace(); 
+       }
+	   return data;
+   }
+   
+   private void deleteGameFromGamesDatasFile() {
+	   File file=new File("./Files/ConfigurationFiles/GamesDatas.csv");
+	   ArrayList<String> datas=new ArrayList<String>();
+	   try {
+		   Scanner scan=new Scanner(file);
+		   while(scan.hasNextLine()) {
+			   String line=scan.nextLine();
+			   String[] splittedLine=scan.nextLine().split(",");
+			   if(!splittedLine[3].equals(gameCode)) 
+				   datas.add(line);
+		   }
+		   PrintWriter pw=new PrintWriter(file);
+		   for(String line:datas)
+			   pw.println(line);
+		   pw.close();
+	   }
+	   catch(IOException e) {
+		   e.printStackTrace();
+	   }
+   }
+   
+   private void deleteSerializationFile() {
+	   File serializationFile= new File("./Files/ConfigurationFiles/"+gameCode+".ser");
+	   if(serializationFile.exists())
+		   serializationFile.delete();
    }
 }

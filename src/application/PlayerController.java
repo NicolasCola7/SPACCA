@@ -34,7 +34,7 @@ public class PlayerController implements Initializable{
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-		playButton.disableProperty().bind(Bindings.isEmpty(gameCode.textProperty()));
+		playButton.disableProperty().bind(gameCode.textProperty().isEmpty());
 	}
 	
 	public void goToHome(ActionEvent event) throws IOException {
@@ -44,28 +44,7 @@ public class PlayerController implements Initializable{
 		stage.setScene(scene);
 		stage.show();
 	}
-	private boolean checkGameCode(String code) {
-		boolean check=true;
-		File datas=new File("./Files/ConfigurationFiles/GamesDatas.csv");
-		Scanner scan;
-		try {
-			scan = new Scanner(datas);
-		while(scan.hasNextLine()) {
-			String[] line=scan.nextLine().split(",");
-			if(gameCode.getText().equals(line[2])) {
-				adminUsername=line[0];
-				check=true;
-				break;
-			}
-			else
-				check=false;
-		}
-		} catch (FileNotFoundException e) {
-			System.out.println("File not found");
-			e.printStackTrace();
-		}
-		return check;
-	}
+	
 	public void play(ActionEvent event)  {
 		if(checkGameCode(gameCode.getText())==true) {
 			
@@ -94,6 +73,29 @@ public class PlayerController implements Initializable{
 			alert.showAndWait();
 			gameCode.clear();
 		}	
+	}
+	
+	private boolean checkGameCode(String code) {
+		boolean check=true;
+		File datas=new File("./Files/ConfigurationFiles/GamesDatas.csv");
+		Scanner scan;
+		try {
+			scan = new Scanner(datas);
+		while(scan.hasNextLine()) {
+			String[] line=scan.nextLine().split(",");
+			if(gameCode.getText().equals(line[2])) {
+				adminUsername=line[0];
+				check=true;
+				break;
+			}
+			else
+				check=false;
+		}
+		} catch (FileNotFoundException e) {
+			System.out.println("File not found");
+			e.printStackTrace();
+		}
+		return check;
 	}
 	
 }
