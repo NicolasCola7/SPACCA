@@ -27,7 +27,7 @@ public class PlayerController implements Initializable{
 	private Stage stage;
 	private Parent root;
 	private Alert alert;
-	private GameController GameController;
+	private String gameType;
 	@FXML private TextField gameCode;
 	@FXML private Button playButton;
 	private String adminUsername;
@@ -47,22 +47,37 @@ public class PlayerController implements Initializable{
 	
 	public void play(ActionEvent event)  {
 		if(checkGameCode(gameCode.getText())==true) {
-			
-			//start match 
-		 	FXMLLoader loader = new FXMLLoader(getClass().getResource("Game.fxml"));
-		 	
-            try {
-				Parent gameScene = loader.load();
-				Scene scene=new Scene(gameScene);
-				GameController gameController=loader.getController();
-	            gameController.setGameCode(gameCode.getText());
-	            gameController.setAdminUsername(adminUsername);
-				stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-				stage.setScene(scene);
-				stage.show();
-            } catch (IOException e) {
-				System.out.println("File not found");
-				e.printStackTrace();
+			if(gameType.equals("classic")) {
+				FXMLLoader loader = new FXMLLoader(getClass().getResource("ClassicGame.fxml"));
+				
+				try {
+					Parent classicGameScene = loader.load();
+					Scene scene=new Scene(classicGameScene);
+					ClassicGameController classicGameController=loader.getController();
+		            classicGameController.setGameCode(gameCode.getText());
+		            classicGameController.setAdminUsername(adminUsername);
+		            stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+					stage.setScene(scene);
+					stage.show();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			else {
+				FXMLLoader loader = new FXMLLoader(getClass().getResource("Tournament.fxml"));
+				
+				try {
+					Parent tournamentScene = loader.load();
+					Scene scene=new Scene(tournamentScene);
+					TournamentController tournamentController=loader.getController();
+		            tournamentController.setGameCode(gameCode.getText());
+		            tournamentController.setAdminUsername(adminUsername);
+		            stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+					stage.setScene(scene);
+					stage.show();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		else {
@@ -85,6 +100,7 @@ public class PlayerController implements Initializable{
 			String[] line=scan.nextLine().split(",");
 			if(gameCode.getText().equals(line[2])) {
 				adminUsername=line[0];
+				gameType=line[1];
 				check=true;
 				break;
 			}

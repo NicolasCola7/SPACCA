@@ -68,7 +68,7 @@ public class NewPlayerController implements Initializable {
 	}
 
 	public void addPlayer(ActionEvent event) throws IOException {
-		String name=playerUsername.getText();
+		String name=playerUsername.getText().trim();
         playersList=new File("./Files/ConfigurationFiles/"+adminUsername+"ListaGiocatori.csv");
 		Scanner scan = new Scanner(playersList);
 		players=new ArrayList<String>();
@@ -76,7 +76,7 @@ public class NewPlayerController implements Initializable {
 			String player=scan.nextLine();
 			players.add(player);	
 		}
-        	if(!players.contains(name)) {
+        	if(!players.contains(name) && !name.equalsIgnoreCase("bot")) {
         		addToPlayersList();
         		addToClassicGamesLeaderboard(name);
         		addToTournamentsLeaderboard(name);
@@ -87,7 +87,7 @@ public class NewPlayerController implements Initializable {
         	}
         	else {
         		msg.setVisible(true);
-        		msg.setText("Giocatore già esistente!");
+        		msg.setText("Impossibile inserire questo giocatore, prova con un altro nome!");
 				msg.setTextFill(Color.RED);
 				playerUsername.clear();
         	}

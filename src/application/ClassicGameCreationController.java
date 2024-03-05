@@ -74,7 +74,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
-public class StandardMatchController implements Initializable {
+public class ClassicGameCreationController implements Initializable {
 	private Scene scene;
 	private Stage stage;
 	private Parent root;

@@ -8,7 +8,7 @@ public enum GameType {
         this.description = description;
     }
 
-    // Metodo toString personalizzato per restituire la descrizione
+    // Metodo toString per restituire la descrizione
     @Override
     public String toString() {
         return description;

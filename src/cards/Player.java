@@ -18,9 +18,7 @@ public class Player implements Serializable{
 	private WeaponCard equipedWeapon;
 	private int attackPower;
 	private ArrayList<Card> hand;
-	private int position;
-	private int classicGamesWon;
-	private int tournamentsWon;
+
 	
 	public Player(String name,Character ch) {
 		username = name;
@@ -29,12 +27,7 @@ public class Player implements Serializable{
 		hand=new ArrayList<Card>();
 		board=new StaticCard[2];
 	}
-	public Character getCharacter() {
-		return character;
-	}
-	public void setCharacter(Character c) {
-		character=c;
-	}
+	
 	public void setEquipedWeapon(WeaponCard w) {
 		equipedWeapon=w;
 		attackPower=equipedWeapon.getDamage()+character.getAttack();
@@ -52,6 +45,7 @@ public class Player implements Serializable{
 				board[1]=sc;
 			return true;
 		}
+		
 		else if(board[0]==null && board[1]!=null) {
 			if(sc instanceof ShieldCard || sc instanceof HologramCard || sc instanceof EnchantedMirrorCard) {
 				board[0]=sc;
@@ -61,6 +55,7 @@ public class Player implements Serializable{
 				check=false;
 			return check;
 		}
+		
 		else if(board[0]!=null && board[1]==null) {
 			if(sc instanceof ShieldCard || sc instanceof HologramCard || sc instanceof EnchantedMirrorCard)
 				check=false;
@@ -86,12 +81,6 @@ public class Player implements Serializable{
 			return character.getAttack();
 	}
 	
-	public String getUsername() {
-		return username;
-	}
-	public void setUsername(String username) {
-		this.username = username;
-	}
 	public StaticCard removeFromBoard(StaticCard sc) {
 		StaticCard temp=null;
 		if(sc instanceof ShieldCard || sc instanceof HologramCard || sc instanceof EnchantedMirrorCard) {
@@ -104,6 +93,7 @@ public class Player implements Serializable{
 		}
 		return temp;
 	}
+	
 	public StaticCard removeFromBoardInPosition(int position) { //rimuove dalla board una carta in una determinata posizione
 		StaticCard temp=board[position];
 		board[position]=null;
@@ -119,6 +109,7 @@ public class Player implements Serializable{
 	public ArrayList<Card> getHand(){
 		return hand;
 	}
+	
 	//di seguito tutti i metodi per controllare le carte nella board
 	public boolean hasRing() {
 		if(board[1]!=null && board[1] instanceof RingCard) 
@@ -161,22 +152,28 @@ public class Player implements Serializable{
 		else
 			return false;
 	}
-	public int getPosition() {
-		return position;
+	
+	public void resetAll() {
+		board=new StaticCard[2];
+		this.removeEquipedWeapon();
+		hand.clear();
+		character.resetLife();
 	}
-	public void setPosition(int position) {
-		this.position = position;
+	
+	public String getUsername() {
+		return username;
 	}
-	public int getClassicGamesWon() {
-		return classicGamesWon;
+	
+	public void setUsername(String username) {
+		this.username = username;
 	}
-	public void increaseClassicGamesWon() {
-		classicGamesWon++;
+	
+	public Character getCharacter() {
+		return character;
 	}
-	public int getTournamentsWon() {
-		return tournamentsWon;
+	
+	public void setCharacter(Character c) {
+		character=c;
 	}
-	public void increaseTournamentsWon() {
-		tournamentsWon++;
-	}
+	
 }	

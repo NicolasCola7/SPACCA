@@ -19,7 +19,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
 import application.Leaderboard;
 
-public class Game implements Serializable{
+public class ClassicGame implements Serializable{
 
 	private static final long serialVersionUID = 5021983098796754824L;
 	private Deck deck;
@@ -40,9 +40,9 @@ public class Game implements Serializable{
 	private boolean hasAttackedValue;
 	private boolean hasDiscardedValue;
 	private GameType gameType;
-	private  transient Leaderboard leaderboard;
+	private  Leaderboard leaderboard;
 	
-	public Game(String code, String admin) {
+	public ClassicGame(String code, String admin) {
 		gameCode=code;
 		this.admin=admin;
 		deck=new Deck();
@@ -124,14 +124,6 @@ public class Game implements Serializable{
 					alert.setTitle("Messaggio informativo");
 					alert.setHeaderText(null);
 					alert.setContentText("Hai eliminato "+targetPlayer.getUsername()+".");
-					alert.showAndWait();
-				}
-				if(attackingPlayer.getCharacter().getCurrentLife()<=0) { // caso in cui l'attaccate venga eliminato dal veleno di vedova nera
-					//this.eliminatePlayer(currentPlayer);
-					alert=new Alert(Alert.AlertType.INFORMATION);
-					alert.setTitle("Messaggio informativo");
-					alert.setHeaderText(null);
-					alert.setContentText("Il veleno di vedova nera ti ha ucciso!Sei stato eliminato da "+targetPlayer.getUsername()+".");
 					alert.showAndWait();
 				}
 				break;	

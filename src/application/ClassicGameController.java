@@ -1,7 +1,11 @@
 /*TODO
+ * valutare se creare o interfaccia o classe astratta Game
+ * controllare quando vine eliminato un giocatore prima nel caso in cui ci siamo 4 o 5 giocatori e valutare se dare la possinilità di giocare in 4  o 5
+ * gestire caso in cui l'utente chiuda il gioco dalla X in alto a destra
+ * riorganizzare packages
  * implementare il bot
- * torneo
  * grafica
+ * avanzamento torneo
  */
 package application;
 import cards.*;
@@ -64,10 +68,10 @@ import java.util.ResourceBundle;
 import java.util.Scanner;
 
 
-public class GameController implements Initializable{
+public class ClassicGameController implements Initializable{
 	private String gameCode;
 	private String  adminUsername;
-	private Game game;
+	private ClassicGame game;
 	private int currentPlayer;
 	private int actualNumberOfPlayers;
 	private SimpleBooleanProperty hasDrawed;
@@ -113,7 +117,7 @@ public class GameController implements Initializable{
 				initializeCardsBox(currentPlayer);
 				}
 			else {
-				game=new Game(gameCode,adminUsername);
+				game=new ClassicGame(gameCode,adminUsername);
 				currentPlayer=0;
 				initializeCardsBox(currentPlayer);
 			}
@@ -277,10 +281,10 @@ public class GameController implements Initializable{
 			}
 		}
 		
-	    System.out.println("target:"+targetPlayer);
+	   /* System.out.println("target:"+targetPlayer);
 		System.out.println("current:"+currentPlayer);
 		System.out.println("current size:"+actualNumberOfPlayers);
-		System.out.println("real size:"+players.size()); 
+		System.out.println("real size:"+players.size()); */
 	
 		if(players.size()<actualNumberOfPlayers && targetPlayer<currentPlayer) {//controllo che serve per quando viene eliminato un giocatore che in ordine di giocata è prima del giocatore corrente
 			if(currentPlayer==actualNumberOfPlayers-1 || actualNumberOfPlayers>3) {
@@ -294,14 +298,32 @@ public class GameController implements Initializable{
 		}
 		
 		if(game.getPlayer(currentPlayer).getCharacter().getCurrentLife()<=0) {//serve a gestire il caso in cui il giocatore corrente venga eliminato dal veleno di vedova nera o dallo specchio
+			 // caso in cui l'attaccate venga eliminato dal veleno di vedova nera o specchio o entrambi
+			Alert alert=new Alert(Alert.AlertType.INFORMATION);
+			alert.setTitle("Messaggio informativo");
+			alert.setHeaderText(null);
+			Player target =game.getPlayer(targetPlayer);
+			if(target.hasEnchantedMirror() && target.hasBlackWidowsPoison()) {
+				target.removeFromBoardInPosition(0);
+				alert.setContentText("Il veleno di vedova nera e lo specchio ti hanno ucciso!Sei stato eliminato da "+target.getUsername()+".");
+			}
+			else if(target.hasEnchantedMirror() && !target.hasBlackWidowsPoison()) {
+				target.removeFromBoardInPosition(0);
+				alert.setContentText("Lo specchio ti ha ucciso!Sei stato eliminato da "+target.getUsername()+".");
+			}
+			else
+				alert.setContentText("Il veleno di vedova nera ti ha ucciso!Sei stato eliminato da "+target.getUsername()+".");
+			alert.showAndWait();
+			
 			game.eliminatePlayer(currentPlayer);
+			
 			if(currentPlayer==actualNumberOfPlayers-1 || players.size()<actualNumberOfPlayers) {
 				
 				if(players.size()==0) { // gestisco l'eccezione del caso in gli ultimi 2 giocatori si eliminano a vicenda
 					try {
 						throw new NoWinnerException("Partita terminata in pareggio, non ci sono vincitori!");
 					}catch(NoWinnerException exception) {
-						Alert alert=new Alert(Alert.AlertType.INFORMATION);
+						alert=new Alert(Alert.AlertType.INFORMATION);
 						alert.setTitle("Messaggio informativo");
 						alert.setHeaderText(null);
 						alert.setContentText(exception.getMessage());
@@ -309,11 +331,7 @@ public class GameController implements Initializable{
 						deleteSerializationFile();
 						disableButtons();	
 					}
-					if(game.getGameType().equals(GameType.CLASSIC))
-						deleteGameFromGamesDatasFile();
-					else {
-						//TODO gestire in caso di torneo
-					}
+					deleteGameFromGamesDatasFile();
 				}
 				else
 					updateCurrentPlayer(currentPlayer);
@@ -380,13 +398,16 @@ public class GameController implements Initializable{
 		disableButtons();
 	}
 	private void disableButtons() {
-		submitCardButton.setDisable(true);
-		drawCardButton.setDisable(true);
-		submitPlayerButton.setDisable(true);
-		discardCardButton.setDisable(true);
-		characterInfosButton.setDisable(true);
-		playersInfosButton.setDisable(true);
-		boardInfosButton.setDisable(true);
+		game.setHasAttacked(true);
+		game.setHasDiscarded(true);
+		game.setHasDrawed(true);
+		isSelected.unbind();
+		isSelected.set(true);
+
+		submitPlayerButton.disableProperty().set(true);
+		characterInfosButton.disableProperty().set(true);
+		playersInfosButton.disableProperty().set(true);
+		boardInfosButton.disableProperty().set(true);
 	}
 	
 	public void serialize(String filename) {
@@ -404,12 +425,12 @@ public class GameController implements Initializable{
     }
     
     // Static method to deserialize the GameController
-    public  Game deserialize(String filename) {
-       Game game = null;
+    public  ClassicGame deserialize(String filename) {
+       ClassicGame game = null;
         try {
             FileInputStream fileIn = new FileInputStream(filename);
             ObjectInputStream in = new ObjectInputStream(fileIn);
-            game = (Game) in.readObject();
+            game = (ClassicGame) in.readObject();
             in.close();
             fileIn.close();
             System.out.println("deserialized successfully");
@@ -515,8 +536,8 @@ public class GameController implements Initializable{
 		   Scanner scan=new Scanner(file);
 		   while(scan.hasNextLine()) {
 			   String line=scan.nextLine();
-			   String[] splittedLine=scan.nextLine().split(",");
-			   if(!splittedLine[3].equals(gameCode)) 
+			   String[] splittedLine=line.split(",");
+			   if(!splittedLine[2].equals(gameCode)) 
 				   datas.add(line);
 		   }
 		   PrintWriter pw=new PrintWriter(file);

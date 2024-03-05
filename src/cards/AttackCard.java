@@ -54,82 +54,93 @@ public class AttackCard extends ActionCard{
 		Character tC=targetPlayer.getCharacter();
 		deck.addToStockPile(this); 
 	
-		 if(attackingPlayer.hasRing()) {//caso in cui l'attaccato abbia l'anello nella board
-			tC.increasePrecision(1); //aumenta la fortuna dell' attaccato grazuie all'anello
-			
+		 if(attackingPlayer.hasRing() && !targetPlayer.hasAztecCurse()) {//caso in cui l'attaccante ha anello e attaccato non ha maledizione
+			aC.increasePrecision(1);
+			 Alert alert=new Alert(Alert.AlertType.INFORMATION);
+			 alert.setTitle("Messaggio informativo");
+			 alert.setHeaderText(null);
 			if(firstCheck(aC,tC) && secondCheck(attackingPlayer, targetPlayer,deck)) { //eseguo i due controlli, se sono entrambi true, l'attacco parte
-				Alert alert=new Alert(Alert.AlertType.INFORMATION);
-				alert.setTitle("Messaggio informativo");
-				alert.setHeaderText(null);
 				alert.setContentText("Attacco eseguito con successo!");
 				alert.showAndWait();
-				tC.resetPrecision(); //resetto la fortuna dell'attaccato che era aumentata grazie all'anello
+				aC.resetPrecision();;
+			
+				if(targetPlayer.hasEnchantedMirror()) {//se l'attacco è partito e l'attaccato ha lo specchio incantato, l'attaccante si autocolpisce danni
+					EnchantedMirrorCard em=new EnchantedMirrorCard();
+					em.getEffect(attackingPlayer);
+					alert.setContentText("Sei stato incantato dallo specchio, ti sei autocolpito!");
+					alert.showAndWait();
+				}
+				if(targetPlayer.hasBlackWidowsPoison()) {//se l'attacco è partito e l'attaccato ha il veleno di vedova nera, l'attaccante subisce 5 danni
+					BlackWidowsPoisonCard bwp=new BlackWidowsPoisonCard();
+					bwp.getEffect(attackingPlayer);
+					alert.setContentText("Sei anche stato avvelenato dal veleno di vedova nera, hai perso 5 punti vita.");
+					alert.showAndWait();
+				}
+				else 
+					tC.decreaseLife(attackingPlayer.getAttackPower()); //diminusco la vita dell'attaccato
 			}
-			if(targetPlayer.hasEnchantedMirror()) {//se l'attacco è partito e l'attaccato ha lo specchio incantato, l'attaccante si autocolpisce danni
-				EnchantedMirrorCard em=new EnchantedMirrorCard();
-				em.getEffect(attackingPlayer);
-				targetPlayer.removeFromBoardInPosition(0);
-				Alert alert=new Alert(Alert.AlertType.INFORMATION);
-				alert.setTitle("Messaggio informativo");
-				alert.setHeaderText(null);
-				alert.setContentText("Sei stato incantato dallo specchio, ti sei autocolpito!");
-				alert.showAndWait();
-			}
-			else 
-				tC.decreaseLife(attackingPlayer.getAttackPower()); //diminusco la vita dell'attaccato
 		}
 		
-		else if(targetPlayer.hasAztecCurse()) {// caso in cui l'attaccato abbia la maledizione azteca nella board
+		else if(targetPlayer.hasAztecCurse() && !attackingPlayer.hasRing()) {// caso in cui l'attaccato abbia la maledizione azteca nella board e l'attaccante non ha l'anello
 			aC.decreasePrecision(1); //diminuisco la precisione dell'attaccante grazie alla maledizione azteca
-			
+			Alert alert=new Alert(Alert.AlertType.INFORMATION);
+			alert.setTitle("Messaggio informativo");
+			alert.setHeaderText(null);
 			if(firstCheck(aC,tC) && secondCheck(attackingPlayer, targetPlayer,deck)) {
-				Alert alert=new Alert(Alert.AlertType.INFORMATION);
-				alert.setTitle("Messaggio informativo");
-				alert.setHeaderText(null);
 				alert.setContentText("Attacco eseguito con successo!");
 				alert.showAndWait();
 				aC.resetPrecision();
+				if(targetPlayer.hasEnchantedMirror()) {//se l'attacco è partito e l'attaccato ha lo specchio incantato, l'attaccante si autocolpisce danni
+					EnchantedMirrorCard em=new EnchantedMirrorCard();
+					em.getEffect(attackingPlayer);
+					targetPlayer.removeFromBoardInPosition(0);
+					alert.setContentText("Sei stato incantato dallo specchio, ti sei autocolpito!");
+					alert.showAndWait();
+				}
+				else
+					tC.decreaseLife(attackingPlayer.getAttackPower());
 			}
-			if(targetPlayer.hasEnchantedMirror()) {//se l'attacco è partito e l'attaccato ha lo specchio incantato, l'attaccante si autocolpisce danni
-				EnchantedMirrorCard em=new EnchantedMirrorCard();
-				em.getEffect(attackingPlayer);
-				targetPlayer.removeFromBoardInPosition(0);
-				Alert alert=new Alert(Alert.AlertType.INFORMATION);
-				alert.setTitle("Messaggio informativo");
-				alert.setHeaderText(null);
-				alert.setContentText("Sei stato incantato dallo specchio, ti sei autocolpito!");
-				alert.showAndWait();
-			}
-			else
-				tC.decreaseLife(attackingPlayer.getAttackPower());
 		}
 	
-		else { //caso in cui l'attaccato non ha  anello ne maledizione azteca
+		else if(!targetPlayer.hasAztecCurse()){ //caso in cui l'attaccato non ha maledizione azteca e l'attaccante non ha anello
+			Alert alert=new Alert(Alert.AlertType.INFORMATION);
+			alert.setTitle("Messaggio informativo");
+			alert.setHeaderText(null);
 			if(firstCheck(aC,tC) && secondCheck(attackingPlayer, targetPlayer,deck)) {
-				Alert alert=new Alert(Alert.AlertType.INFORMATION);
-				alert.setTitle("Messaggio informativo");
-				alert.setHeaderText(null);
 				alert.setContentText("Attacco eseguito con successo!");
 				alert.showAndWait();
 				if(targetPlayer.hasBlackWidowsPoison()) {//se l'attacco è partito e l'attaccato ha il veleno di vedova nera, l'attaccante subisce 5 danni
 					BlackWidowsPoisonCard bwp=new BlackWidowsPoisonCard();
 					bwp.getEffect(attackingPlayer);
-					alert.setTitle("Messaggio informativo");
-					alert.setHeaderText(null);
 					alert.setContentText("Sei anche stato avvelenato dal veleno di vedova nera, hai perso 5 punti vita.");
 					alert.showAndWait();
 				}
 				if(targetPlayer.hasEnchantedMirror()) {//se l'attacco è partito e l'attaccato ha lo specchio incantato, l'attaccante si autocolpisce danni
 					EnchantedMirrorCard em=new EnchantedMirrorCard();
 					em.getEffect(attackingPlayer);
-					targetPlayer.removeFromBoardInPosition(0);
-					alert.setTitle("Messaggio informativo");
-					alert.setHeaderText(null);
 					alert.setContentText("Sei stato incantato dallo specchio, ti sei autocolpito!");
 					alert.showAndWait();
 				}
 				else
 					tC.decreaseLife(attackingPlayer.getAttackPower());
+			}
+		}
+		else {// caso in cui l'attaccante ha anello e attaccato ha maledizione azteca
+			 Alert alert=new Alert(Alert.AlertType.INFORMATION);
+			 alert.setTitle("Messaggio informativo");
+			 alert.setHeaderText(null);
+			if(firstCheck(aC,tC) && secondCheck(attackingPlayer, targetPlayer,deck)) { //eseguo i due controlli, se sono entrambi true, l'attacco parte
+				alert.setContentText("Attacco eseguito con successo!");
+				alert.showAndWait();
+			
+				if(targetPlayer.hasEnchantedMirror()) {//se l'attacco è partito e l'attaccato ha lo specchio incantato, l'attaccante si autocolpisce danni
+					EnchantedMirrorCard em=new EnchantedMirrorCard();
+					em.getEffect(attackingPlayer);
+					alert.setContentText("Sei stato incantato dallo specchio, ti sei autocolpito!");
+					alert.showAndWait();
+				}
+				else 
+					tC.decreaseLife(attackingPlayer.getAttackPower()); //diminusco la vita dell'attaccato
 			}
 		}
 	}

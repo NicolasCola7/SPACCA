@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -13,7 +14,7 @@ import java.util.Map;
 import java.util.Scanner;
 import cards.GameType;
 
-public class Leaderboard {
+public class Leaderboard implements Serializable{
 	private LinkedList<String> names;
 	private LinkedList<Integer> scores;
 	private File leaderboardFile;

@@ -42,14 +42,14 @@ public class MatchesManagementController{
 		stage.show();
 	}
 	public void standardMatch(ActionEvent event) throws IOException {
-		root = FXMLLoader.load(getClass().getResource("StandardMatch.fxml"));
+		root = FXMLLoader.load(getClass().getResource("ClassicGameCreation.fxml"));
 		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 		scene=new Scene(root);
 		stage.setScene(scene);
 		stage.show();
 	}
 	public void tournament(ActionEvent event) throws IOException {
-		root = FXMLLoader.load(getClass().getResource("Tournament.fxml"));
+		root = FXMLLoader.load(getClass().getResource("TournamentCreation.fxml"));
 		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 		scene=new Scene(root);
 		stage.setScene(scene);
