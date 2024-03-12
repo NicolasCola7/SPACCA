@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import cards.GameType;
+import game.GameType;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -50,6 +50,13 @@ public class MatchesManagementController{
 	}
 	public void tournament(ActionEvent event) throws IOException {
 		root = FXMLLoader.load(getClass().getResource("TournamentCreation.fxml"));
+		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+		scene=new Scene(root);
+		stage.setScene(scene);
+		stage.show();
+	}
+	public void suspendedGames(ActionEvent event) throws IOException {
+		root = FXMLLoader.load(getClass().getResource("SuspendedGames.fxml"));
 		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 		scene=new Scene(root);
 		stage.setScene(scene);

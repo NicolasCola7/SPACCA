@@ -53,7 +53,7 @@ import java.util.Arrays;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 
-import cards.GameType;
+import game.GameType;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

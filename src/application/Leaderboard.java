@@ -12,7 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Scanner;
-import cards.GameType;
+import game.GameType;
 
 public class Leaderboard implements Serializable{
 	private LinkedList<String> names;

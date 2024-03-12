@@ -1,15 +1,23 @@
 /*TODO
- * valutare se creare o interfaccia o classe astratta Game
  * controllare quando vine eliminato un giocatore prima nel caso in cui ci siamo 4 o 5 giocatori e valutare se dare la possinilità di giocare in 4  o 5
- * gestire caso in cui l'utente chiuda il gioco dalla X in alto a destra
- * riorganizzare packages
  * implementare il bot
  * grafica
- * avanzamento torneo
+ * avanzamento torneo(da considerare come componente aggiuntiva?)
  */
 package application;
 import cards.*;
-import cards.Character;
+import cards.actions.ActionCard;
+import cards.actions.BoardingCard;
+import cards.actions.HealingPotionCard;
+import cards.actions.SauronEyeCard;
+import cards.characters.Character;
+import cards.events.EventCard;
+import cards.events.MiracleCard;
+import cards.statics.StaticCard;
+import game.Player;
+import game.GameType;
+import game.ClassicGame;
+import game.NoWinnerException;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -34,6 +42,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Labeled;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -47,6 +56,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import java.beans.EventHandler;
 import java.io.File;
@@ -80,8 +90,7 @@ public class ClassicGameController implements Initializable{
 	private SimpleBooleanProperty isSelected;
 	private SimpleBooleanProperty isSelectedAttackCard;
 	
-	@FXML private Label codeLabel;
-	@FXML private Label adminLabel;
+
 	@FXML private Label playerUsernameLabel;
 	@FXML private Label turnLabel;
 	@FXML private Button drawCardButton;
@@ -93,11 +102,13 @@ public class ClassicGameController implements Initializable{
 	@FXML private Button boardInfosButton;
 	@FXML private HBox cardsBox;
 	@FXML private VBox infoBox;
+	@FXML private MenuButton menu;
 	
 	private ToggleGroup group;
 	private final Insets MARGIN =new Insets(10, 2, 10, 2); // sono le spaziature tra le carte
 	private ArrayList<ToggleButton> currentPlayerHand;
 	private ArrayList<String> players;
+	Stage primaryStage;
 	
 	public void setGameCode(String code) { // metodo che viene chiamato dal playerController per settare il gameCode
 		gameCode=code;
@@ -108,7 +119,7 @@ public class ClassicGameController implements Initializable{
 	}
 	
 	@Override
-	public void initialize(URL arg0, ResourceBundle arg1) { // inizializza la partita 
+	public void initialize(URL arg0, ResourceBundle arg1) {// inizializza la partita 
 		Platform.runLater(() -> {// metodo da capire meglio, serve a ritardare le istruzioni al suo interno dato che quando si passano dati da un altro controller (PlayerController in questo caso)  il metodo initialize viene eseguito prima dei metodi utilizzati nel controller che passa i dati,in guesto caso setGameCode() e setAdminUsername()
 			if(isSerialized("./Files/ConfigurationFiles/"+gameCode+".ser")){
 				game=deserialize("./Files/ConfigurationFiles/"+gameCode+".ser");
@@ -121,6 +132,9 @@ public class ClassicGameController implements Initializable{
 				currentPlayer=0;
 				initializeCardsBox(currentPlayer);
 			}
+			
+			primaryStage= (Stage) drawCardButton.getScene().getWindow();
+			primaryStage.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::closeWindowEvent);
 	    });  
 	}
 	private void initializeCardsBox(int currentPlayer) {// inizializza la UI del giocatore corrente
@@ -136,7 +150,6 @@ public class ClassicGameController implements Initializable{
 			addToCardsBox(btn);
 		}
 		setBindings();
-		
 	}
 	private void setBindings() { // serve a fare in modo che i bottoni vengano disattivati e attivati  in determinate situazioni
 		hasDrawed=game.getHasDrawed();
@@ -146,6 +159,7 @@ public class ClassicGameController implements Initializable{
 		isSelectedAttackCard=new SimpleBooleanProperty(false);
 		
 		isSelected.bind(group.selectedToggleProperty().isNull());// isSelected diventa true  è selezionata una carta
+		
 		group.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
 	            if (newValue != null) 
 	                isSelectedAttackCard.bind(((ToggleButton)group.getSelectedToggle()).textProperty().isEqualTo("AttackCard"));// isSelectedAttackCard diventa true se è selezionata la carta attacco
@@ -396,6 +410,7 @@ public class ClassicGameController implements Initializable{
 		deleteGameFromGamesDatasFile();
 		deleteSerializationFile();
 		disableButtons();
+		showLeaderboard();
 	}
 	private void disableButtons() {
 		game.setHasAttacked(true);
@@ -408,6 +423,7 @@ public class ClassicGameController implements Initializable{
 		characterInfosButton.disableProperty().set(true);
 		playersInfosButton.disableProperty().set(true);
 		boardInfosButton.disableProperty().set(true);
+		menu.setDisable(true);
 	}
 	
 	public void serialize(String filename) {
@@ -484,9 +500,24 @@ public class ClassicGameController implements Initializable{
 	        stage.show();
 		}
    }
-   
-   public void showLeaderboard(ActionEvent event)throws IOException{
-       TableView<LeaderboardData> leaderboard = new TableView<>();
+   private void closeWindowEvent(WindowEvent event) {
+	   if(!game.isGameOver()) {
+	       Alert alert = new Alert(Alert.AlertType.INFORMATION);
+	       alert.getButtonTypes().remove(ButtonType.OK);
+	       
+	       alert.getButtonTypes().add(ButtonType.CANCEL);
+	       alert.getButtonTypes().add(ButtonType.YES);
+	       alert.setTitle("Chiusura applicazione");
+	       alert.setHeaderText(null);
+	       alert.setContentText("Sei sicuro di voler uscire senza salvare?");
+	       if(alert.showAndWait().get()==ButtonType.CANCEL) {
+	           event.consume();
+	       }
+	   }
+  
+   }
+   private TableView<LeaderboardData>  getLeaderboard() {
+	   TableView<LeaderboardData> leaderboard = new TableView<>();
        TableColumn<LeaderboardData,Integer> positionColumn = new TableColumn<>("POSIZIONE");
        TableColumn<LeaderboardData,String> nameColumn = new TableColumn<>("NOME");
        TableColumn<LeaderboardData,Integer> scoreColumn = new TableColumn<>("VITTORIE");
@@ -500,8 +531,18 @@ public class ClassicGameController implements Initializable{
        ObservableList<LeaderboardData> data = getDataFromLeaderboardFile();
        leaderboard.setItems(data);
        
-       VBox vbox = new VBox(leaderboard);
-       
+       return leaderboard;
+   }
+   public void showLeaderboard(ActionEvent event)throws IOException{
+       VBox vbox = new VBox(getLeaderboard());
+       Scene scene = new Scene(vbox, 300, 200);
+       Stage popupLeaderboard = new Stage();
+       popupLeaderboard.setTitle("Leaderboard");
+       popupLeaderboard.setScene(scene);
+       popupLeaderboard.show();
+   }
+   public void showLeaderboard() {
+	   VBox vbox = new VBox(getLeaderboard());
        Scene scene = new Scene(vbox, 300, 200);
        Stage popupLeaderboard = new Stage();
        popupLeaderboard.setTitle("Leaderboard");

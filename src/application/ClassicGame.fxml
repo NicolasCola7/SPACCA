@@ -15,7 +15,7 @@
       <Button fx:id="discardCardButton" layoutX="538.0" layoutY="227.0" mnemonicParsing="false" onAction="#discardCard" prefHeight="25.0" prefWidth="61.0" text="Scarta" />
       <Button fx:id="drawCardButton" layoutX="538.0" layoutY="175.0" mnemonicParsing="false" onAction="#drawCard" prefHeight="25.0" prefWidth="61.0" text="Pesca" />
       <Button fx:id="submitPlayerButton" layoutX="538.0" layoutY="253.0" mnemonicParsing="false" onAction="#submitPlayer" prefHeight="25.0" prefWidth="61.0" text="Passa" />
-      <MenuButton layoutX="14.0" layoutY="14.0" mnemonicParsing="false" text="Menu">
+      <MenuButton fx:id="menu" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" text="Menu">
         <items>
             <MenuItem mnemonicParsing="false" onAction="#save" text="Salva" />
           <MenuItem mnemonicParsing="false" onAction="#saveAndQuit" text="Salva ed Esci" />

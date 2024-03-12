@@ -1,6 +1,16 @@
 package application;
 import cards.*;
-import cards.Character;
+import cards.actions.ActionCard;
+import cards.actions.BoardingCard;
+import cards.actions.HealingPotionCard;
+import cards.actions.SauronEyeCard;
+import cards.characters.Character;
+import cards.events.EventCard;
+import cards.events.MiracleCard;
+import cards.statics.StaticCard;
+import game.Player;
+import game.Tournament;
+import game.TournamentPhase;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -25,6 +35,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Labeled;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -38,6 +49,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import java.beans.EventHandler;
 import java.io.File;
@@ -70,8 +82,7 @@ public class TournamentController implements Initializable{
 	private SimpleBooleanProperty isSelected;
 	private SimpleBooleanProperty isSelectedAttackCard;
 	
-	@FXML private Label codeLabel;
-	@FXML private Label adminLabel;
+	
 	@FXML private Label playerUsernameLabel;
 	@FXML private Label turnLabel;
 	@FXML private Button drawCardButton;
@@ -83,11 +94,13 @@ public class TournamentController implements Initializable{
 	@FXML private Button boardInfosButton;
 	@FXML private HBox cardsBox;
 	@FXML private VBox infoBox;
+	@FXML private MenuButton menu;
 	
 	private ToggleGroup group;
 	private final Insets MARGIN =new Insets(10, 2, 10, 2); // sono le spaziature tra le carte
 	private ArrayList<ToggleButton> currentPlayerHand;
 	private ArrayList<String> actualGamePlayersNames;
+	private Stage primaryStage;
 	
 	public void setGameCode(String code) { // metodo che viene chiamato dal playerController per settare il gameCode
 		gameCode=code;
@@ -111,6 +124,9 @@ public class TournamentController implements Initializable{
 				currentPlayer=0;
 				initializeCardsBox(currentPlayer);
 			}
+		
+		    primaryStage = (Stage) drawCardButton.getScene().getWindow();
+			primaryStage.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::closeWindowEvent);
 	    });  
 	}
 	private void initializeCardsBox(int currentPlayer) {// inizializza la UI del giocatore corrente
@@ -124,8 +140,7 @@ public class TournamentController implements Initializable{
 			ToggleButton btn=new ToggleButton(card.getName());
 			addToCardsBox(btn);
 		}
-		//setBindings();
-		
+		setBindings();	
 	}
 	private void setBindings() { // serve a fare in modo che i bottoni vengano disattivati e attivati  in determinate situazioni
 		hasDrawed=tournament.getHasDrawed();
@@ -206,7 +221,7 @@ public class TournamentController implements Initializable{
 		ToggleButton btn=(ToggleButton)group.getSelectedToggle(); //ottengo il bottone selezionato
 		Card submittedCard=tournament.getCurrentPlayersHand(currentPlayer).get(currentPlayerHand.indexOf(btn)); // ottengo la carta nella mano del giocatore corrispondente all'indice del bottone
 		int submittedCardIndex=currentPlayerHand.indexOf(btn); // ottengo l'indice della carta nella mano del giocatore 
-		String toAttack=(currentPlayer==0?actualGamePlayersNames.get(1):actualGamePlayersNames.get(0)); // lista dei giocatori che possono essere attaccati
+		String toAttack=actualGamePlayersNames.get(1-currentPlayer); // nome avversario
 		int targetPlayer=0;
 		if(submittedCard instanceof ActionCard ) {
 			
@@ -275,7 +290,6 @@ public class TournamentController implements Initializable{
 			tournament.setCurrentPlayer(currentPlayer);
 			
 			if(tournament.getActualGamePlayers().size()==0) { //caso in cui i due giocatori si eliminino a vicenda
-					currentPlayer=0;
 					ArrayList<String> latestTwo=tournament.getLatestTwoEliminated();
 					alert=new Alert(Alert.AlertType.INFORMATION);
 					alert.setTitle("Messaggio informativo");
@@ -328,12 +342,10 @@ public class TournamentController implements Initializable{
 	}
 	
 	private void updateCurrentPlayer(int currentPlayer) {
-		if(currentPlayer==1) {
-			this.currentPlayer=0;
+		if(currentPlayer==1)
 			tournament.changeTurn();
-		}
-		else
-			this.currentPlayer++;
+		
+		this.currentPlayer=1-currentPlayer;
 		tournament.setCurrentPlayer(this.currentPlayer);
 		refreshCardsBox(this.currentPlayer);
 	}
@@ -355,6 +367,8 @@ public class TournamentController implements Initializable{
 		deleteGameFromGamesDatasFile();
 		deleteSerializationFile();
 		disableButtons();
+		showLeaderboard();
+		
 	}
 	private void endCurrentGame(int currentPlayer) {
 		Alert alert=new Alert(Alert.AlertType.INFORMATION);
@@ -376,6 +390,7 @@ public class TournamentController implements Initializable{
 		characterInfosButton.disableProperty().set(true);
 		playersInfosButton.disableProperty().set(true);
 		boardInfosButton.disableProperty().set(true);
+		menu.setDisable(true);
 	}
 	
 	public void serialize(String filename) {
@@ -453,8 +468,23 @@ public class TournamentController implements Initializable{
 		}
    }
    
-   public void showLeaderboard(ActionEvent event)throws IOException{
-       TableView<LeaderboardData> leaderboard = new TableView<>();
+   private void closeWindowEvent(WindowEvent event) {
+	   if(!tournament.isTournamentGameOver()) {
+		   Alert alert = new Alert(Alert.AlertType.INFORMATION);
+		   alert.getButtonTypes().remove(ButtonType.OK);
+		   
+		   alert.getButtonTypes().add(ButtonType.CANCEL);
+		   alert.getButtonTypes().add(ButtonType.YES);
+		   alert.setTitle("Chiusura applicazione");
+		   alert.setHeaderText(null);
+		   alert.setContentText("Sei sicuro di voler uscire senza salvare?");
+		   if(alert.showAndWait().get()==ButtonType.CANCEL) {
+		       event.consume();
+		   }
+	   }
+   }
+   private TableView<LeaderboardData>  getLeaderboard() {
+	   TableView<LeaderboardData> leaderboard = new TableView<>();
        TableColumn<LeaderboardData,Integer> positionColumn = new TableColumn<>("POSIZIONE");
        TableColumn<LeaderboardData,String> nameColumn = new TableColumn<>("NOME");
        TableColumn<LeaderboardData,Integer> scoreColumn = new TableColumn<>("VITTORIE");
@@ -468,8 +498,18 @@ public class TournamentController implements Initializable{
        ObservableList<LeaderboardData> data = getDataFromLeaderboardFile();
        leaderboard.setItems(data);
        
-       VBox vbox = new VBox(leaderboard);
-       
+       return leaderboard;
+   }
+   public void showLeaderboard(ActionEvent event)throws IOException{
+       VBox vbox = new VBox(getLeaderboard());
+       Scene scene = new Scene(vbox, 300, 200);
+       Stage popupLeaderboard = new Stage();
+       popupLeaderboard.setTitle("Leaderboard");
+       popupLeaderboard.setScene(scene);
+       popupLeaderboard.show();
+   }
+   public void showLeaderboard() {
+	   VBox vbox = new VBox(getLeaderboard());
        Scene scene = new Scene(vbox, 300, 200);
        Stage popupLeaderboard = new Stage();
        popupLeaderboard.setTitle("Leaderboard");
