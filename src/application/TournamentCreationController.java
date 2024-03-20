@@ -29,6 +29,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
+import leaderboard.Leaderboard;
 
 public class TournamentCreationController implements Initializable{
 	private Scene scene;
@@ -41,7 +42,7 @@ public class TournamentCreationController implements Initializable{
 	private ArrayList<String> players;
 	private String adminUsername;
 	private File playersList;
-	final int numberOfPlayers=8;
+	private final int numberOfPlayers=8;
 	private ArrayList<String> gamePlayers;
 	
 	@Override
@@ -79,12 +80,11 @@ public class TournamentCreationController implements Initializable{
 	}
 	
 	public void confirm(ActionEvent e) throws IOException  {
-		
 		gamePlayers=new ArrayList<String>( numberOfPlayers);
 		gamePlayers.addAll(playersSelection.getSelectionModel().getSelectedItems());
-		if((botCheck.isSelected() && gamePlayers.size()!= numberOfPlayers) || (!botCheck.isSelected() && gamePlayers.size()== numberOfPlayers)) {
+		if(((botCheck.isSelected() && gamePlayers.size()!= numberOfPlayers) || (!botCheck.isSelected() && gamePlayers.size()== numberOfPlayers)) && gameCodeCheck(gameCode.getText())) {
 			for(int i=gamePlayers.size();i< numberOfPlayers;i++)
-				gamePlayers.add(i,"bot");
+				gamePlayers.add(i,"bot"+i);
 			addToGamesDatasFile(); 
 			Alert alert=new Alert(AlertType.CONFIRMATION);
 			alert.setTitle("Attenzione!");
@@ -145,25 +145,29 @@ public class TournamentCreationController implements Initializable{
 	}
 	
 	private boolean gameCodeCheck(String code) {
-		boolean check=true;
+		boolean check=false;
 		File file=new File("./Files/ConfigurationFiles/GamesDatas.csv");
+		
 		if(file.length()!=0) {
 			try {
 				Scanner scan=new Scanner(file);
 				while(scan.hasNextLine()) {
 					String[] gameInfos=scan.nextLine().split(",");
-					if(gameInfos[2].equals(code))
+					if(gameInfos[2].equals(code)) {
 						check=false;
+						break;
+					}
 					else
 						check=true;
 				}
+				scan.close();
 			} catch (FileNotFoundException e) {
-				System.out.println("File not found");
 				e.printStackTrace();
 			}
-		}	
+		}
 		return check;
 	}
+	
 	private void addToGamesDatasFile()  {
 		try {
 			FileWriter writer = new FileWriter(new File("./Files/ConfigurationFiles/GamesDatas.csv"),true);

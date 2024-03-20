@@ -17,7 +17,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
-import application.Leaderboard;
+import leaderboard.Leaderboard;
 import cards.*;
 import cards.actions.*;
 import cards.statics.*;
@@ -49,7 +49,7 @@ public class Tournament extends Game{
 		alert.setContentText(tournamentPhase + ", " + gameNumber +"° partita: "+ actualGamePlayersNames.get(0) + " VS " + actualGamePlayersNames.get(1));
 		alert.showAndWait();
 	}
-	protected void buildPlayersHands() {
+	public void buildPlayersHands() {
 		actualGamePlayersNames=new ArrayList<String>();
 		actualGamePlayers=new ArrayList<Player>();
 		hasDrawedValue=false;
@@ -62,18 +62,16 @@ public class Tournament extends Game{
 	
 		for(int i=(gameNumber-1)*2;i<gameNumber*2;i++) {
 			
-			if(tournamentPhase.equals(TournamentPhase.QUARTI))
-				players.get(i).getHand().addAll(deck.drawHand());
-			else {
+			if(!tournamentPhase.equals(TournamentPhase.QUARTI))
 				players.get(i).resetAll();
-				players.get(i).getHand().addAll(deck.drawHand());
-			}
+			
+			players.get(i).getHand().addAll(deck.drawHand());
 			
 			actualGamePlayers.add(players.get(i));
 			actualGamePlayersNames.add(players.get(i).getUsername());
 		}
 	}
-	protected void insertPlayers() {
+	public void insertPlayers() {
 		players=new LinkedList<Player>();
 		try {
 			Scanner scan=new Scanner(datas);
@@ -84,7 +82,11 @@ public class Tournament extends Game{
 					playersNames=new ArrayList<String>(nOfPlayers);
 					for(int i=0;i<nOfPlayers;i++) {
 						playersNames.add(line[4+i]);
-						players.add(new Player(playersNames.get(i),chDeck.getCharacter()));
+						
+						if( line[4+i].length()>3 && line[4+i].substring(0, 3).equals("bot"))
+							players.add(new Bot(playersNames.get(i),chDeck.getCharacter()));
+						else
+							players.add(new Player(playersNames.get(i),chDeck.getCharacter()));	
 					}
 					break;
 				}
@@ -117,7 +119,7 @@ public class Tournament extends Game{
 			return false;
 	}
 	
-	public void switchGame() { //mettere degli alert per quando si cambia fase o partita
+	public void switchGame() {
 		Alert alert=new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle("Messaggio informativo");
 		alert.setHeaderText(null);
@@ -154,8 +156,7 @@ public class Tournament extends Game{
 		else {
 			alert.setContentText(tournamentPhase + ", " + gameNumber +"° partita: "+ actualGamePlayersNames.get(0) + " VS " + actualGamePlayersNames.get(1));
 			alert.showAndWait();
-		}
-				
+		}		
 	}
 	
 	public Player getPlayer(int player) {
@@ -166,6 +167,7 @@ public class Tournament extends Game{
 		Player attackingPlayer=actualGamePlayers.get(currentPlayer);
 		Player targetPlayer=actualGamePlayers.get(target);
 		ActionCard submittedActionCard=(ActionCard)attackingPlayer.getHand().get(submittedCard);
+		String message="";
 		switch(submittedActionCard.getName()) {
 			case "AttackCard":{
 				hasAttackedValue=true;
@@ -174,11 +176,7 @@ public class Tournament extends Game{
 				ac.onUse(attackingPlayer,targetPlayer, deck);
 				if(targetPlayer.getCharacter().getCurrentLife()<=0) {// caso in cui con l'attacco si elimina un giocatore
 					this.eliminatePlayer(target);
-					alert=new Alert(Alert.AlertType.INFORMATION);
-					alert.setTitle("Messaggio informativo");
-					alert.setHeaderText(null);
-					alert.setContentText("Hai eliminato "+targetPlayer.getUsername()+".");
-					alert.showAndWait();
+					message="Hai eliminato "+targetPlayer.getUsername()+".";
 				}
 				break;	
 			}
@@ -186,30 +184,23 @@ public class Tournament extends Game{
 				SauronEyeCard sec=new SauronEyeCard();
 				sec.onUse(actualGamePlayers, attackingPlayer, deck);
 				int hit=1-currentPlayer;
-				
-				alert=new Alert(Alert.AlertType.INFORMATION);
-				alert.setTitle("Messaggio informativo");
-				alert.setHeaderText(null);
-				
+
 				if(this.getPlayer(hit).getCharacter().getCurrentLife()<=0){// controllo se ho eliminato l'avversario  utilizzando l'occhio di sauron
-					alert.setContentText("Hai inflitto 20 p.ti danno all'avversario e lo hai eliminato!");
+					message="Hai inflitto 20 p.ti danno all'avversario e lo hai eliminato!";
 					this.eliminatePlayer(hit);
 				}
 				else
-					alert.setContentText("Hai inflitto 20 p.ti danno all'avversario!");
+					message="Hai inflitto 20 p.ti danno all'avversario!";
 				
-				alert.showAndWait();
+				
 				break;
 			}
 			case "GauntletCard":{
 				GauntletCard gc=new GauntletCard();
 				Card discarded=gc.onUse(attackingPlayer,targetPlayer, deck);
 				targetPlayer.getHand().remove(discarded);
-				alert=new Alert(Alert.AlertType.INFORMATION);
-				alert.setTitle("Messaggio informativo");
-				alert.setHeaderText(null);
-				alert.setContentText("La carta '"+discarded.getName()+"' è stata scartata dalla mano di "+targetPlayer.getUsername());
-				alert.showAndWait();
+				
+				message="La carta '"+discarded.getName()+"' è stata scartata dalla mano di "+targetPlayer.getUsername();
 				break;
 			}
 			case "BoardingCard":{
@@ -217,11 +208,8 @@ public class Tournament extends Game{
 				Card stolen=bc.onUse(attackingPlayer,players.get(target) , deck);
 				attackingPlayer.getHand().add(stolen);
 				targetPlayer.getHand().remove(stolen);
-				alert=new Alert(Alert.AlertType.INFORMATION);
-				alert.setTitle("Messaggio informativo");
-				alert.setHeaderText(null);
-				alert.setContentText("La carta '"+stolen.getName()+"' è stata rubata dalla mano di "+targetPlayer.getUsername());
-				alert.showAndWait();
+				
+				message="La carta '"+stolen.getName()+"' è stata rubata dalla mano di "+targetPlayer.getUsername();
 				break;
 			}
 			case "HealingPotionCard":{
@@ -235,9 +223,17 @@ public class Tournament extends Game{
 				break;
 			}
 		}
+		if(!(actualGamePlayers.get(this.currentPlayer) instanceof Bot)) {
+			alert=new Alert(Alert.AlertType.INFORMATION);
+			alert.setTitle("Messaggio informativo");
+			alert.setHeaderText(null);
+			alert.setContentText(message);
+			alert.showAndWait();
+		}
 		this.currentPlayer=currentPlayer;
 		attackingPlayer.getHand().remove(submittedCard);	
 	}
+	
 	public boolean submitStaticCard(int submittedCard, int player) {// per static cards
 		Player currentPlayer=actualGamePlayers.get(player);  
 		StaticCard submitted=(StaticCard)currentPlayer.getHand().get(submittedCard);
@@ -263,6 +259,7 @@ public class Tournament extends Game{
 		this.currentPlayer=player;
 		return check;
 	}
+	
 	public boolean submitWeaponCard(int submittedCard, int player) { // per weapon cards
 		Player currentPlayer=actualGamePlayers.get(player);   
 		WeaponCard submittedWeapon=(WeaponCard)currentPlayer.getHand().get(submittedCard);
@@ -289,6 +286,7 @@ public class Tournament extends Game{
 		this.currentPlayer=player;
 		return check;
 	}
+	
 	public void submitEventCard(int submittedCard, int player, int target) { // per event cards
 		Player currentPlayer=actualGamePlayers.get(player);
 		Player targetPlayer=actualGamePlayers.get(target);
@@ -302,11 +300,13 @@ public class Tournament extends Game{
 			case "DoomsdayCard":{
 				DoomsdayCard dc=new DoomsdayCard();
 				dc.onUse(currentPlayer,targetPlayer,deck);
-				alert=new Alert(Alert.AlertType.INFORMATION);
-				alert.setTitle("Messaggio informativo");
-				alert.setHeaderText(null);
-				alert.setContentText("Il giorno del giudizio è arrivato per "+targetPlayer.getUsername());
-				alert.showAndWait();
+				if(!(actualGamePlayers.get(this.currentPlayer) instanceof Bot)) {
+					alert=new Alert(Alert.AlertType.INFORMATION);
+					alert.setTitle("Messaggio informativo");
+					alert.setHeaderText(null);
+					alert.setContentText("Il giorno del giudizio è arrivato per "+targetPlayer.getUsername());
+					alert.showAndWait();
+				}
 				this.eliminatePlayer(target);
 				break;
 			}
@@ -320,6 +320,21 @@ public class Tournament extends Game{
 		currentPlayer.getHand().remove(submittedCard);
 	}
 	
+	public Card drawCard(int currentPlayer) {//metodo per pescare la carta e aggiungerla alla mano 
+		Card c=deck.drawCard();
+		this.currentPlayer=currentPlayer;
+		actualGamePlayers.get(currentPlayer).getHand().add(c);
+		hasDrawedValue=true;
+		hasDrawed.set(hasDrawedValue); // hasDrawed diventa true cosi che il giocatore non possa pescare più di una carta per turno in quanto viene disattivato il bottone per pescare
+		return c;
+	}
+	
+	public void discardCard(int currentPlayer,int selectedCard) { //scarta una carta
+		deck.addToStockPile(actualGamePlayers.get(currentPlayer).getHand().remove(selectedCard));
+		this.currentPlayer=currentPlayer;
+		hasDiscardedValue=true;
+		hasDiscarded.set(hasDiscardedValue); //HasDiscarded diventa true in modo che il giocatore corrente non possa scartare più di una carta
+	}
 	
 	public ArrayList<Player> getActualGamePlayers() {
 		return actualGamePlayers;
@@ -360,5 +375,7 @@ public class Tournament extends Game{
 		actualGamePlayersNames.addAll(latestTwo);
 		return latestTwo;
 	}
+	
+	
 }
 	

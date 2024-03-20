@@ -1,4 +1,4 @@
-package application;
+package leaderboard;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -80,8 +80,6 @@ public class Leaderboard implements Serializable{
 			scores.remove(position);
 			orderLeaderboard();
 		}
-		else 
-			System.out.println("Non esiste");
 	}
 	public void increaseScore(String player) {
 		if(names.contains(player)) {
@@ -90,8 +88,6 @@ public class Leaderboard implements Serializable{
 			scores.set(position, ++previousScore);
 			orderLeaderboard();
 		}
-		else 
-			System.out.println("Non esiste");
 	}
 	public void renamePlayerInLeaderboard(String oldName,String newName) {
 		if(names.contains(oldName)) {
@@ -99,8 +95,6 @@ public class Leaderboard implements Serializable{
 			names.set(position, newName);
 			orderLeaderboard();
 		}
-		else 
-			System.out.println("Non esiste");
 	}
 	private void getPlayersNames() {
 		playersNames=new ArrayList<String>();

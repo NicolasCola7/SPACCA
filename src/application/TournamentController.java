@@ -1,16 +1,29 @@
 package application;
 import cards.*;
 import cards.actions.ActionCard;
+import cards.actions.AttackCard;
 import cards.actions.BoardingCard;
 import cards.actions.HealingPotionCard;
 import cards.actions.SauronEyeCard;
 import cards.characters.Character;
+import cards.events.DoomsdayCard;
 import cards.events.EventCard;
+import cards.events.IdentityTheftCard;
 import cards.events.MiracleCard;
+import cards.statics.AztecCurseCard;
+import cards.statics.BlackWidowsPoisonCard;
+import cards.statics.EnchantedMirrorCard;
+import cards.statics.HologramCard;
+import cards.statics.RingCard;
+import cards.statics.ShieldCard;
 import cards.statics.StaticCard;
+import game.Bot;
+import game.NoWinnerException;
 import game.Player;
 import game.Tournament;
 import game.TournamentPhase;
+import leaderboard.Leaderboard;
+import leaderboard.LeaderboardData;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -117,31 +130,49 @@ public class TournamentController implements Initializable{
 				tournament=deserialize("./Files/ConfigurationFiles/"+gameCode+".ser");
 				currentPlayer=tournament.getCurrentPlayer();
 				tournament.initializeProperties();
-				initializeCardsBox(currentPlayer);
-				}
+			}
 			else {
 				tournament=new Tournament(gameCode,adminUsername);
 				currentPlayer=0;
-				initializeCardsBox(currentPlayer);
 			}
-		
+			actualGamePlayersNames=tournament.getActualGamePlayersNames();
+			initializeCardsBox(currentPlayer);
+
 		    primaryStage = (Stage) drawCardButton.getScene().getWindow();
 			primaryStage.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::closeWindowEvent);
 	    });  
 	}
 	private void initializeCardsBox(int currentPlayer) {// inizializza la UI del giocatore corrente
+		
 		currentPlayerHand=new ArrayList<ToggleButton>();
-		actualGamePlayersNames=tournament.getActualGamePlayersNames();
 		turnLabel.setText(tournament.getTurn()+"° turno");
 		playerUsernameLabel.setText("Username:"+tournament.getPlayer(currentPlayer).getUsername());
 		group=new ToggleGroup();
-		for(int i=0;i<tournament.getPlayer(currentPlayer).getHand().size();i++) {
-			Card card=tournament.getPlayer(currentPlayer).getHand().get(i);
-			ToggleButton btn=new ToggleButton(card.getName());
-			addToCardsBox(btn);
+		
+		if(areBothBot()) {
+			int looser=(int)(Math.random()*2);
+			tournament.eliminatePlayer(looser);
+			endCurrentGame(0);
 		}
-		setBindings();	
+		else if(isBot(this.currentPlayer)) {
+			Alert alert = new Alert(AlertType.INFORMATION);
+		    alert.setTitle("Informazione");
+		    alert.setHeaderText("Sta giocando "+tournament.getPlayer(this.currentPlayer).getUsername()+":"); 
+		    alert.setContentText("Premi OK per continuare!");
+	        alert.showAndWait();
+	        useBotRoutine();
+		}
+		else {
+			for(int i=0;i<tournament.getPlayer(currentPlayer).getHand().size();i++) {
+				Card card=tournament.getPlayer(currentPlayer).getHand().get(i);
+				ToggleButton btn=new ToggleButton(card.getName());
+				addToCardsBox(btn);
+			}
+			setBindings();
+			
+		}
 	}
+	
 	private void setBindings() { // serve a fare in modo che i bottoni vengano disattivati e attivati  in determinate situazioni
 		hasDrawed=tournament.getHasDrawed();
 		hasAttacked=tournament.getHasAttacked();
@@ -218,97 +249,44 @@ public class TournamentController implements Initializable{
 	}
 
 	public void submitCard(ActionEvent event)throws IOException{ // per giocare una carta
+		
 		ToggleButton btn=(ToggleButton)group.getSelectedToggle(); //ottengo il bottone selezionato
-		Card submittedCard=tournament.getCurrentPlayersHand(currentPlayer).get(currentPlayerHand.indexOf(btn)); // ottengo la carta nella mano del giocatore corrispondente all'indice del bottone
-		int submittedCardIndex=currentPlayerHand.indexOf(btn); // ottengo l'indice della carta nella mano del giocatore 
+		int submittedCardIndex=currentPlayerHand.indexOf(btn); // ottengo l'indice della carta nella mano del giocatore
+		Card submittedCard=tournament.getPlayer(currentPlayer).getHand().get(submittedCardIndex); // ottengo la carta nella mano del giocatore corrispondente all'indice del bottone
 		String toAttack=actualGamePlayersNames.get(1-currentPlayer); // nome avversario
 		int targetPlayer=0;
 		if(submittedCard instanceof ActionCard ) {
 			
-			if(submittedCard instanceof HealingPotionCard || submittedCard instanceof SauronEyeCard ) { // in questo caso nel metodo passo 2 volte currentPlayer perchè per queste 2 carte non serve passare il target Player
-				tournament.submitActionCard(submittedCardIndex, currentPlayer,currentPlayer);
-				removeFromCardsBox(btn);
-			}
-				
-			else {
-		        targetPlayer=actualGamePlayersNames.indexOf(toAttack);
-	        	tournament.submitActionCard(submittedCardIndex, currentPlayer,targetPlayer);
-	        	removeFromCardsBox(btn);
-		      
-		        if(submittedCard instanceof BoardingCard) // in questo caso aggiorno la mano per vedere la carta rubata dalla mano dell'avversario selezionato
-		        	refreshCardsBox(currentPlayer);
-			}		
+	        targetPlayer=actualGamePlayersNames.indexOf(toAttack);
+        	tournament.submitActionCard(submittedCardIndex, currentPlayer,targetPlayer);
+        	removeFromCardsBox(btn);
+	        if(submittedCard instanceof BoardingCard) // in questo caso aggiorno la mano per vedere la carta rubata dalla mano dell'avversario selezionato
+	        	refreshCardsBox(currentPlayer);		
 		}
+		
 		else if(submittedCard instanceof EventCard) {
-			
-			if(submittedCard instanceof MiracleCard) {
-				tournament.submitEventCard(submittedCardIndex, currentPlayer,currentPlayer); // stesso caso delle actionCard HralingPotion e SuronEye
-				 removeFromCardsBox(btn);
-			}
-			else {
-				targetPlayer=actualGamePlayersNames.indexOf(toAttack);
-				tournament.submitEventCard(submittedCardIndex, currentPlayer,targetPlayer);
-		        removeFromCardsBox(btn);
-	        }
+		
+			targetPlayer=actualGamePlayersNames.indexOf(toAttack);
+			tournament.submitEventCard(submittedCardIndex, currentPlayer,targetPlayer);
+	        removeFromCardsBox(btn);
 		}
+		
 		else if(submittedCard instanceof WeaponCard) {
+			
 			if(tournament.submitWeaponCard(submittedCardIndex, currentPlayer)) {
 				 removeFromCardsBox(btn);
 			}
 		}
+		
 		else {
 			if(tournament.submitStaticCard(submittedCardIndex, currentPlayer)) {
 				 removeFromCardsBox(btn);
 			}
 		}
 		
-		if(actualGamePlayersNames.size()==1 && currentPlayer==1) {//controllo che serve per quando viene eliminato un giocatore che in ordine di giocata è prima del giocatore corrente
-			currentPlayer=0;
-			tournament.setCurrentPlayer(currentPlayer);
-		}
+		checkElimination();
+		checkCurrentPlayerElimination(targetPlayer);
 		
-		if(tournament.getPlayer(currentPlayer).getCharacter().getCurrentLife()<=0) {
-		 // caso in cui l'attaccate venga eliminato dal veleno di vedova nera o specchio o entrambi
-				Alert alert=new Alert(Alert.AlertType.INFORMATION);
-				alert.setTitle("Messaggio informativo");
-				alert.setHeaderText(null);
-				Player target =tournament.getPlayer(targetPlayer);
-				if(target.hasEnchantedMirror() && target.hasBlackWidowsPoison()) {
-					target.removeFromBoardInPosition(0);
-					alert.setContentText("Il veleno di vedova nera e lo specchio ti hanno ucciso!Sei stato eliminato da "+target.getUsername()+".");
-				}
-				else if(target.hasEnchantedMirror() && !target.hasBlackWidowsPoison()) {
-					target.removeFromBoardInPosition(0);
-					alert.setContentText("Lo specchio ti ha ucciso!Sei stato eliminato da "+target.getUsername()+".");
-				}
-				else
-					alert.setContentText("Il veleno di vedova nera ti ha ucciso!Sei stato eliminato da "+target.getUsername()+".");
-				alert.showAndWait();
-				
-			tournament.eliminatePlayer(currentPlayer);
-			currentPlayer=0;
-			tournament.setCurrentPlayer(currentPlayer);
-			
-			if(tournament.getActualGamePlayers().size()==0) { //caso in cui i due giocatori si eliminino a vicenda
-					ArrayList<String> latestTwo=tournament.getLatestTwoEliminated();
-					alert=new Alert(Alert.AlertType.INFORMATION);
-					alert.setTitle("Messaggio informativo");
-					alert.setHeaderText(null);
-					alert.setContentText("Vi siete eliminati a vicenda, verrà lanciata una moneta per decretare il vincitore: se esce testa vince "+latestTwo.get(0)+", se esce croce "+latestTwo.get(1));
-					alert.showAndWait();
-					int winner=(int)(Math.random()+1);
-					if (winner==0) {
-						alert.setContentText("E' uscito TESTA");
-						alert.showAndWait();
-						tournament.eliminatePlayer(1);
-					}
-					else {
-						alert.setContentText("E' uscito CROCE");
-						alert.showAndWait();
-						tournament.eliminatePlayer(0);
-					}
-			}
-		}
 		if(tournament.isTournamentGameOver()) //controlla se è rimasto solo un giocatore 
 			endTournament(currentPlayer);
 		
@@ -320,11 +298,237 @@ public class TournamentController implements Initializable{
 	
 	public void submitPlayer(ActionEvent event)throws IOException{ //passa la giocata al prossimo giocatore
 		updateCurrentPlayer(currentPlayer);
-		tournament.setHasAttacked(false);
-		tournament.setHasDiscarded(false);
-		tournament.setHasDrawed(false);
 	}
 	
+	private boolean isBot(int current) {
+		if (tournament.getPlayer(current) instanceof Bot)
+			return true;
+		else
+			return false;		
+	}
+	private boolean areBothBot() {
+		boolean check=false;
+		for(Player p:tournament.getActualGamePlayers()){
+			if(p instanceof Bot)
+				check=true;
+			else {
+				check=false;
+				break;
+			}
+		}
+		return check;
+	}
+	private void useBotRoutine() {
+		Alert alert = new Alert(AlertType.INFORMATION);
+	    alert.setTitle("Informazione");
+	    alert.setHeaderText(null); 
+	    
+		Bot bot =(Bot) tournament.getPlayer(currentPlayer);
+		String botActionsMessage="Il bot ha eseguito le seguenti azioni:\n";
+		//board del bot
+		StaticCard[] board=bot.getBoard();
+		
+		// 1° azione:pesca una carta;
+		tournament.drawCard(currentPlayer);
+		botActionsMessage=botActionsMessage+"-Pescato una carta;\n";
+		
+		//2° azione:controllo se ho un'arma equipaggiata, se non ce l'ho ne cerco una nella mano e la equipaggio
+		if(bot.getEquipedWeapon()==null) {
+			for(Card c:bot.getHand())
+				if(c instanceof WeaponCard) {
+					botActionsMessage=botActionsMessage+"-Equipaggiato un'arma;\n";
+					tournament.submitWeaponCard(bot.getHand().indexOf(c),currentPlayer);
+					break;
+				}
+		}
+		
+		if(tournament.getTurn()!=1) {
+			//3° azione: utilizzo una qualsiasi carta azione che non sia Attacco
+			for(Card c:bot.getHand())
+				if(c instanceof ActionCard && !(c instanceof AttackCard)) {
+					int targetPlayer=1-currentPlayer;
+					
+					if(c instanceof HealingPotionCard || c instanceof SauronEyeCard)
+						botActionsMessage=botActionsMessage+"-Usato la carta "+c.getName()+";\n";
+					else 
+						botActionsMessage=botActionsMessage+"-Usato la carta "+c.getName()+" su "+tournament.getPlayer(targetPlayer).getUsername()+";\n";
+					
+					tournament.submitActionCard(bot.getHand().indexOf(c),currentPlayer,targetPlayer);
+					checkElimination();
+					checkCurrentPlayerElimination(targetPlayer);
+					//controlla se è rimasto solo un giocatore 
+					if(tournament.isTournamentGameOver()) {
+						alert.setContentText(botActionsMessage);
+				        alert.showAndWait();
+						endTournament(currentPlayer);
+						return;
+					}
+					else if(tournament.isActualGameOver()) {
+						alert.setContentText(botActionsMessage);
+				        alert.showAndWait();
+						 endCurrentGame(currentPlayer);
+						 return;
+					}
+					break;
+				}
+			
+			//4° azione: controlla se ha carta attacco e la usa
+			if(bot.hasAttackCard()) {
+				//scelgo un giocatore da attaccare
+				int targetPlayer=1-currentPlayer;
+				//cerco posizione carta
+				for(Card c:bot.getHand())
+					if(c instanceof AttackCard) {
+						botActionsMessage=botActionsMessage+"-Attaccato "+tournament.getPlayer(targetPlayer).getUsername()+";\n";
+						tournament.submitActionCard(bot.getHand().indexOf(c),currentPlayer,targetPlayer);
+						break;
+					}
+				checkElimination();
+				checkCurrentPlayerElimination(targetPlayer);
+				//controlla se è rimasto solo un giocatore 
+				if(tournament.isTournamentGameOver()) {
+					alert.setContentText(botActionsMessage);
+			        alert.showAndWait();
+					endTournament(currentPlayer);
+					return;
+				}
+				else if(tournament.isActualGameOver()) {
+					alert.setContentText(botActionsMessage);
+			        alert.showAndWait();
+					endCurrentGame(currentPlayer);
+					return;
+				}
+			}
+			//5° azione:gestione carte evento, se ne ha una la usa(la carta miracolo solo se ha <=30 p.ti vita)
+			if(bot.hasEventCard()) {
+				int targetPlayer=1-currentPlayer;
+				for(Card c:bot.getHand()) {
+					if(c instanceof DoomsdayCard) {
+						botActionsMessage=botActionsMessage+"-Eliminato, usando la carta Giorno del Giudizio, "+tournament.getPlayer(targetPlayer).getUsername()+";\n";
+						tournament.submitEventCard(bot.getHand().indexOf(c),currentPlayer,targetPlayer);
+						checkElimination();
+						checkCurrentPlayerElimination(targetPlayer);
+						//controlla se è rimasto solo un giocatore 
+						if(tournament.isTournamentGameOver()) {
+							alert.setContentText(botActionsMessage);
+					        alert.showAndWait();
+							endTournament(currentPlayer);
+							return;
+						}
+						else if(tournament.isActualGameOver()) {
+							alert.setContentText(botActionsMessage);
+					        alert.showAndWait();
+							 endCurrentGame(currentPlayer);
+							 return;
+						}
+						break;
+					}
+					if(c instanceof IdentityTheftCard) {
+						botActionsMessage=botActionsMessage+"-Cambiato personaggio usando la carta Furto d'identità su "+tournament.getPlayer(targetPlayer).getUsername()+";\n";
+						tournament.submitEventCard(bot.getHand().indexOf(c),currentPlayer,targetPlayer);
+						break;
+					}
+					if(c instanceof MiracleCard && bot.getCharacter().getCurrentLife()<=30) {
+						botActionsMessage=botActionsMessage+"-Recuperato tutti i punti vita usando la carta Miracolo;\n";
+						tournament.submitEventCard(bot.getHand().indexOf(c),currentPlayer,currentPlayer);
+						break;
+					}
+				}
+			}
+		}
+		
+		//6° azione: posiziono tutte le carte statiche che posso nelle posizioni libere
+		if(board[0]==null) {
+			for(Card c:bot.getHand())
+				if(c instanceof ShieldCard || c instanceof HologramCard || c instanceof EnchantedMirrorCard) {
+					tournament.submitStaticCard(bot.getHand().indexOf(c),currentPlayer);
+					break;
+				}
+		}
+		if(board[1]==null) {
+			for(Card c:bot.getHand())
+				if(c instanceof AztecCurseCard || c instanceof RingCard || c instanceof BlackWidowsPoisonCard) {
+					tournament.submitStaticCard(bot.getHand().indexOf(c),currentPlayer);
+					break;
+				}
+		}
+		
+		
+		
+		//7° azione: scarta una carta
+		if(!bot.getHand().isEmpty()) {
+			int toDiscard=(int)(Math.random()*bot.getHand().size());
+			botActionsMessage=botActionsMessage+"-Scartato una carta;\n";
+			tournament.discardCard(currentPlayer,toDiscard);
+		}
+		
+		//mostro le azioni  rilevanti effettuate dal bot
+		alert.setContentText(botActionsMessage);
+        alert.showAndWait();
+		
+		//8° azione: passo turno
+		updateCurrentPlayer(currentPlayer);  
+	}
+	
+	//controllo che serve per quando viene eliminato un giocatore che in ordine di giocata è prima del giocatore corrente
+	private void checkElimination() {
+		if(actualGamePlayersNames.size()==1 && currentPlayer==1) {
+			currentPlayer=0;
+			tournament.setCurrentPlayer(currentPlayer);
+		}
+	}
+		
+	 // caso in cui l'attaccate venga eliminato dal veleno di vedova nera o specchio o entrambi
+	private void checkCurrentPlayerElimination(int targetPlayer) {
+		if(tournament.getPlayer(currentPlayer).getCharacter().getCurrentLife()<=0) {
+			Alert alert=new Alert(Alert.AlertType.INFORMATION);
+			alert.setTitle("Messaggio informativo");
+			alert.setHeaderText(null);
+			Player target =tournament.getPlayer(targetPlayer);
+			if(target.hasEnchantedMirror() && target.hasBlackWidowsPoison()) {
+				target.removeFromBoardInPosition(0);
+				alert.setContentText("Il veleno di vedova nera e lo specchio ti hanno ucciso!Sei stato eliminato da "+target.getUsername()+".");
+			}
+			else if(target.hasEnchantedMirror() && !target.hasBlackWidowsPoison()) {
+				target.removeFromBoardInPosition(0);
+				alert.setContentText("Lo specchio ti ha ucciso!Sei stato eliminato da "+target.getUsername()+".");
+			}
+			else
+				alert.setContentText("Il veleno di vedova nera ti ha ucciso!Sei stato eliminato da "+target.getUsername()+".");
+			
+			if(!(tournament.getPlayer(currentPlayer) instanceof Bot))
+				alert.showAndWait();
+			
+			tournament.eliminatePlayer(currentPlayer);
+			currentPlayer=0;
+			tournament.setCurrentPlayer(currentPlayer);
+		}
+		
+		checkConcurrentElimination();
+	}
+	
+	//caso in cui i due giocatori si eliminino a vicenda	
+	private void checkConcurrentElimination() {
+		if(tournament.getActualGamePlayers().size()==0) { 
+			ArrayList<String> latestTwo=tournament.getLatestTwoEliminated();
+			Alert alert=new Alert(Alert.AlertType.INFORMATION);
+			alert.setTitle("Messaggio informativo");
+			alert.setHeaderText(null);
+			alert.setContentText("Vi siete eliminati a vicenda, verrà lanciata una moneta per decretare il vincitore: se esce testa vince "+latestTwo.get(0)+", se esce croce "+latestTwo.get(1));
+			alert.showAndWait();
+			int winner=(int)(Math.random()*2);
+			if (winner==0) {
+				alert.setContentText("E' uscito TESTA");
+				alert.showAndWait();
+				tournament.eliminatePlayer(1);
+			}
+			else {
+				alert.setContentText("E' uscito CROCE");
+				alert.showAndWait();
+				tournament.eliminatePlayer(0);
+			}
+		}
+	}
 	private void removeFromCardsBox(ToggleButton btn) { //rimuove una determinata carta/bottone dalla UI
 		currentPlayerHand.remove(btn);
 		cardsBox.getChildren().remove(btn);
@@ -342,15 +546,19 @@ public class TournamentController implements Initializable{
 	}
 	
 	private void updateCurrentPlayer(int currentPlayer) {
+		tournament.setHasAttacked(false);
+		tournament.setHasDiscarded(false);
+		tournament.setHasDrawed(false);
 		if(currentPlayer==1)
 			tournament.changeTurn();
 		
 		this.currentPlayer=1-currentPlayer;
 		tournament.setCurrentPlayer(this.currentPlayer);
+		
 		refreshCardsBox(this.currentPlayer);
 	}
 	
-	private void refreshCardsBox(int currentPlayer) { //aggiorna la UI
+	private void refreshCardsBox(int currentPlayer) {//aggiorna la UI
 		group.getToggles().clear();
 		cardsBox.getChildren().clear();
 		currentPlayerHand.clear();
@@ -371,14 +579,20 @@ public class TournamentController implements Initializable{
 		
 	}
 	private void endCurrentGame(int currentPlayer) {
+		String actualWinner=actualGamePlayersNames.get(currentPlayer);
 		Alert alert=new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle("Messaggio informativo");
 		alert.setHeaderText(null);
-		alert.setContentText("Congratulazioni "+actualGamePlayersNames.get(currentPlayer)+", hai vinto la partita e sei passato alla fase successiva!");
+		alert.setContentText("Congratulazioni "+actualWinner+", hai vinto la partita e sei passato alla fase successiva!");
 		alert.showAndWait();
+		
 		tournament.switchGame();
+		
+		actualGamePlayersNames=tournament.getActualGamePlayersNames();
 		refreshCardsBox(tournament.getCurrentPlayer());
+	
 	}
+	
 	private void disableButtons() {
 		tournament.setHasAttacked(true);
 		tournament.setHasDiscarded(true);

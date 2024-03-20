@@ -18,7 +18,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
-import application.Leaderboard;
+import leaderboard.Leaderboard;
 import cards.*;
 import cards.actions.*;
 import cards.statics.*;
@@ -41,15 +41,13 @@ public class ClassicGame extends Game {
 		initializeProperties();
 	}
 	
-	protected void buildPlayersHands() {
-		players=new LinkedList<Player>();
-		for(int i=0;i<nOfPlayers;i++) {
-			players.add(new Player(playersNames.get(i),chDeck.getCharacter()));
+	public void buildPlayersHands() {
+		for(int i=0;i<nOfPlayers;i++) 
 			players.get(i).getHand().addAll(deck.drawHand());
-		}
 	}
 	
-	protected void insertPlayers() {
+	public void insertPlayers() {
+		players=new LinkedList<Player>();
 		try {
 			Scanner scan=new Scanner(datas);
 			while(scan.hasNextLine()) {
@@ -57,8 +55,14 @@ public class ClassicGame extends Game {
 				if(line[2].equals(gameCode)) {
 					nOfPlayers=Integer.parseInt(line[3]);
 					playersNames=new ArrayList<String>(nOfPlayers);
+					
 					for(int i=0;i<nOfPlayers;i++) {
 						playersNames.add(line[4+i]);
+						
+						if(line[4+i].equals("bot"+i))
+							players.add(new Bot(playersNames.get(i),chDeck.getCharacter()));
+						else
+							players.add(new Player(playersNames.get(i),chDeck.getCharacter()));	
 					}
 					break;
 				}
@@ -92,6 +96,7 @@ public class ClassicGame extends Game {
 		Player attackingPlayer=players.get(currentPlayer);
 		Player targetPlayer=players.get(target);
 		ActionCard submittedActionCard=(ActionCard)attackingPlayer.getHand().get(submittedCard);
+		String message="";
 		switch(submittedActionCard.getName()) {
 			case "AttackCard":{
 				hasAttackedValue=true;
@@ -100,11 +105,7 @@ public class ClassicGame extends Game {
 				ac.onUse(attackingPlayer,targetPlayer, deck);
 				if(targetPlayer.getCharacter().getCurrentLife()<=0) {// caso in cui con l'attacco si elimina un giocatore
 					this.eliminatePlayer(target);
-					alert=new Alert(Alert.AlertType.INFORMATION);
-					alert.setTitle("Messaggio informativo");
-					alert.setHeaderText(null);
-					alert.setContentText("Hai eliminato "+targetPlayer.getUsername()+".");
-					alert.showAndWait();
+					message="Hai eliminato "+targetPlayer.getUsername()+".";
 				}
 				break;	
 			}
@@ -122,38 +123,28 @@ public class ClassicGame extends Game {
 					else
 						index++;
 				}
-				alert=new Alert(Alert.AlertType.INFORMATION);
-				alert.setTitle("Messaggio informativo");
-				alert.setHeaderText(null);
-				if(eliminated.length()>1) 
-					alert.setContentText("Hai inflitto 20 p.ti danno a tutti i giocatori, e hai eliminato "+eliminated);
-				else
-					alert.setContentText("Hai inflitto 20 p.ti danno ha tutti i giocatori!");
-				alert.showAndWait();
 				
+				if(eliminated.length()>1) 
+					message="Hai inflitto 20 p.ti danno a tutti i giocatori, e hai eliminato "+eliminated;
+				else
+					message="Hai inflitto 20 p.ti danno ha tutti i giocatori!";
+
 				break;
 			}
 			case "GauntletCard":{
 				GauntletCard gc=new GauntletCard();
 				Card discarded=gc.onUse(attackingPlayer,targetPlayer, deck);
 				targetPlayer.getHand().remove(discarded);
-				alert=new Alert(Alert.AlertType.INFORMATION);
-				alert.setTitle("Messaggio informativo");
-				alert.setHeaderText(null);
-				alert.setContentText("La carta '"+discarded.getName()+"' è stata scartata dalla mano di "+targetPlayer.getUsername());
-				alert.showAndWait();
+				
+				message="La carta '"+discarded.getName()+"' è stata scartata dalla mano di "+targetPlayer.getUsername();
 				break;
 			}
 			case "BoardingCard":{
 				BoardingCard bc=new BoardingCard();
 				Card stolen=bc.onUse(attackingPlayer,players.get(target) , deck);
 				attackingPlayer.getHand().add(stolen);
-				targetPlayer.getHand().remove(stolen);
-				alert=new Alert(Alert.AlertType.INFORMATION);
-				alert.setTitle("Messaggio informativo");
-				alert.setHeaderText(null);
-				alert.setContentText("La carta '"+stolen.getName()+"' è stata rubata dalla mano di "+targetPlayer.getUsername());
-				alert.showAndWait();
+				
+				message="La carta '"+stolen.getName()+"' è stata rubata dalla mano di "+targetPlayer.getUsername();
 				break;
 			}
 			case "HealingPotionCard":{
@@ -167,6 +158,15 @@ public class ClassicGame extends Game {
 				break;
 			}
 		}
+		
+		if(!(players.get(this.currentPlayer) instanceof Bot)) {
+			alert=new Alert(Alert.AlertType.INFORMATION);
+			alert.setTitle("Messaggio informativo");
+			alert.setHeaderText(null);
+			alert.setContentText(message);
+			alert.showAndWait();
+		}
+		
 		this.currentPlayer=currentPlayer;
 		attackingPlayer.getHand().remove(submittedCard);	
 	}
@@ -236,11 +236,13 @@ public class ClassicGame extends Game {
 			case "DoomsdayCard":{
 				DoomsdayCard dc=new DoomsdayCard();
 				dc.onUse(currentPlayer,targetPlayer,deck);
-				alert=new Alert(Alert.AlertType.INFORMATION);
-				alert.setTitle("Messaggio informativo");
-				alert.setHeaderText(null);
-				alert.setContentText("Il giorno del giudizio è arrivato per "+targetPlayer.getUsername());
-				alert.showAndWait();
+				if(!(players.get(this.currentPlayer) instanceof Bot)) {
+					alert=new Alert(Alert.AlertType.INFORMATION);
+					alert.setTitle("Messaggio informativo");
+					alert.setHeaderText(null);
+					alert.setContentText("Il giorno del giudizio è arrivato per "+targetPlayer.getUsername());
+					alert.showAndWait();
+				}
 				this.eliminatePlayer(target);
 				break;
 			}
@@ -253,7 +255,19 @@ public class ClassicGame extends Game {
 		this.currentPlayer=player;
 		currentPlayer.getHand().remove(submittedCard);
 	}
-	
-	
+	public Card drawCard(int currentPlayer) {//metodo per pescare la carta e aggiungerla alla mano 
+		Card c=deck.drawCard();
+		this.currentPlayer=currentPlayer;
+		players.get(currentPlayer).getHand().add(c);
+		hasDrawedValue=true;
+		hasDrawed.set(hasDrawedValue); // hasDrawed diventa true cosi che il giocatore non possa pescare più di una carta per turno in quanto viene disattivato il bottone per pescare
+		return c;
+	}
+	public void discardCard(int currentPlayer,int selectedCard) { //scarta una carta
+		deck.addToStockPile(this.getPlayersHand(currentPlayer).remove(selectedCard));
+		this.currentPlayer=currentPlayer;
+		hasDiscardedValue=true;
+		hasDiscarded.set(hasDiscardedValue); //HasDiscarded diventa true in modo che il giocatore corrente non possa scartare più di una carta
+	}
 }
 	

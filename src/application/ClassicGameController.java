@@ -1,23 +1,23 @@
 /*TODO
  * controllare quando vine eliminato un giocatore prima nel caso in cui ci siamo 4 o 5 giocatori e valutare se dare la possinilità di giocare in 4  o 5
- * implementare il bot
+ * fare in modo che nel primo turno non si possano usare carte evento o azione?
  * grafica
  * avanzamento torneo(da considerare come componente aggiuntiva?)
  */
 package application;
 import cards.*;
-import cards.actions.ActionCard;
-import cards.actions.BoardingCard;
-import cards.actions.HealingPotionCard;
-import cards.actions.SauronEyeCard;
+import cards.actions.*;
+import cards.events.*;
+import cards.statics.*;
+import cards.characters.*;
 import cards.characters.Character;
-import cards.events.EventCard;
-import cards.events.MiracleCard;
-import cards.statics.StaticCard;
 import game.Player;
 import game.GameType;
+import game.Bot;
 import game.ClassicGame;
+import leaderboard.Leaderboard;
 import game.NoWinnerException;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -56,7 +56,10 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
+import javafx.util.Duration;
+import leaderboard.LeaderboardData;
 
 import java.beans.EventHandler;
 import java.io.File;
@@ -238,7 +241,7 @@ public class ClassicGameController implements Initializable{
 
 	public void submitCard(ActionEvent event)throws IOException{ // per giocare una carta
 		ToggleButton btn=(ToggleButton)group.getSelectedToggle(); //ottengo il bottone selezionato
-		Card submittedCard=game.getCurrentPlayersHand(currentPlayer).get(currentPlayerHand.indexOf(btn)); // ottengo la carta nella mano del giocatore corrispondente all'indice del bottone
+		Card submittedCard=game.getPlayersHand(currentPlayer).get(currentPlayerHand.indexOf(btn)); // ottengo la carta nella mano del giocatore corrispondente all'indice del bottone
 		int submittedCardIndex=currentPlayerHand.indexOf(btn); // ottengo l'indice della carta nella mano del giocatore 
 		ArrayList<String> toAttack=new ArrayList<String>(); // lista dei giocatori che possono essere attaccati
 		toAttack.addAll(players);
@@ -299,8 +302,25 @@ public class ClassicGameController implements Initializable{
 		System.out.println("current:"+currentPlayer);
 		System.out.println("current size:"+actualNumberOfPlayers);
 		System.out.println("real size:"+players.size()); */
+		
+		checkElimination(targetPlayer);
+		 
+		checkCurrentPlayerElimination(targetPlayer);
+		
+		if(game.isGameOver()) //controlla se è rimasto solo un giocatore 
+			endGame(currentPlayer);
+	}
 	
-		if(players.size()<actualNumberOfPlayers && targetPlayer<currentPlayer) {//controllo che serve per quando viene eliminato un giocatore che in ordine di giocata è prima del giocatore corrente
+	public void submitPlayer(ActionEvent event)throws IOException{ //passa la giocata al prossimo giocatore
+		updateCurrentPlayer(currentPlayer);
+		game.setHasAttacked(false);
+		game.setHasDiscarded(false);
+		game.setHasDrawed(false);
+	}
+	
+	//controllo che serve per quando viene eliminato un giocatore che in ordine di giocata è prima del giocatore corrente
+	private void checkElimination(int targetPlayer) {
+		if(players.size()<actualNumberOfPlayers && targetPlayer<currentPlayer) {
 			if(currentPlayer==actualNumberOfPlayers-1 || actualNumberOfPlayers>3) {
 				currentPlayer=currentPlayer-(actualNumberOfPlayers-players.size());
 			}
@@ -310,9 +330,12 @@ public class ClassicGameController implements Initializable{
 			game.setCurrentPlayer(currentPlayer);
 			actualNumberOfPlayers=game.getNOfPlayers();
 		}
-		
-		if(game.getPlayer(currentPlayer).getCharacter().getCurrentLife()<=0) {//serve a gestire il caso in cui il giocatore corrente venga eliminato dal veleno di vedova nera o dallo specchio
-			 // caso in cui l'attaccate venga eliminato dal veleno di vedova nera o specchio o entrambi
+	}
+	
+	 // caso in cui l'attaccate venga eliminato dal veleno di vedova nera o specchio o entrambi
+	private void checkCurrentPlayerElimination(int targetPlayer) {
+		if(game.getPlayer(currentPlayer).getCharacter().getCurrentLife()<=0) {
+			
 			Alert alert=new Alert(Alert.AlertType.INFORMATION);
 			alert.setTitle("Messaggio informativo");
 			alert.setHeaderText(null);
@@ -327,42 +350,178 @@ public class ClassicGameController implements Initializable{
 			}
 			else
 				alert.setContentText("Il veleno di vedova nera ti ha ucciso!Sei stato eliminato da "+target.getUsername()+".");
-			alert.showAndWait();
+			
+			if(!(game.getPlayer(currentPlayer) instanceof Bot))
+				alert.showAndWait();			
 			
 			game.eliminatePlayer(currentPlayer);
 			
-			if(currentPlayer==actualNumberOfPlayers-1 || players.size()<actualNumberOfPlayers) {
-				
-				if(players.size()==0) { // gestisco l'eccezione del caso in gli ultimi 2 giocatori si eliminano a vicenda
-					try {
-						throw new NoWinnerException("Partita terminata in pareggio, non ci sono vincitori!");
-					}catch(NoWinnerException exception) {
-						alert=new Alert(Alert.AlertType.INFORMATION);
-						alert.setTitle("Messaggio informativo");
-						alert.setHeaderText(null);
-						alert.setContentText(exception.getMessage());
-						alert.showAndWait();
-						deleteSerializationFile();
-						disableButtons();	
-					}
-					deleteGameFromGamesDatasFile();
-				}
-				else
-					updateCurrentPlayer(currentPlayer);
-			}
-			else
-				refreshCardsBox(currentPlayer);
+			checkConcurrentElimination();
 		}
-		
-		if(game.isGameOver()) //controlla se è rimasto solo un giocatore 
-			endGame(currentPlayer);
 	}
 	
-	public void submitPlayer(ActionEvent event)throws IOException{ //passa la giocata al prossimo giocatore
-		updateCurrentPlayer(currentPlayer);
-		game.setHasAttacked(false);
-		game.setHasDiscarded(false);
-		game.setHasDrawed(false);
+	private void checkConcurrentElimination() {
+		if(currentPlayer==actualNumberOfPlayers-1 || players.size()<actualNumberOfPlayers) {
+			// gestisco l'eccezione del caso in gli ultimi 2 giocatori si eliminano a vicenda
+			if(players.size()==0) { 
+				try {
+					throw new NoWinnerException("Partita terminata in pareggio, non ci sono vincitori!");
+				}catch(NoWinnerException exception) {
+					Alert alert=new Alert(Alert.AlertType.INFORMATION);
+					alert.setTitle("Messaggio informativo");
+					alert.setHeaderText(null);
+					alert.setContentText(exception.getMessage());
+					alert.showAndWait();
+					deleteSerializationFile();
+					disableButtons();	
+				}
+				deleteGameFromGamesDatasFile();
+			}
+			else
+				updateCurrentPlayer(currentPlayer);
+		}
+		else
+			refreshCardsBox(currentPlayer);
+	}
+	
+	private boolean isBot(int current) {
+		if (game.getPlayer(current) instanceof Bot)
+			return true;
+		else
+			return false;		
+	}
+	
+	private synchronized void useBotRoutine() {
+		Alert alert = new Alert(AlertType.INFORMATION);
+	    alert.setTitle("Informazione");
+	    alert.setHeaderText(null); 
+	    
+		Bot bot =(Bot) game.getPlayer(currentPlayer);
+		String botActionsMessage="Il bot ha eseguito le seguenti azioni:\n";
+		//board del bot
+		StaticCard[] board=bot.getBoard();
+		
+		// 1° azione:pesca una carta;
+		game.drawCard(currentPlayer);
+		botActionsMessage=botActionsMessage+"-Pescato una carta;\n";
+		
+		//2° azione:controllo se ho un'arma equipaggiata, se non ce l'ho ne cerco una nella mano e la equipaggio
+		if(bot.getEquipedWeapon()==null) {
+			for(Card c:bot.getHand())
+				if(c instanceof WeaponCard) {
+					botActionsMessage=botActionsMessage+"-Equipaggiato un'arma;\n";
+					game.submitWeaponCard(bot.getHand().indexOf(c),currentPlayer);
+					break;
+				}
+		}
+		//azioni 3,4 e 5 eseguite solo se il turno è diverso da uno
+		if(game.getTurn()!=1) {
+			//3° azione: utilizzo una qualsiasi carta azione che non sia Attacco
+			for(Card c:bot.getHand())
+				if(c instanceof ActionCard && !(c instanceof AttackCard)) {
+					int targetPlayer=(currentPlayer==game.getNOfPlayers()-1?0:currentPlayer+1);
+					
+					if(c instanceof HealingPotionCard || c instanceof SauronEyeCard)
+						botActionsMessage=botActionsMessage+"-Usato la carta "+c.getName()+";\n";
+					else 
+						botActionsMessage=botActionsMessage+"-Usato la carta "+c.getName()+" su "+game.getPlayer(targetPlayer).getUsername()+";\n";
+					
+					game.submitActionCard(bot.getHand().indexOf(c),currentPlayer,targetPlayer);
+					checkElimination(targetPlayer);
+					checkCurrentPlayerElimination(targetPlayer);
+					//controlla se è rimasto solo un giocatore 
+					if(game.isGameOver()) {
+						alert.setContentText(botActionsMessage);
+				        alert.showAndWait();
+						endGame(currentPlayer);
+						return;
+					}
+					break;
+				}
+			
+			//4° azione: controlla se ha carta attacco e la usa
+			if(bot.hasAttackCard()) {
+				//scelgo un giocatore da attaccare
+				int targetPlayer=(currentPlayer==game.getNOfPlayers()-1?0:currentPlayer+1);
+				//cerco posizione carta
+				for(Card c:bot.getHand())
+					if(c instanceof AttackCard) {
+						botActionsMessage=botActionsMessage+"-Attaccato "+game.getPlayer(targetPlayer).getUsername()+";\n";
+						game.submitActionCard(bot.getHand().indexOf(c),currentPlayer,targetPlayer);
+						break;
+					}
+				checkElimination(targetPlayer);
+				checkCurrentPlayerElimination(targetPlayer);
+				//controlla se è rimasto solo un giocatore 
+				if(game.isGameOver()) {
+					alert.setContentText(botActionsMessage);
+			        alert.showAndWait();
+					endGame(currentPlayer);
+					return;
+				}
+			}
+			
+			//5° azione:gestione carte evento, se ne ha una la usa(la carta miracolo solo se ha <= p.ti vita)
+			if(bot.hasEventCard()) {
+				int targetPlayer=(currentPlayer==game.getNOfPlayers()-1?0:currentPlayer+1);
+				for(Card c:bot.getHand()) {
+					if(c instanceof DoomsdayCard) {
+						botActionsMessage=botActionsMessage+"-Eliminato, usando la carta Giorno del Giudizio, "+game.getPlayer(targetPlayer).getUsername()+";\n";
+						game.submitEventCard(bot.getHand().indexOf(c),currentPlayer,targetPlayer);
+						checkElimination(targetPlayer);
+						checkCurrentPlayerElimination(targetPlayer);
+						//controlla se è rimasto solo un giocatore 
+						if(game.isGameOver()) {
+							alert.setContentText(botActionsMessage);
+					        alert.showAndWait();
+							endGame(currentPlayer);
+							return;
+						}
+						break;
+					}
+					if(c instanceof IdentityTheftCard) {
+						botActionsMessage=botActionsMessage+"-Cambiato personaggio usando la carta Furto d'identità su "+game.getPlayer(targetPlayer).getUsername()+";\n";
+						game.submitEventCard(bot.getHand().indexOf(c),currentPlayer,targetPlayer);
+						break;
+					}
+					if(c instanceof MiracleCard && bot.getCharacter().getCurrentLife()<=30) {
+						botActionsMessage=botActionsMessage+"-Recuperato tutti i punti vita usando la carta Miracolo;\n";
+						game.submitEventCard(bot.getHand().indexOf(c),currentPlayer,currentPlayer);
+						break;
+					}
+				}
+			}
+		}
+		
+		//6° azione: posiziono tutte le carte statiche che posso nelle posizioni libere
+		if(board[0]==null) {
+			for(Card c:bot.getHand())
+				if(c instanceof ShieldCard || c instanceof HologramCard || c instanceof EnchantedMirrorCard) {
+					game.submitStaticCard(bot.getHand().indexOf(c),currentPlayer);
+					break;
+				}
+		}
+		if(board[1]==null) {
+			for(Card c:bot.getHand())
+				if(c instanceof AztecCurseCard || c instanceof RingCard || c instanceof BlackWidowsPoisonCard) {
+					game.submitStaticCard(bot.getHand().indexOf(c),currentPlayer);
+					break;
+				}
+		}
+		
+		//7° azione: scarta una carta
+		if(!bot.getHand().isEmpty()) {
+			int toDiscard=(int)(Math.random()*bot.getHand().size());
+			botActionsMessage=botActionsMessage+"-Scartato una carta;\n";
+			game.discardCard(currentPlayer,toDiscard);
+		}
+		
+		//mostro le azioni  rilevanti effettuate dal bot
+		alert.setContentText(botActionsMessage);
+        alert.showAndWait();
+		
+		//8° azione: passo turno
+		updateCurrentPlayer(currentPlayer);  
 	}
 	
 	private void removeFromCardsBox(ToggleButton btn) { //rimuove una determinata carta/bottone dalla UI
@@ -390,7 +549,18 @@ public class ClassicGameController implements Initializable{
 		else
 			this.currentPlayer++;
 		game.setCurrentPlayer(this.currentPlayer);
-		refreshCardsBox(this.currentPlayer);
+		
+		if(isBot(this.currentPlayer)) {
+			Alert alert = new Alert(AlertType.INFORMATION);
+		    alert.setTitle("Informazione");
+		    alert.setHeaderText("Sta giocando "+game.getPlayer(this.currentPlayer).getUsername()+":"); 
+		    alert.setContentText("Premi OK per continuare!");
+	        alert.showAndWait();
+			
+	        useBotRoutine();
+		}
+		else
+			refreshCardsBox(this.currentPlayer);
 	}
 	
 	private void refreshCardsBox(int currentPlayer) { //aggiorna la UI
@@ -406,7 +576,7 @@ public class ClassicGameController implements Initializable{
 		alert.setHeaderText(null);
 		alert.setContentText("Congratulazioni "+players.get(currentPlayer)+", hai vinto la partita!");
 		alert.showAndWait();
-		assignScore(players.get(currentPlayer));
+		assignScore(currentPlayer);
 		deleteGameFromGamesDatasFile();
 		deleteSerializationFile();
 		disableButtons();
@@ -462,9 +632,9 @@ public class ClassicGameController implements Initializable{
         return file.exists();
     }
     
-    private void assignScore(String currentPlayerName) {
-    	if(currentPlayerName!="bot")
-    		game.getLeaderboard().increaseScore(currentPlayerName);
+    private void assignScore(int currentPlayer) {
+    	if(!(game.getPlayer(currentPlayer) instanceof Bot))
+    		game.getLeaderboard().increaseScore(game.getPlayer(currentPlayer).getUsername());
     }
     
     public void saveAndQuit(ActionEvent event) throws IOException{

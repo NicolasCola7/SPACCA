@@ -22,12 +22,12 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 public class Player implements Serializable{
 	
-	private String username;
-	private Character character;
-	private StaticCard[] board;
-	private WeaponCard equipedWeapon;
-	private int attackPower;
-	private ArrayList<Card> hand;
+	protected String username;
+	protected Character character;
+	protected StaticCard[] board;
+	protected WeaponCard equipedWeapon;
+	protected int attackPower;
+	protected ArrayList<Card> hand;
 
 	
 	public Player(String name,Character ch) {

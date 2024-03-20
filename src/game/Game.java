@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import application.Leaderboard;
+import leaderboard.Leaderboard;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.Alert;
 import cards.*;
@@ -40,35 +40,22 @@ import decks.*;
 		currentPlayer=0;
 		
 	}
-	abstract protected void insertPlayers();
-	abstract protected void buildPlayersHands();
+	abstract public void insertPlayers();
+	abstract public void buildPlayersHands();
 	abstract public Player getPlayer(int player);
 	abstract public void eliminatePlayer(int player);
 	abstract public void submitActionCard(int submittedCard, int currentPlayer, int target);
 	abstract public boolean submitStaticCard(int submittedCard, int player);
 	abstract public boolean submitWeaponCard(int submittedCard, int player);
 	abstract public void submitEventCard(int submittedCard, int player, int target);
+	abstract public Card drawCard(int currentPlayer);
+	abstract public void discardCard(int currentPlayer,int cardIndex);
 	
 	public void changeTurn() {//cambio turno
 		turn++;
 	}
-	
-	public void discardCard(int currentPlayer,int selectedCard) { //scarta una carta
-		deck.addToStockPile(this.getCurrentPlayersHand(currentPlayer).remove(selectedCard));
-		this.currentPlayer=currentPlayer;
-		hasDiscardedValue=true;
-		hasDiscarded.set(hasDiscardedValue); //HasDiscarded diventa true in modo che il giocatore corrente non possa scartare più di una carta
-	}
-	
-	public Card drawCard(int currentPlayer) {//metodo per pescare la carta e aggiungerla alla mano 
-		Card c=deck.drawCard();
-		this.currentPlayer=currentPlayer;
-		this.getCurrentPlayersHand(currentPlayer).add(c);
-		hasDrawedValue=true;
-		hasDrawed.set(hasDrawedValue); // hasDrawed diventa true cosi che il giocatore non possa pescare più di una carta per turno in quanto viene disattivato il bottone per pescare
-		return c;
-	}
-	public ArrayList<Card> getCurrentPlayersHand(int currentPlayer){// ritorna la mano del gicatore corrente
+		
+	public ArrayList<Card> getPlayersHand(int currentPlayer){// ritorna la mano del gicatore corrente
 		return players.get(currentPlayer).getHand();
 	}
 	public ArrayList<String> getPlayers() {

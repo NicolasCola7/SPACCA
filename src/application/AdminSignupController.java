@@ -23,6 +23,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import leaderboard.Leaderboard;
 
 public class AdminSignupController implements Initializable {
 	private Scene scene;

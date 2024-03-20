@@ -73,6 +73,7 @@ import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
+import leaderboard.Leaderboard;
 
 public class ClassicGameCreationController implements Initializable {
 	private Scene scene;
@@ -127,9 +128,9 @@ public class ClassicGameCreationController implements Initializable {
 		numberOfPlayers=numberOfPlayerSelection.getSelectionModel().getSelectedItem();
 		gamePlayers=new ArrayList<String>( numberOfPlayers);
 		gamePlayers.addAll(playersSelection.getSelectionModel().getSelectedItems());
-		if((botCheck.isSelected() && gamePlayers.size()!= numberOfPlayers) || (!botCheck.isSelected() && gamePlayers.size()== numberOfPlayers) && gameCodeCheck(gameCode.getText())) {
+		if(((botCheck.isSelected() && gamePlayers.size()!= numberOfPlayers) || (!botCheck.isSelected() && gamePlayers.size()== numberOfPlayers)) && gameCodeCheck(gameCode.getText())) {
 			for(int i=gamePlayers.size();i< numberOfPlayers;i++)
-				gamePlayers.add(i,"bot");
+				gamePlayers.add(i,"bot"+i);
 				addToGamesDatasFile();
 				
 				Alert alert=new Alert(AlertType.CONFIRMATION);
@@ -168,6 +169,7 @@ public class ClassicGameCreationController implements Initializable {
 		        	String line=scan.nextLine();
 		        	adminUsername=line;
 		        }
+			  scan.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -181,9 +183,11 @@ public class ClassicGameCreationController implements Initializable {
 			while(scan.hasNextLine()) {
 				players.add(scan.nextLine());
 			}
+			scan.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+		
 		playersSelection.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		playersSelection.getItems().addAll(players);
 	}
@@ -197,11 +201,14 @@ public class ClassicGameCreationController implements Initializable {
 				Scanner scan=new Scanner(file);
 				while(scan.hasNextLine()) {
 					String[] gameInfos=scan.nextLine().split(",");
-					if(gameInfos[2].equals(code))
+					if(gameInfos[2].equals(code)) {
 						check=false;
+						break;
+					}
 					else
 						check=true;
 				}
+				scan.close();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
