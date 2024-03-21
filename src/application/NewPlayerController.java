@@ -76,7 +76,7 @@ public class NewPlayerController implements Initializable {
 			String player=scan.nextLine();
 			players.add(player);	
 		}
-        	if(!players.contains(name) && !name.equalsIgnoreCase("bot")) {
+        	if(!players.contains(name) && !name.substring(0, 3).equalsIgnoreCase("bot")) {
         		addToPlayersList();
         		addToClassicGamesLeaderboard(name);
         		addToTournamentsLeaderboard(name);
@@ -87,7 +87,7 @@ public class NewPlayerController implements Initializable {
         	}
         	else {
         		msg.setVisible(true);
-        		msg.setText("Impossibile inserire questo giocatore, prova con un altro nome!");
+        		msg.setText("Nome invalido o già esistente, prova con un altro nome!");
 				msg.setTextFill(Color.RED);
 				playerUsername.clear();
         	}

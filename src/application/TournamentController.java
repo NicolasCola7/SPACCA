@@ -18,20 +18,13 @@ import cards.statics.RingCard;
 import cards.statics.ShieldCard;
 import cards.statics.StaticCard;
 import game.Bot;
-import game.NoWinnerException;
 import game.Player;
 import game.Tournament;
 import game.TournamentPhase;
 import leaderboard.Leaderboard;
 import leaderboard.LeaderboardData;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
-import javafx.beans.binding.BooleanExpression;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -45,9 +38,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Label;
-import javafx.scene.control.Labeled;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
@@ -57,14 +48,10 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-import java.beans.EventHandler;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -73,13 +60,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 
@@ -142,8 +124,8 @@ public class TournamentController implements Initializable{
 			primaryStage.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::closeWindowEvent);
 	    });  
 	}
+	
 	private void initializeCardsBox(int currentPlayer) {// inizializza la UI del giocatore corrente
-		
 		currentPlayerHand=new ArrayList<ToggleButton>();
 		turnLabel.setText(tournament.getTurn()+"° turno");
 		playerUsernameLabel.setText("Username:"+tournament.getPlayer(currentPlayer).getUsername());
@@ -249,7 +231,6 @@ public class TournamentController implements Initializable{
 	}
 
 	public void submitCard(ActionEvent event)throws IOException{ // per giocare una carta
-		
 		ToggleButton btn=(ToggleButton)group.getSelectedToggle(); //ottengo il bottone selezionato
 		int submittedCardIndex=currentPlayerHand.indexOf(btn); // ottengo l'indice della carta nella mano del giocatore
 		Card submittedCard=tournament.getPlayer(currentPlayer).getHand().get(submittedCardIndex); // ottengo la carta nella mano del giocatore corrispondente all'indice del bottone
@@ -306,6 +287,7 @@ public class TournamentController implements Initializable{
 		else
 			return false;		
 	}
+	
 	private boolean areBothBot() {
 		boolean check=false;
 		for(Player p:tournament.getActualGamePlayers()){
@@ -318,6 +300,7 @@ public class TournamentController implements Initializable{
 		}
 		return check;
 	}
+	
 	private void useBotRoutine() {
 		Alert alert = new Alert(AlertType.INFORMATION);
 	    alert.setTitle("Informazione");
@@ -452,8 +435,6 @@ public class TournamentController implements Initializable{
 					break;
 				}
 		}
-		
-		
 		
 		//7° azione: scarta una carta
 		if(!bot.getHand().isEmpty()) {
@@ -697,6 +678,7 @@ public class TournamentController implements Initializable{
 		   }
 	   }
    }
+   
    private TableView<LeaderboardData>  getLeaderboard() {
 	   TableView<LeaderboardData> leaderboard = new TableView<>();
        TableColumn<LeaderboardData,Integer> positionColumn = new TableColumn<>("POSIZIONE");
@@ -714,6 +696,7 @@ public class TournamentController implements Initializable{
        
        return leaderboard;
    }
+   
    public void showLeaderboard(ActionEvent event)throws IOException{
        VBox vbox = new VBox(getLeaderboard());
        Scene scene = new Scene(vbox, 300, 200);
@@ -722,6 +705,7 @@ public class TournamentController implements Initializable{
        popupLeaderboard.setScene(scene);
        popupLeaderboard.show();
    }
+   
    public void showLeaderboard() {
 	   VBox vbox = new VBox(getLeaderboard());
        Scene scene = new Scene(vbox, 300, 200);

@@ -97,6 +97,7 @@ public class ClassicGame extends Game {
 		Player targetPlayer=players.get(target);
 		ActionCard submittedActionCard=(ActionCard)attackingPlayer.getHand().get(submittedCard);
 		String message="";
+		boolean isBot=players.get(this.currentPlayer) instanceof Bot;
 		switch(submittedActionCard.getName()) {
 			case "AttackCard":{
 				hasAttackedValue=true;
@@ -116,16 +117,15 @@ public class ClassicGame extends Game {
 				int index=0;
 				while(index<players.size()){ // controllo se ho eliminato qualce giocatore utilizzano l'occhio di sauron
 					if(players.get(index).getCharacter().getCurrentLife()<=0 && players.get(index).getUsername()!=attackingPlayer.getUsername()) {
-						eliminated=(eliminated.length()>1 ? eliminated+","+players.get(index).getUsername():players.get(index).getUsername());
+						eliminated=(eliminated.length()!=0 ? eliminated+"-"+players.get(index).getUsername()+"\n" : "-"+players.get(index).getUsername()+"\n");
 						this.eliminatePlayer(index);
 						index=(index==0?0:index-1);
 					}
 					else
 						index++;
 				}
-				
-				if(eliminated.length()>1) 
-					message="Hai inflitto 20 p.ti danno a tutti i giocatori, e hai eliminato "+eliminated;
+				if(eliminated.length()!=0) 
+					message="Hai inflitto 20 p.ti danno a tutti i giocatori, e hai eliminato:\n "+eliminated;
 				else
 					message="Hai inflitto 20 p.ti danno ha tutti i giocatori!";
 
@@ -159,7 +159,7 @@ public class ClassicGame extends Game {
 			}
 		}
 		
-		if(!(players.get(this.currentPlayer) instanceof Bot)) {
+		if(!isBot) {
 			alert=new Alert(Alert.AlertType.INFORMATION);
 			alert.setTitle("Messaggio informativo");
 			alert.setHeaderText(null);

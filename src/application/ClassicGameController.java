@@ -17,15 +17,8 @@ import game.Bot;
 import game.ClassicGame;
 import leaderboard.Leaderboard;
 import game.NoWinnerException;
-import javafx.animation.PauseTransition;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
-import javafx.beans.binding.BooleanExpression;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -140,10 +133,11 @@ public class ClassicGameController implements Initializable{
 			primaryStage.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::closeWindowEvent);
 	    });  
 	}
+	
 	private void initializeCardsBox(int currentPlayer) {// inizializza la UI del giocatore corrente
 		currentPlayerHand=new ArrayList<ToggleButton>();
 		actualNumberOfPlayers=game.getNOfPlayers();
-		players=game.getPlayers();
+		players=game.getPlayersNames();
 		turnLabel.setText(game.getTurn()+"° turno");
 		playerUsernameLabel.setText("Username:"+game.getPlayer(currentPlayer).getUsername());
 		group=new ToggleGroup();
@@ -152,8 +146,9 @@ public class ClassicGameController implements Initializable{
 			ToggleButton btn=new ToggleButton(card.getName());
 			addToCardsBox(btn);
 		}
-		setBindings();
+		//setBindings();
 	}
+	
 	private void setBindings() { // serve a fare in modo che i bottoni vengano disattivati e attivati  in determinate situazioni
 		hasDrawed=game.getHasDrawed();
 		hasAttacked=game.getHasAttacked();
@@ -250,7 +245,7 @@ public class ClassicGameController implements Initializable{
 		if(submittedCard instanceof ActionCard ) {
 			
 			if(submittedCard instanceof HealingPotionCard || submittedCard instanceof SauronEyeCard ) { // in questo caso nel metodo passo 2 volte currentPlayer perchè per queste 2 carte non serve passare il target Player
-				game.submitActionCard(submittedCardIndex, currentPlayer,currentPlayer);
+				game.submitActionCard(submittedCardIndex, currentPlayer,0);
 				 removeFromCardsBox(btn);
 			}
 				
@@ -272,7 +267,7 @@ public class ClassicGameController implements Initializable{
 		else if(submittedCard instanceof EventCard) {
 			
 			if(submittedCard instanceof MiracleCard) {
-				game.submitEventCard(submittedCardIndex, currentPlayer,currentPlayer); // stesso caso delle actionCard HralingPotion e SuronEye
+				game.submitEventCard(submittedCardIndex, currentPlayer,0); // stesso caso delle actionCard HealingPotion e SuronEye
 				 removeFromCardsBox(btn);
 			}
 			else {
@@ -297,12 +292,6 @@ public class ClassicGameController implements Initializable{
 				 removeFromCardsBox(btn);
 			}
 		}
-		
-	   /* System.out.println("target:"+targetPlayer);
-		System.out.println("current:"+currentPlayer);
-		System.out.println("current size:"+actualNumberOfPlayers);
-		System.out.println("real size:"+players.size()); */
-		
 		checkElimination(targetPlayer);
 		 
 		checkCurrentPlayerElimination(targetPlayer);
@@ -321,18 +310,13 @@ public class ClassicGameController implements Initializable{
 	//controllo che serve per quando viene eliminato un giocatore che in ordine di giocata è prima del giocatore corrente
 	private void checkElimination(int targetPlayer) {
 		if(players.size()<actualNumberOfPlayers && targetPlayer<currentPlayer) {
-			if(currentPlayer==actualNumberOfPlayers-1 || actualNumberOfPlayers>3) {
-				currentPlayer=currentPlayer-(actualNumberOfPlayers-players.size());
-			}
-			else {
-				currentPlayer--;
-			}
+			currentPlayer=game.getPlayersNames().indexOf(playerUsernameLabel.getText().substring(9));
 			game.setCurrentPlayer(currentPlayer);
 			actualNumberOfPlayers=game.getNOfPlayers();
 		}
 	}
 	
-	 // caso in cui l'attaccate venga eliminato dal veleno di vedova nera o specchio o entrambi
+	 // caso in cui l'attaccate venga eliminato dal veleno di vedova nera,specchio o entrambi
 	private void checkCurrentPlayerElimination(int targetPlayer) {
 		if(game.getPlayer(currentPlayer).getCharacter().getCurrentLife()<=0) {
 			
@@ -582,6 +566,7 @@ public class ClassicGameController implements Initializable{
 		disableButtons();
 		showLeaderboard();
 	}
+	
 	private void disableButtons() {
 		game.setHasAttacked(true);
 		game.setHasDiscarded(true);
@@ -597,7 +582,6 @@ public class ClassicGameController implements Initializable{
 	}
 	
 	public void serialize(String filename) {
-		
         try {
             FileOutputStream fileOut = new FileOutputStream(filename);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
@@ -670,6 +654,7 @@ public class ClassicGameController implements Initializable{
 	        stage.show();
 		}
    }
+   
    private void closeWindowEvent(WindowEvent event) {
 	   if(!game.isGameOver()) {
 	       Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -684,8 +669,8 @@ public class ClassicGameController implements Initializable{
 	           event.consume();
 	       }
 	   }
-  
    }
+   
    private TableView<LeaderboardData>  getLeaderboard() {
 	   TableView<LeaderboardData> leaderboard = new TableView<>();
        TableColumn<LeaderboardData,Integer> positionColumn = new TableColumn<>("POSIZIONE");
@@ -703,6 +688,7 @@ public class ClassicGameController implements Initializable{
        
        return leaderboard;
    }
+   
    public void showLeaderboard(ActionEvent event)throws IOException{
        VBox vbox = new VBox(getLeaderboard());
        Scene scene = new Scene(vbox, 300, 200);
@@ -711,6 +697,7 @@ public class ClassicGameController implements Initializable{
        popupLeaderboard.setScene(scene);
        popupLeaderboard.show();
    }
+   
    public void showLeaderboard() {
 	   VBox vbox = new VBox(getLeaderboard());
        Scene scene = new Scene(vbox, 300, 200);

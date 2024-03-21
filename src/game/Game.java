@@ -58,7 +58,7 @@ import decks.*;
 	public ArrayList<Card> getPlayersHand(int currentPlayer){// ritorna la mano del gicatore corrente
 		return players.get(currentPlayer).getHand();
 	}
-	public ArrayList<String> getPlayers() {
+	public ArrayList<String> getPlayersNames() {
 		return playersNames;
 	}
 	public int getNOfPlayers() {
