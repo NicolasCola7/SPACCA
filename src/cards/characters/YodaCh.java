@@ -7,6 +7,6 @@ import cards.Seed;
 public class YodaCh extends Character {
 
 	public YodaCh() {
-		super("Yoda",Seed.SW,90,9,8);
+		super("YodaCh",Seed.SW,90,9,8);
 	}
 }

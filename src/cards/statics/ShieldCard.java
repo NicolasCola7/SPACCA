@@ -5,7 +5,7 @@ import cards.Seed;
 public class ShieldCard extends StaticCard {
 
 	public ShieldCard() {
-		super("ShieldCard",Seed.NS);	
+		super("Scudo",Seed.NS);	
 	}
 	
 }

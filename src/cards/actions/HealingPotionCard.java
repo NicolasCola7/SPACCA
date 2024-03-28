@@ -9,7 +9,7 @@ public class HealingPotionCard extends ActionCard{
 	private int healRate;
 	
 	public HealingPotionCard() {
-		super("HealingPotionCard",Seed.SA);
+		super("Pozione Curativa",Seed.SA);
 		healRate = 15;
 	}
 	

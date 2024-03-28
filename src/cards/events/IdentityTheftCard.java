@@ -9,7 +9,7 @@ import game.Player;
 
 public class IdentityTheftCard extends EventCard {
 	public IdentityTheftCard() {
-		super("IdentityTheftCard",Seed.NS);
+		super("Furto Di Identità",Seed.NS);
 	}
 	public void onUse(Player attackingPlayer,Player targetPlayer,Deck deck) { //scambia il personaggio con quello dell'avversario scelto
 		Character a=attackingPlayer.getCharacter();

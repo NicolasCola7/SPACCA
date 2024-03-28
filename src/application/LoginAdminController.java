@@ -19,6 +19,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -30,12 +32,18 @@ public class LoginAdminController implements Initializable{
 	@FXML private TextField adminUsername;
 	@FXML private  Text errorMsg;
 	@FXML private Button loginButton;
+	@FXML private Button homeButton;
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-		 loginButton.disableProperty().bind(adminUsername.textProperty().isEmpty().or(psw.textProperty().isEmpty()));
-
+		loginButton.disableProperty().bind(adminUsername.textProperty().isEmpty().or(psw.textProperty().isEmpty()));
+		
+		ImageView homeImg=new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Home2.png")));
+		homeImg.setFitWidth(homeButton.getPrefWidth());
+		homeImg.setFitHeight(homeButton.getPrefHeight());
+		homeButton.setGraphic(homeImg);
 	}
+	
 	public void goToHome(ActionEvent event) throws IOException {
 		root = FXMLLoader.load(getClass().getResource("home.fxml"));
 		stage=(Stage)((Node)event.getSource()).getScene().getWindow();

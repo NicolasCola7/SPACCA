@@ -8,7 +8,7 @@ import decks.Deck;
 import game.Player;
 public class GauntletCard extends ActionCard{
 	public GauntletCard() {
-		super("GauntletCard",Seed.MV);
+		super("Guanto Di Thanos",Seed.MV);
 			
 	}
 	public Card onUse(Player attackingPlayer,Player targetPlayer, Deck deck) { //permetrte di scartare una carta casuale dalla mano dell'avversario

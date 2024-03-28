@@ -15,7 +15,7 @@
          </font>
       </Label>
       <Button fx:id="playButton" layoutX="277.0" layoutY="238.0" mnemonicParsing="false" onAction="#play" text="Gioca" />
-      <Button layoutX="20.0" layoutY="25.0" mnemonicParsing="false" onAction="#goToHome" text="Home" />
+      <Button fx:id="homeButton" contentDisplay="GRAPHIC_ONLY" layoutX="20.0" layoutY="12.0" mnemonicParsing="false" onAction="#goToHome" prefHeight="38.0" prefWidth="49.0" text="Home" />
       <TextField fx:id="gameCode" layoutX="225.0" layoutY="175.0" />
    </children>
 </AnchorPane>

@@ -11,7 +11,7 @@ import game.Player;
 public class BoardingCard extends ActionCard{ //permette di rubare una carta casuale dalla mano dell'avversario
 
 	public BoardingCard() {
-		super("BoardingCard",Seed.PC);
+		super("Arrembaggio",Seed.PC);
 	}
 	public Card onUse(Player attackingPlayer,Player targetPlayer, Deck deck) {
 		ArrayList<Card> tH=targetPlayer.getHand();

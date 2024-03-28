@@ -27,6 +27,8 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import leaderboard.Leaderboard;
@@ -39,11 +41,14 @@ public class TournamentCreationController implements Initializable{
 	@FXML private CheckBox botCheck;
 	@FXML private TextField gameCode;
 	@FXML private Button confirmButton;
+	@FXML private Button homeButton;
+	@FXML private Button backButton;
 	private ArrayList<String> players;
 	private String adminUsername;
 	private File playersList;
 	private final int numberOfPlayers=8;
 	private ArrayList<String> gamePlayers;
+	
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
@@ -55,6 +60,15 @@ public class TournamentCreationController implements Initializable{
 		confirmButton.disableProperty().bind(
 				gameCode.textProperty().isEmpty().or(
 				playersSelection.getSelectionModel().selectedItemProperty().isNull()));
+		
+		ImageView backImg=new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Back2.png")));
+		ImageView homeImg=new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Home2.png")));
+		backImg.setFitWidth(backButton.getPrefWidth());
+		homeImg.setFitWidth(homeButton.getPrefWidth());
+		backImg.setFitHeight(backButton.getPrefHeight());
+		homeImg.setFitHeight(homeButton.getPrefHeight());
+		homeButton.setGraphic(homeImg);
+		backButton.setGraphic(backImg);
 	 }
 	
 	public void goToHome(ActionEvent event) throws IOException {

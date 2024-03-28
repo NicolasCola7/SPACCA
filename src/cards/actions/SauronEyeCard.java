@@ -11,7 +11,7 @@ import game.Player;
 public class SauronEyeCard extends ActionCard{
 	
 	public SauronEyeCard() {
-		super("SauronEyeCard",Seed.SA);
+		super("Occhio Di Sauron",Seed.SA);
 		
 	}
 	public void onUse(List<Player> players,Player attackingPlayer,Deck deck) {

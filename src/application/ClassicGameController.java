@@ -1,5 +1,5 @@
 /*TODO
- * controllare quando vine eliminato un giocatore prima nel caso in cui ci siamo 4 o 5 giocatori e valutare se dare la possinilità di giocare in 4  o 5
+ * fare in modo che quando è il turno di un giocatore, questo venga informato delle azioni eseguite su di lui(con arrayList du stringhe)
  * fare in modo che nel primo turno non si possano usare carte evento o azione?
  * grafica
  * avanzamento torneo(da considerare come componente aggiuntiva?)
@@ -17,15 +17,19 @@ import game.Bot;
 import game.ClassicGame;
 import leaderboard.Leaderboard;
 import game.NoWinnerException;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -33,6 +37,9 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.MenuButton;
@@ -42,12 +49,16 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Modality;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
@@ -98,10 +109,12 @@ public class ClassicGameController implements Initializable{
 	@FXML private Button boardInfosButton;
 	@FXML private HBox cardsBox;
 	@FXML private VBox infoBox;
+	@FXML private VBox gameButtonsBox;
 	@FXML private MenuButton menu;
+	private ArrayList<HBox> playersBoxes=new ArrayList<HBox>();
+	
 	
 	private ToggleGroup group;
-	private final Insets MARGIN =new Insets(10, 2, 10, 2); // sono le spaziature tra le carte
 	private ArrayList<ToggleButton> currentPlayerHand;
 	private ArrayList<String> players;
 	Stage primaryStage;
@@ -121,20 +134,31 @@ public class ClassicGameController implements Initializable{
 				game=deserialize("./Files/ConfigurationFiles/"+gameCode+".ser");
 				currentPlayer=game.getCurrentPlayer();
 				game.initializeProperties();
-				initializeCardsBox(currentPlayer);
 				}
 			else {
 				game=new ClassicGame(gameCode,adminUsername);
 				currentPlayer=0;
-				initializeCardsBox(currentPlayer);
 			}
+			initializeCardsBox(currentPlayer);
 			
 			primaryStage= (Stage) drawCardButton.getScene().getWindow();
 			primaryStage.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::closeWindowEvent);
+			
+	        primaryStage.setMaximized(true);
+	        
+	        gameButtonsBox.setLayoutX(primaryStage.getWidth()-(gameButtonsBox.getPrefWidth()));
+	        infoBox.setLayoutX(0);
+	        cardsBox.setLayoutY(primaryStage.getHeight()-(gameButtonsBox.getPrefHeight()));
+	       // cardsBox.setStyle("-fx-border-color: black; -fx-border-width: 2px; -fx-border-radius: 5px;-fx-alignment: center;");
+	        setMenuButtonStyle();
+	        //setButtonStyle();
+	       
+	        
 	    });  
 	}
 	
 	private void initializeCardsBox(int currentPlayer) {// inizializza la UI del giocatore corrente
+		
 		currentPlayerHand=new ArrayList<ToggleButton>();
 		actualNumberOfPlayers=game.getNOfPlayers();
 		players=game.getPlayersNames();
@@ -146,7 +170,7 @@ public class ClassicGameController implements Initializable{
 			ToggleButton btn=new ToggleButton(card.getName());
 			addToCardsBox(btn);
 		}
-		//setBindings();
+		setBindings();
 	}
 	
 	private void setBindings() { // serve a fare in modo che i bottoni vengano disattivati e attivati  in determinate situazioni
@@ -160,7 +184,7 @@ public class ClassicGameController implements Initializable{
 		
 		group.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
 	            if (newValue != null) 
-	                isSelectedAttackCard.bind(((ToggleButton)group.getSelectedToggle()).textProperty().isEqualTo("AttackCard"));// isSelectedAttackCard diventa true se è selezionata la carta attacco
+	                isSelectedAttackCard.bind(((ToggleButton)group.getSelectedToggle()).textProperty().isEqualTo("Attacco"));// isSelectedAttackCard diventa true se è selezionata la carta attacco
 	            else 
 	            	isSelectedAttackCard.unbind();
 	            
@@ -174,28 +198,78 @@ public class ClassicGameController implements Initializable{
 	public void seeBoard(ActionEvent event)throws IOException{ // permette di visualizzare le carte presenti nella board del giocatore corrrente
 		StaticCard[] board=game.getPlayer(currentPlayer).getBoard();
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
-		alert.setTitle("Informazione");
+		alert.setTitle("Board");
 		alert.setHeaderText(null);
-		String staticCard1=(board[0]==null?"vuoto":board[0].getName());
-		String staticCard2=(board[1]==null?"vuoto":board[1].getName());
-		alert.setContentText("Pos1:"+staticCard1+"\n"+
-							 "Pos2:"+staticCard2);
+		alert.setGraphic(null);
+		alert.getButtonTypes().remove(ButtonType.OK);
+		alert.getButtonTypes().add(ButtonType.CLOSE);
+		
+		String staticCard1=(board[0]==null?"Vuoto":board[0].getName().replaceAll("\\s+", ""));
+		String staticCard2=(board[1]==null?"Vuoto":board[1].getName().replaceAll("\\s+", ""));
+		ImageView imageView1 = new ImageView(new Image(getClass().getResourceAsStream("./CardsImages/"+staticCard1+".png")));
+	    ImageView imageView2 = new ImageView(new Image(getClass().getResourceAsStream("./CardsImages/"+staticCard2+".png")));
+	    
+	    imageView1.setFitWidth(300);
+        imageView1.setFitHeight(350);
+        imageView2.setFitWidth(300);
+        imageView2.setFitHeight(350);
+        
+        HBox boardBox = new HBox(10);
+        boardBox.getChildren().addAll(imageView1, imageView2);
+        
+        alert.getDialogPane().setContent(boardBox);
+   
 		alert.showAndWait();	
 	}
 	
 	public void seeCharacterInfos(ActionEvent event) throws IOException{//permette di vedere le informazioni relative al personaggio del giocatore corrente
 		Character character=game.getPlayer(currentPlayer).getCharacter();
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
-		alert.setTitle("Informazione");
+		alert.setTitle("Personaggio");
 		alert.setHeaderText(null);
-		alert.setContentText("Personaggio:"+character.getName()+"\n"+
+		alert.setGraphic(null);
+		alert.getButtonTypes().remove(ButtonType.OK);
+		alert.getButtonTypes().add(ButtonType.CLOSE);
+		/*alert.setContentText("Personaggio:"+character.getName()+"\n"+
 							 "Seme:"+character.getSeed()+"\n"+
 							 "Attacco:"+character.getAttack()+"\n"+
 							 "Arma equipaggiata:"+(game.getPlayer(currentPlayer).getEquipedWeapon()==null?"nessuna":game.getPlayer(currentPlayer).getEquipedWeapon().getName())+"\n"+
 							 "Potenza d'attacco:"+game.getPlayer(currentPlayer).getAttackPower()+"\n"+
 							 "Vita:"+character.getCurrentLife()+"\n"+
-							 "Precisione:"+character.getCurrentPrecision()+"\n");
-							 
+							 "Precisione:"+character.getCurrentPrecision()+"\n");*/
+		 
+        
+		ImageView chImage = new ImageView(new Image(getClass().getResourceAsStream("./CharactersCardsImages/"+character.getName()+".png")));
+		chImage.setFitWidth(300);
+		chImage.setFitHeight(350);	
+		
+		VBox box = new VBox(10);
+		Text remainingLife=new Text("Vita rimanente:"+character.getCurrentLife());
+		Text attackPower=new Text("Potenza d'attacco:"+game.getPlayer(currentPlayer).getAttackPower());
+		remainingLife.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+		attackPower.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+		box.getChildren().addAll(chImage,remainingLife,attackPower);
+		
+		alert.getDialogPane().setContent(box);
+		alert.showAndWait();
+	}
+	
+	public void seeEquipedWeapon(ActionEvent event)throws IOException{
+		WeaponCard wc=game.getPlayer(currentPlayer).getEquipedWeapon();
+		String fileName=(wc==null?"Vuoto.png":wc.getName().replaceAll("\\s+", "")+".png");
+		Alert alert = new Alert(Alert.AlertType.INFORMATION);
+		alert.setTitle("Arma Equipaggiata");
+		alert.setHeaderText(null);
+		alert.setGraphic(null);
+		alert.getButtonTypes().remove(ButtonType.OK);
+		alert.getButtonTypes().add(ButtonType.CLOSE);
+		
+		ImageView weaponImage = new ImageView(new Image(getClass().getResourceAsStream("./CardsImages/"+fileName)));
+		 weaponImage.setFitWidth(300);
+		 weaponImage.setFitHeight(350);	
+		
+		alert.getDialogPane().setContent(weaponImage);
+		alert.getDialogPane().setPadding(new Insets(10));
 		alert.showAndWait();
 	}
 	
@@ -210,12 +284,25 @@ public class ClassicGameController implements Initializable{
         
         if(result.isPresent() || result.get()!=null ) {
         	Player player=game.getPlayer(players.indexOf(dialog.getSelectedItem()));
+        	Character character=player.getCharacter();
         	Alert alert = new Alert(Alert.AlertType.INFORMATION);
-			alert.setTitle("Informazione");
+			alert.setTitle(player.getUsername());
 			alert.setHeaderText(null);
-			alert.setContentText("Nome:"+player.getUsername()+"\n"+
+			alert.setGraphic(null);
+			alert.getButtonTypes().remove(ButtonType.OK);
+			alert.getButtonTypes().add(ButtonType.CLOSE);
+			/*alert.setContentText("Nome:"+player.getUsername()+"\n"+
 								"Personaggio:"+player.getCharacter().getName()+"\n"+
-								"Vita rimanente:"+player.getCharacter().getCurrentLife());
+								"Vita rimanente:"+player.getCharacter().getCurrentLife());*/
+			ImageView chImage = new ImageView(new Image(getClass().getResourceAsStream("./CharactersCardsImages/"+character.getName()+".png")));
+			chImage.setFitWidth(200);
+			chImage.setFitHeight(250);	
+			VBox box = new VBox(10);
+			Text remainingLife=new Text("Vita rimanente:"+player.getCharacter().getCurrentLife());
+			remainingLife.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+			box.getChildren().addAll(chImage,remainingLife);
+			alert.getDialogPane().setContent(box);
+
 			alert.showAndWait();
         }
 	}
@@ -517,11 +604,11 @@ public class ClassicGameController implements Initializable{
 	private void addToCardsBox(ToggleButton btn) { //aggiunge una determinata carta/bottone dalla UI
 		currentPlayerHand.add(btn);
 		group.getToggles().add(btn);	
-        // Bind the button's width and height to the containing HBox's width and height
-        btn.prefWidthProperty().bind(cardsBox.widthProperty());
-        btn.prefHeightProperty().bind(cardsBox.heightProperty());
+        btn.setPrefHeight(215);
+        btn.setPrefWidth(145);
+        setCardImage(btn);
 		cardsBox.getChildren().add(btn);
-		HBox.setMargin(btn, MARGIN);
+		//HBox.setMargin(btn, MARGIN);
 	}
 	
 	private void updateCurrentPlayer(int currentPlayer) {
@@ -753,4 +840,56 @@ public class ClassicGameController implements Initializable{
 	   if(serializationFile.exists())
 		   serializationFile.delete();
    }
+   
+   private void setCardImage(ToggleButton btn) {
+	   // Loading an image
+       Image icon = new Image(getClass().getResourceAsStream("./CardsImages/"+btn.getText().replaceAll("\\s+", "")+".png"));
+
+       // Creating an ImageView with the loaded image
+       ImageView iconView = new ImageView(icon);
+       iconView.setFitWidth(btn.getPrefWidth()); 
+       iconView.setFitHeight(btn.getPrefHeight());
+       
+       btn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+       btn.setGraphic(iconView);  
+       
+      setCardStyle(btn);
+   }
+   
+   private void setCardStyle(ToggleButton btn) {
+	   btn.setPadding(new Insets(7));
+       btn.setStyle("-fx-background-color: transparent;");
+       btn.setOnMouseEntered(e -> btn.setStyle("-fx-background-color: red;"));
+       btn.setOnMouseExited(e -> {
+           if (!btn.isFocused()) {
+        	   btn.setStyle("-fx-background-color: transparent;");
+           }
+       });
+       
+       btn.selectedProperty().addListener((observable, oldValue, newValue) -> {
+           if (newValue) {
+        	   btn.setStyle("-fx-background-color:red;");
+           } else {
+        	   btn.setStyle("-fx-background-color: transparent;");
+           }
+       });
+   }
+   
+   private void setButtonStyle() {
+	  gameButtonsBox.getChildren().forEach(node -> {
+  
+         ((Button) node).setStyle("-fx-padding: 1rem 2rem; -fx-background-radius: .5rem; -fx-border-radius: .5rem; -fx-border-width: 0; -fx-font-size: 1rem; -fx-font-weight: 400; -fx-text-fill: #f4f0ff; -fx-alignment: center; -fx-cursor: hand; -fx-background-color: rgba(8, 77, 126, 0.42);");
+      });
+   }
+   private void setMenuButtonStyle() {
+	   menu.setLayoutX(primaryStage.getX()+10);
+       menu.setLayoutY(primaryStage.getY()+10);
+       ImageView menuImg=new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Menu1.png")));
+       menuImg.setFitWidth(menu.getPrefWidth()); 
+       menuImg.setFitHeight(menu.getPrefHeight());
+       menu.setStyle("-fx-background-color:transparent;-fx-background-radius: 0;");
+       menu.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+       menu.setGraphic(menuImg);
+   }
+ 
 }

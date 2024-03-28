@@ -22,6 +22,8 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
@@ -34,12 +36,25 @@ public class SuspendedGamesController implements Initializable{
 	private String adminUsername;
 	private File gamesList;
 	private ArrayList<String> adminGamesList;
+	@FXML private Button homeButton;
+	@FXML private Button backButton;
 	
+	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		getCurrentAdmin();
 		populateAdminGamesList();
 		deleteButton.disableProperty().bind(gameSelection.getSelectionModel().selectedItemProperty().isNull());
+		 
+		ImageView backImg=new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Back2.png")));
+		ImageView homeImg=new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Home2.png")));
+		backImg.setFitWidth(backButton.getPrefWidth());
+		homeImg.setFitWidth(homeButton.getPrefWidth());
+		backImg.setFitHeight(backButton.getPrefHeight());
+		homeImg.setFitHeight(homeButton.getPrefHeight());
+		homeButton.setGraphic(homeImg);
+		backButton.setGraphic(backImg);
 	}
+	
 	public void goToHome(ActionEvent event) throws IOException {
 		Alert alert=new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Logout");

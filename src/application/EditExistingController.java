@@ -25,6 +25,8 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import leaderboard.Leaderboard;
@@ -38,6 +40,8 @@ public class EditExistingController implements Initializable {
 	@FXML private ChoiceBox<String> selectedPlayer;
 	@FXML private TextField newPlayerName;
 	@FXML private Alert alert;
+	@FXML private Button homeButton;
+	@FXML private Button backButton;
 	private ArrayList<String> players;
 	private String adminUsername;
 	private File playersList;
@@ -55,7 +59,15 @@ public class EditExistingController implements Initializable {
 		selectedPlayer.getItems().addAll(players);
 		deleteButton.disableProperty().bind(selectedPlayer.valueProperty().isNull());
 		modifyButton.disableProperty().bind(selectedPlayer.valueProperty().isNull().or(newPlayerName.textProperty().isEmpty()));
-
+		
+		ImageView backImg=new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Back2.png")));
+		ImageView homeImg=new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Home2.png")));
+		backImg.setFitWidth(backButton.getPrefWidth());
+		homeImg.setFitWidth(homeButton.getPrefWidth());
+		backImg.setFitHeight(backButton.getPrefHeight());
+		homeImg.setFitHeight(homeButton.getPrefHeight());
+		homeButton.setGraphic(homeImg);
+		backButton.setGraphic(backImg);
 	}
 	public void goToHome(ActionEvent event) throws IOException {
 		alert=new Alert(AlertType.CONFIRMATION);

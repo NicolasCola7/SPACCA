@@ -20,6 +20,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
 public class PlayerController implements Initializable{
@@ -31,10 +33,16 @@ public class PlayerController implements Initializable{
 	@FXML private TextField gameCode;
 	@FXML private Button playButton;
 	private String adminUsername;
+	@FXML private Button homeButton;
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		playButton.disableProperty().bind(gameCode.textProperty().isEmpty());
+		
+		ImageView homeImg=new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Home2.png")));
+		homeImg.setFitWidth(homeButton.getPrefWidth());
+		homeImg.setFitHeight(homeButton.getPrefHeight());
+		homeButton.setGraphic(homeImg);
 	}
 	
 	public void goToHome(ActionEvent event) throws IOException {

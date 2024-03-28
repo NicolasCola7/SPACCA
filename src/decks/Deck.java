@@ -95,7 +95,6 @@ public class Deck implements Serializable {
 			while (scan.hasNextLine()) {
 				String[] line = scan.nextLine().split(",");
 				String name = line[0];
-				String seed = line[1];
 				int copy = Integer.parseInt(line[2]);
 				Seed s = null;
 				switch (name) {
@@ -174,8 +173,6 @@ public class Deck implements Serializable {
 	}
 
 	private void buildEventCards() {
-		//for (int i = 0; i < 100; i++)
-		deck.add(new DoomsdayCard());
 		deck.add(new IdentityTheftCard());
 		deck.add(new DoomsdayCard());
 		deck.add(new MiracleCard());

@@ -21,6 +21,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import leaderboard.Leaderboard;
@@ -34,6 +36,7 @@ public class AdminSignupController implements Initializable {
 	@FXML private TextField adminUsername;
 	@FXML private Text errorMsg;
 	@FXML private Button registerButton;
+	@FXML private Button homeButton;
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
@@ -41,6 +44,10 @@ public class AdminSignupController implements Initializable {
 				psw.textProperty().isEmpty().or(
 				confirmPsw.textProperty().isEmpty())));
 		
+		ImageView homeImg=new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Home2.png")));
+		homeImg.setFitWidth(homeButton.getPrefWidth());
+		homeImg.setFitHeight(homeButton.getPrefHeight());
+		homeButton.setGraphic(homeImg);
 	}
 	
 	public void goToHome(ActionEvent event) throws IOException {

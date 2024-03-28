@@ -165,7 +165,7 @@ public class TournamentController implements Initializable{
 		isSelected.bind(group.selectedToggleProperty().isNull());// isSelected diventa true  è selezionata una carta
 		group.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
 	            if (newValue != null) 
-	                isSelectedAttackCard.bind(((ToggleButton)group.getSelectedToggle()).textProperty().isEqualTo("AttackCard"));// isSelectedAttackCard diventa true se è selezionata la carta attacco
+	                isSelectedAttackCard.bind(((ToggleButton)group.getSelectedToggle()).textProperty().isEqualTo("Attacco"));// isSelectedAttackCard diventa true se è selezionata la carta attacco
 	            else 
 	            	isSelectedAttackCard.unbind();
 	            

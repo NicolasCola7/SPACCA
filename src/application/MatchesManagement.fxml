@@ -14,8 +14,8 @@
             <Font size="20.0" />
          </font>
       </Label>
-      <Button layoutX="22.0" layoutY="21.0" mnemonicParsing="false" onAction="#goToHome" text="Home" />
-      <Button layoutX="521.0" layoutY="21.0" mnemonicParsing="false" onAction="#back" text="Indietro" />
+      <Button fx:id="homeButton" contentDisplay="GRAPHIC_ONLY" layoutX="22.0" layoutY="21.0" mnemonicParsing="false" onAction="#goToHome" prefHeight="37.0" prefWidth="49.0" text="Home" />
+      <Button fx:id="backButton" contentDisplay="GRAPHIC_ONLY" layoutX="521.0" layoutY="21.0" mnemonicParsing="false" onAction="#back" prefHeight="37.0" prefWidth="58.0" text="Indietro" />
       <Button layoutX="224.0" layoutY="229.0" mnemonicParsing="false" onAction="#suspendedGames" prefHeight="111.0" prefWidth="151.0" text="Partite Iniziate" />
    </children>
 </AnchorPane>

@@ -10,7 +10,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.Alert;
 import cards.*;
 import decks.*;	
-;public abstract class Game implements Serializable{
+	public abstract class Game implements Serializable{
 
 	protected Deck deck;
 	protected CharactersDeck chDeck;

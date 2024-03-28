@@ -99,7 +99,7 @@ public class ClassicGame extends Game {
 		String message="";
 		boolean isBot=players.get(this.currentPlayer) instanceof Bot;
 		switch(submittedActionCard.getName()) {
-			case "AttackCard":{
+			case "Attacco":{
 				hasAttackedValue=true;
 				hasAttacked.set(hasAttackedValue);
 				AttackCard ac=new AttackCard();
@@ -110,7 +110,7 @@ public class ClassicGame extends Game {
 				}
 				break;	
 			}
-			case "SauronEyeCard":{
+			case "Occhio Di Sauron":{
 				SauronEyeCard sec=new SauronEyeCard();
 				sec.onUse(players, attackingPlayer, deck);
 				String eliminated="";
@@ -131,7 +131,7 @@ public class ClassicGame extends Game {
 
 				break;
 			}
-			case "GauntletCard":{
+			case "Guanto Di Thanos":{
 				GauntletCard gc=new GauntletCard();
 				Card discarded=gc.onUse(attackingPlayer,targetPlayer, deck);
 				targetPlayer.getHand().remove(discarded);
@@ -139,7 +139,7 @@ public class ClassicGame extends Game {
 				message="La carta '"+discarded.getName()+"' è stata scartata dalla mano di "+targetPlayer.getUsername();
 				break;
 			}
-			case "BoardingCard":{
+			case "Arrembaggio":{
 				BoardingCard bc=new BoardingCard();
 				Card stolen=bc.onUse(attackingPlayer,players.get(target) , deck);
 				attackingPlayer.getHand().add(stolen);
@@ -147,19 +147,19 @@ public class ClassicGame extends Game {
 				message="La carta '"+stolen.getName()+"' è stata rubata dalla mano di "+targetPlayer.getUsername();
 				break;
 			}
-			case "HealingPotionCard":{
+			case "Pozione Curativa":{
 				HealingPotionCard hpc=new HealingPotionCard();
 				hpc.onUse(attackingPlayer, deck);
 				break;
 			}
-			case "MeteorsRainCard":{
+			case "Pioggia Di Meteore":{
 				MeteorsRainCard mrc=new MeteorsRainCard();
 				mrc.onUse(attackingPlayer, targetPlayer, deck);
 				break;
 			}
 		}
 		
-		if(!isBot) {
+		if(!isBot && message.length()>0) {
 			alert=new Alert(Alert.AlertType.INFORMATION);
 			alert.setTitle("Messaggio informativo");
 			alert.setHeaderText(null);
@@ -228,12 +228,12 @@ public class ClassicGame extends Game {
 		Player targetPlayer=players.get(target);
 		EventCard submittedEventCard=(EventCard)currentPlayer.getHand().get(submittedCard);
 		switch(submittedEventCard.getName()) {
-			case "IdentityTheftCard":{
+			case "Furto Di Identità":{
 				IdentityTheftCard itc=new IdentityTheftCard();
 				itc.onUse(currentPlayer,targetPlayer,deck);
 				break;
 			}
-			case "DoomsdayCard":{
+			case "Giorno Del Giudizio":{
 				DoomsdayCard dc=new DoomsdayCard();
 				dc.onUse(currentPlayer,targetPlayer,deck);
 				if(!(players.get(this.currentPlayer) instanceof Bot)) {
@@ -246,7 +246,7 @@ public class ClassicGame extends Game {
 				this.eliminatePlayer(target);
 				break;
 			}
-			case "MiracleCard":{
+			case "Miracolo":{
 				MiracleCard mc=new MiracleCard();
 				mc.onUse(currentPlayer, deck);
 				break;

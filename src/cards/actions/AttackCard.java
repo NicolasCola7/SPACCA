@@ -15,7 +15,7 @@ import javafx.scene.control.Alert;
 public class AttackCard extends ActionCard{
 	
 	public AttackCard() {
-		super("AttackCard",Seed.NS);	
+		super("Attacco",Seed.NS);	
 	}
 	private boolean firstCheck(Character aC, Character tC,Player attackingPlayer) {
 		

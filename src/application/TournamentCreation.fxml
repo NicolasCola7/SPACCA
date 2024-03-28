@@ -10,8 +10,8 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.TournamentCreationController">
    <children>
-      <Button layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#goToHome" text="Home" />
-      <Button layoutX="534.0" layoutY="14.0" mnemonicParsing="false" onAction="#back" text="Indietro" />
+      <Button fx:id="homeButton" contentDisplay="GRAPHIC_ONLY" layoutX="14.0" layoutY="9.0" mnemonicParsing="false" onAction="#goToHome" prefHeight="39.0" prefWidth="49.0" text="Home" />
+      <Button fx:id="backButton" contentDisplay="GRAPHIC_ONLY" layoutX="534.0" layoutY="14.0" mnemonicParsing="false" onAction="#back" prefHeight="30.0" prefWidth="58.0" text="Indietro" />
       <Label layoutX="272.0" layoutY="18.0" text="Torneo">
          <font>
             <Font size="20.0" />

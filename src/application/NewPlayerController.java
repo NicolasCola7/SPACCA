@@ -26,6 +26,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
@@ -39,11 +41,22 @@ public class NewPlayerController implements Initializable {
 	private String adminUsername;
 	private File playersList;
 	private ArrayList<String> players;
+	@FXML private Button homeButton;
+	@FXML private Button backButton;
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		getCurrentAdmin();
-		 addButton.disableProperty().bind(playerUsername.textProperty().isEmpty());
+		addButton.disableProperty().bind(playerUsername.textProperty().isEmpty());
+		 
+		ImageView backImg=new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Back2.png")));
+		ImageView homeImg=new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Home2.png")));
+		backImg.setFitWidth(backButton.getPrefWidth());
+		homeImg.setFitWidth(homeButton.getPrefWidth());
+		backImg.setFitHeight(backButton.getPrefHeight());
+		homeImg.setFitHeight(homeButton.getPrefHeight());
+		homeButton.setGraphic(homeImg);
+		backButton.setGraphic(backImg);
 	}
 	
 	public void goToHome(ActionEvent event) throws IOException {
