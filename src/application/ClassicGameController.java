@@ -29,6 +29,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -44,6 +45,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ScrollBar;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.ToggleButton;
@@ -52,10 +57,15 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
@@ -97,7 +107,7 @@ public class ClassicGameController implements Initializable{
 	private SimpleBooleanProperty isSelected;
 	private SimpleBooleanProperty isSelectedAttackCard;
 	
-
+	@FXML private ScrollPane cardsScroller;
 	@FXML private Label playerUsernameLabel;
 	@FXML private Label turnLabel;
 	@FXML private Button drawCardButton;
@@ -105,14 +115,16 @@ public class ClassicGameController implements Initializable{
 	@FXML private Button discardCardButton;
 	@FXML private Button submitPlayerButton;
 	@FXML private Button characterInfosButton;
-	@FXML private Button playersInfosButton;
+	@FXML private Button equipedWeaponButton;
 	@FXML private Button boardInfosButton;
 	@FXML private HBox cardsBox;
 	@FXML private VBox infoBox;
 	@FXML private VBox gameButtonsBox;
+	@FXML private HBox playersBox;
 	@FXML private MenuButton menu;
-	private ArrayList<HBox> playersBoxes=new ArrayList<HBox>();
-	
+	@FXML private Pane deckPane;
+	@FXML private Pane latestPlayedCardPane;
+	@FXML private AnchorPane backGround;
 	
 	private ToggleGroup group;
 	private ArrayList<ToggleButton> currentPlayerHand;
@@ -139,26 +151,21 @@ public class ClassicGameController implements Initializable{
 				game=new ClassicGame(gameCode,adminUsername);
 				currentPlayer=0;
 			}
+			
 			initializeCardsBox(currentPlayer);
 			
 			primaryStage= (Stage) drawCardButton.getScene().getWindow();
-			primaryStage.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::closeWindowEvent);
-			
-	        primaryStage.setMaximized(true);
-	        
-	        gameButtonsBox.setLayoutX(primaryStage.getWidth()-(gameButtonsBox.getPrefWidth()));
-	        infoBox.setLayoutX(0);
-	        cardsBox.setLayoutY(primaryStage.getHeight()-(gameButtonsBox.getPrefHeight()));
-	       // cardsBox.setStyle("-fx-border-color: black; -fx-border-width: 2px; -fx-border-radius: 5px;-fx-alignment: center;");
-	        setMenuButtonStyle();
-	        //setButtonStyle();
-	       
-	        
+			primaryStage.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::closeWindowEvent);				
+		    primaryStage.setMaximized(true);
+		    
+			setMenuButtonStyle();
+		    setButtonStyle();
+		    setSceneStyle();
 	    });  
+		 
 	}
 	
 	private void initializeCardsBox(int currentPlayer) {// inizializza la UI del giocatore corrente
-		
 		currentPlayerHand=new ArrayList<ToggleButton>();
 		actualNumberOfPlayers=game.getNOfPlayers();
 		players=game.getPlayersNames();
@@ -171,8 +178,38 @@ public class ClassicGameController implements Initializable{
 			addToCardsBox(btn);
 		}
 		setBindings();
+		initializePlayersBox();
 	}
-	
+	private void initializePlayersBox() {
+		for (int i=0;i<actualNumberOfPlayers;i++) {
+			if(i!=currentPlayer) {
+				Player player=game.getPlayer(i);
+				Character ch=player.getCharacter();
+				HBox playerBox=new HBox(1);
+				
+				playerBox.setStyle("-fx-border-width:3;-fx-border-color:orange;");
+				playerBox.prefWidthProperty().bind(playersBox.prefWidthProperty());
+				ImageView chImage=new ImageView(new Image(getClass().getResourceAsStream("./CharactersImages/"+ch.getName()+".png")));
+				chImage.setFitHeight(playersBox.getPrefHeight());
+				chImage.setFitWidth(80);
+				Label playerName=new Label(player.getUsername());
+				playerName.setTextFill(Color.WHITE);
+				HBox hbox=new HBox(3);
+				Button moreInfos=new Button("");
+				moreInfos.setPrefHeight(playersBox.getPrefHeight());
+				moreInfos.setPrefWidth(50);
+				ImageView infoImg=new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Info.png")));
+				infoImg.setFitHeight(50);
+				infoImg.setFitWidth(50);
+				moreInfos.setGraphic(infoImg);
+				moreInfos.setOnAction(e -> getCharacterInfos(players.indexOf(playerName.getText())));
+				hbox.getChildren().addAll(playerName,moreInfos);
+				playerBox.getChildren().addAll(chImage,hbox);
+				moreInfos.setPrefWidth(playerBox.getPrefWidth());
+				playersBox.getChildren().add(playerBox);
+			}
+		}
+	}
 	private void setBindings() { // serve a fare in modo che i bottoni vengano disattivati e attivati  in determinate situazioni
 		hasDrawed=game.getHasDrawed();
 		hasAttacked=game.getHasAttacked();
@@ -209,49 +246,20 @@ public class ClassicGameController implements Initializable{
 		ImageView imageView1 = new ImageView(new Image(getClass().getResourceAsStream("./CardsImages/"+staticCard1+".png")));
 	    ImageView imageView2 = new ImageView(new Image(getClass().getResourceAsStream("./CardsImages/"+staticCard2+".png")));
 	    
-	    imageView1.setFitWidth(300);
+	    imageView1.setFitWidth(280);
         imageView1.setFitHeight(350);
-        imageView2.setFitWidth(300);
+        imageView2.setFitWidth(280);
         imageView2.setFitHeight(350);
         
         HBox boardBox = new HBox(10);
         boardBox.getChildren().addAll(imageView1, imageView2);
         
         alert.getDialogPane().setContent(boardBox);
-   
 		alert.showAndWait();	
 	}
 	
 	public void seeCharacterInfos(ActionEvent event) throws IOException{//permette di vedere le informazioni relative al personaggio del giocatore corrente
-		Character character=game.getPlayer(currentPlayer).getCharacter();
-		Alert alert = new Alert(Alert.AlertType.INFORMATION);
-		alert.setTitle("Personaggio");
-		alert.setHeaderText(null);
-		alert.setGraphic(null);
-		alert.getButtonTypes().remove(ButtonType.OK);
-		alert.getButtonTypes().add(ButtonType.CLOSE);
-		/*alert.setContentText("Personaggio:"+character.getName()+"\n"+
-							 "Seme:"+character.getSeed()+"\n"+
-							 "Attacco:"+character.getAttack()+"\n"+
-							 "Arma equipaggiata:"+(game.getPlayer(currentPlayer).getEquipedWeapon()==null?"nessuna":game.getPlayer(currentPlayer).getEquipedWeapon().getName())+"\n"+
-							 "Potenza d'attacco:"+game.getPlayer(currentPlayer).getAttackPower()+"\n"+
-							 "Vita:"+character.getCurrentLife()+"\n"+
-							 "Precisione:"+character.getCurrentPrecision()+"\n");*/
-		 
-        
-		ImageView chImage = new ImageView(new Image(getClass().getResourceAsStream("./CharactersCardsImages/"+character.getName()+".png")));
-		chImage.setFitWidth(300);
-		chImage.setFitHeight(350);	
-		
-		VBox box = new VBox(10);
-		Text remainingLife=new Text("Vita rimanente:"+character.getCurrentLife());
-		Text attackPower=new Text("Potenza d'attacco:"+game.getPlayer(currentPlayer).getAttackPower());
-		remainingLife.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-		attackPower.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-		box.getChildren().addAll(chImage,remainingLife,attackPower);
-		
-		alert.getDialogPane().setContent(box);
-		alert.showAndWait();
+		getCharacterInfos(currentPlayer);
 	}
 	
 	public void seeEquipedWeapon(ActionEvent event)throws IOException{
@@ -265,46 +273,12 @@ public class ClassicGameController implements Initializable{
 		alert.getButtonTypes().add(ButtonType.CLOSE);
 		
 		ImageView weaponImage = new ImageView(new Image(getClass().getResourceAsStream("./CardsImages/"+fileName)));
-		 weaponImage.setFitWidth(300);
+		 weaponImage.setFitWidth(280);
 		 weaponImage.setFitHeight(350);	
 		
 		alert.getDialogPane().setContent(weaponImage);
 		alert.getDialogPane().setPadding(new Insets(10));
 		alert.showAndWait();
-	}
-	
-	public void seePlayersInfos(ActionEvent event)throws IOException{ //serve a vedere informazioni (limitate) degli altri giocatori
-		ArrayList<String> toSee=new ArrayList<String>();
-		toSee.addAll(players);
-		toSee.remove(currentPlayer);
-		ChoiceDialog<String> dialog = new ChoiceDialog<>(toSee.get(0),toSee);
-		dialog.setTitle("Selezione");
-        dialog.setHeaderText("Seleziona un giocatore:");
-        Optional<String> result = dialog.showAndWait();
-        
-        if(result.isPresent() || result.get()!=null ) {
-        	Player player=game.getPlayer(players.indexOf(dialog.getSelectedItem()));
-        	Character character=player.getCharacter();
-        	Alert alert = new Alert(Alert.AlertType.INFORMATION);
-			alert.setTitle(player.getUsername());
-			alert.setHeaderText(null);
-			alert.setGraphic(null);
-			alert.getButtonTypes().remove(ButtonType.OK);
-			alert.getButtonTypes().add(ButtonType.CLOSE);
-			/*alert.setContentText("Nome:"+player.getUsername()+"\n"+
-								"Personaggio:"+player.getCharacter().getName()+"\n"+
-								"Vita rimanente:"+player.getCharacter().getCurrentLife());*/
-			ImageView chImage = new ImageView(new Image(getClass().getResourceAsStream("./CharactersCardsImages/"+character.getName()+".png")));
-			chImage.setFitWidth(200);
-			chImage.setFitHeight(250);	
-			VBox box = new VBox(10);
-			Text remainingLife=new Text("Vita rimanente:"+player.getCharacter().getCurrentLife());
-			remainingLife.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-			box.getChildren().addAll(chImage,remainingLife);
-			alert.getDialogPane().setContent(box);
-
-			alert.showAndWait();
-        }
 	}
 	
 	public void drawCard(ActionEvent event) throws IOException { //per pescare una carta 
@@ -316,9 +290,9 @@ public class ClassicGameController implements Initializable{
 	
 	public void discardCard(ActionEvent event)throws IOException{ //per scartare una carta
 		ToggleButton btn=(ToggleButton) group.getSelectedToggle();
+		setLatestPlayedCard(game.getPlayersHand(currentPlayer).get(currentPlayerHand.indexOf(btn)));
 		game.discardCard(currentPlayer,currentPlayerHand.indexOf(btn));
 		removeFromCardsBox(btn);// rimuove la carta scartata dalla UI del giocatore corrente
-		
 	}
 
 	public void submitCard(ActionEvent event)throws IOException{ // per giocare una carta
@@ -348,9 +322,12 @@ public class ClassicGameController implements Initializable{
 		      
 		        if(submittedCard instanceof BoardingCard) // in questo caso aggiorno la mano per vedere la carta rubata dalla mano dell'avversario selezionato
 		        	refreshCardsBox(currentPlayer);
-		        }		
+		        }	
+		        
 			}
+			setLatestPlayedCard(submittedCard);
 		}
+		
 		else if(submittedCard instanceof EventCard) {
 			
 			if(submittedCard instanceof MiracleCard) {
@@ -367,7 +344,12 @@ public class ClassicGameController implements Initializable{
 		        	game.submitEventCard(submittedCardIndex, currentPlayer,targetPlayer);
 		        	 removeFromCardsBox(btn);
 		        }
+		        if(submittedCard instanceof IdentityTheftCard) {
+		        	playersBox.getChildren().clear();
+		        	initializePlayersBox();
+				}
 			}
+			setLatestPlayedCard(submittedCard);
 		}
 		else if(submittedCard instanceof WeaponCard) {
 			if(game.submitWeaponCard(submittedCardIndex, currentPlayer)) {
@@ -379,6 +361,7 @@ public class ClassicGameController implements Initializable{
 				 removeFromCardsBox(btn);
 			}
 		}
+		
 		checkElimination(targetPlayer);
 		 
 		checkCurrentPlayerElimination(targetPlayer);
@@ -387,6 +370,13 @@ public class ClassicGameController implements Initializable{
 			endGame(currentPlayer);
 	}
 	
+	private void setLatestPlayedCard(Card c) {
+		latestPlayedCardPane.getChildren().clear();
+		ImageView latestPlayedCard=new ImageView(new Image(getClass().getResourceAsStream("./CardsImages/"+c.getName().replaceAll("\\s+", "")+".png")));
+		latestPlayedCard.setFitHeight(200);
+		latestPlayedCard.setFitWidth(140);
+		latestPlayedCardPane.getChildren().add(latestPlayedCard);
+	}
 	public void submitPlayer(ActionEvent event)throws IOException{ //passa la giocata al prossimo giocatore
 		updateCurrentPlayer(currentPlayer);
 		game.setHasAttacked(false);
@@ -396,10 +386,17 @@ public class ClassicGameController implements Initializable{
 	
 	//controllo che serve per quando viene eliminato un giocatore che in ordine di giocata è prima del giocatore corrente
 	private void checkElimination(int targetPlayer) {
+		if(players.size()<actualNumberOfPlayers) {
+			playersBox.getChildren().clear();
+			initializePlayersBox();
+		}
+		
 		if(players.size()<actualNumberOfPlayers && targetPlayer<currentPlayer) {
 			currentPlayer=game.getPlayersNames().indexOf(playerUsernameLabel.getText().substring(9));
 			game.setCurrentPlayer(currentPlayer);
 			actualNumberOfPlayers=game.getNOfPlayers();
+			playersBox.getChildren().clear();
+			initializePlayersBox();
 		}
 	}
 	
@@ -430,10 +427,10 @@ public class ClassicGameController implements Initializable{
 			checkConcurrentElimination();
 		}
 	}
-	
+	//caso in cui entrambi i giocatori si eliminino a vicenda
 	private void checkConcurrentElimination() {
 		if(currentPlayer==actualNumberOfPlayers-1 || players.size()<actualNumberOfPlayers) {
-			// gestisco l'eccezione del caso in gli ultimi 2 giocatori si eliminano a vicenda
+			// gestisco l'eccezione del caso in cui gli ultimi 2 giocatori si eliminano a vicenda
 			if(players.size()==0) { 
 				try {
 					throw new NoWinnerException("Partita terminata in pareggio, non ci sono vincitori!");
@@ -497,6 +494,7 @@ public class ClassicGameController implements Initializable{
 					else 
 						botActionsMessage=botActionsMessage+"-Usato la carta "+c.getName()+" su "+game.getPlayer(targetPlayer).getUsername()+";\n";
 					
+					setLatestPlayedCard(c);
 					game.submitActionCard(bot.getHand().indexOf(c),currentPlayer,targetPlayer);
 					checkElimination(targetPlayer);
 					checkCurrentPlayerElimination(targetPlayer);
@@ -517,6 +515,7 @@ public class ClassicGameController implements Initializable{
 				//cerco posizione carta
 				for(Card c:bot.getHand())
 					if(c instanceof AttackCard) {
+						setLatestPlayedCard(c);
 						botActionsMessage=botActionsMessage+"-Attaccato "+game.getPlayer(targetPlayer).getUsername()+";\n";
 						game.submitActionCard(bot.getHand().indexOf(c),currentPlayer,targetPlayer);
 						break;
@@ -560,6 +559,7 @@ public class ClassicGameController implements Initializable{
 						game.submitEventCard(bot.getHand().indexOf(c),currentPlayer,currentPlayer);
 						break;
 					}
+					setLatestPlayedCard(c);
 				}
 			}
 		}
@@ -584,6 +584,7 @@ public class ClassicGameController implements Initializable{
 		if(!bot.getHand().isEmpty()) {
 			int toDiscard=(int)(Math.random()*bot.getHand().size());
 			botActionsMessage=botActionsMessage+"-Scartato una carta;\n";
+			setLatestPlayedCard(bot.getHand().get(toDiscard));
 			game.discardCard(currentPlayer,toDiscard);
 		}
 		
@@ -599,6 +600,7 @@ public class ClassicGameController implements Initializable{
 		currentPlayerHand.remove(btn);
 		cardsBox.getChildren().remove(btn);
 		group.getToggles().remove(btn);
+		
 	}
 	
 	private void addToCardsBox(ToggleButton btn) { //aggiunge una determinata carta/bottone dalla UI
@@ -608,7 +610,6 @@ public class ClassicGameController implements Initializable{
         btn.setPrefWidth(145);
         setCardImage(btn);
 		cardsBox.getChildren().add(btn);
-		//HBox.setMargin(btn, MARGIN);
 	}
 	
 	private void updateCurrentPlayer(int currentPlayer) {
@@ -637,6 +638,7 @@ public class ClassicGameController implements Initializable{
 	private void refreshCardsBox(int currentPlayer) { //aggiorna la UI
 		group.getToggles().clear();
 		cardsBox.getChildren().clear();
+		playersBox.getChildren().clear();
 		currentPlayerHand.clear();
 		initializeCardsBox(currentPlayer);
 	}
@@ -663,8 +665,8 @@ public class ClassicGameController implements Initializable{
 
 		submitPlayerButton.disableProperty().set(true);
 		characterInfosButton.disableProperty().set(true);
-		playersInfosButton.disableProperty().set(true);
 		boardInfosButton.disableProperty().set(true);
+		equipedWeaponButton.disableProperty().set(true);
 		menu.setDisable(true);
 	}
 	
@@ -857,9 +859,9 @@ public class ClassicGameController implements Initializable{
    }
    
    private void setCardStyle(ToggleButton btn) {
-	   btn.setPadding(new Insets(7));
+	   btn.setPadding(new Insets(10, 10, 10, 10));
        btn.setStyle("-fx-background-color: transparent;");
-       btn.setOnMouseEntered(e -> btn.setStyle("-fx-background-color: red;"));
+       btn.setOnMouseEntered(e -> btn.setStyle("-fx-background-color: orange;"));
        btn.setOnMouseExited(e -> {
            if (!btn.isFocused()) {
         	   btn.setStyle("-fx-background-color: transparent;");
@@ -868,7 +870,7 @@ public class ClassicGameController implements Initializable{
        
        btn.selectedProperty().addListener((observable, oldValue, newValue) -> {
            if (newValue) {
-        	   btn.setStyle("-fx-background-color:red;");
+        	   btn.setStyle("-fx-background-color:orange;");
            } else {
         	   btn.setStyle("-fx-background-color: transparent;");
            }
@@ -876,10 +878,130 @@ public class ClassicGameController implements Initializable{
    }
    
    private void setButtonStyle() {
-	  gameButtonsBox.getChildren().forEach(node -> {
-  
-         ((Button) node).setStyle("-fx-padding: 1rem 2rem; -fx-background-radius: .5rem; -fx-border-radius: .5rem; -fx-border-width: 0; -fx-font-size: 1rem; -fx-font-weight: 400; -fx-text-fill: #f4f0ff; -fx-alignment: center; -fx-cursor: hand; -fx-background-color: rgba(8, 77, 126, 0.42);");
-      });
+	 ImageView chButtonImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Character.png")));
+	 chButtonImg.setFitWidth(50);
+	 chButtonImg.setFitHeight(50);
+	 characterInfosButton.setPadding(new Insets(5, 5, 5, 5));
+	 characterInfosButton.setOnMouseEntered(e -> characterInfosButton.setStyle("-fx-border-color: orange;"));
+	 characterInfosButton.setOnMouseExited(e -> {
+         if (!characterInfosButton.isFocused()) {
+        	 characterInfosButton.setStyle("-fx-border-color: black;-fx-background-color:white;");
+         }
+     });
+	 characterInfosButton.setOnMousePressed(event -> {
+		 characterInfosButton.setStyle("-fx-background-color:orange; "); 
+     });
+
+	 characterInfosButton.setOnMouseReleased(event -> {characterInfosButton.setStyle("-fx-background-color:white;-fx-border-color:black;");});
+	 characterInfosButton.setGraphic(chButtonImg);
+	 
+	 ImageView equipedWeaponImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Weapon3.png")));
+	 equipedWeaponImg.setFitWidth(50);
+	 equipedWeaponImg.setFitHeight(50);
+	 equipedWeaponButton.setPadding(new Insets(5, 5, 5, 5));
+	 equipedWeaponButton.setOnMouseEntered(e -> equipedWeaponButton.setStyle("-fx-border-color: orange;"));
+	 equipedWeaponButton.setOnMouseExited(e -> {
+         if (!equipedWeaponButton.isFocused()) {
+        	 equipedWeaponButton.setStyle("-fx-border-color: black;-fx-background-color:white;");
+         }
+     });
+	 equipedWeaponButton.setOnMousePressed(event -> {
+		 equipedWeaponButton.setStyle("-fx-background-color:orange; "); 
+     });
+
+	 equipedWeaponButton.setOnMouseReleased(event -> {equipedWeaponButton.setStyle("-fx-background-color:white;-fx-border-color:black;");});
+	 equipedWeaponButton.setGraphic(equipedWeaponImg);
+	 
+	 ImageView boardImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Board.png")));
+	 boardImg.setFitWidth(50);
+	 boardImg.setFitHeight(50);
+	 boardInfosButton.setPadding(new Insets(5, 5, 5, 5));
+	 boardInfosButton.setOnMouseEntered(e -> boardInfosButton.setStyle("-fx-border-color: orange;"));
+	 boardInfosButton.setOnMouseExited(e -> {
+         if (!boardInfosButton.isFocused()) {
+        	 boardInfosButton.setStyle("-fx-border-color: black;-fx-background-color:white;");
+         }
+     });
+	 boardInfosButton.setOnMousePressed(event -> {
+		 boardInfosButton.setStyle("-fx-background-color:orange; "); 
+     });
+
+	 boardInfosButton.setOnMouseReleased(event -> {boardInfosButton.setStyle("-fx-background-color:white;-fx-border-color:black;");});
+	 boardInfosButton.setGraphic(boardImg);
+	 
+	 ImageView discardImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/DiscardCard.png")));
+	 discardImg.setFitWidth(50);
+	 discardImg.setFitHeight(50);
+	 discardCardButton.setPadding(new Insets(5, 5, 5, 5));
+	 discardCardButton.setOnMouseEntered(e -> discardCardButton.setStyle("-fx-border-color: orange;"));
+	 discardCardButton.setOnMouseExited(e -> {
+         if (!discardCardButton.isFocused()) {
+        	 discardCardButton.setStyle("-fx-border-color: black;-fx-background-color:white;");
+         }
+     });
+	 discardCardButton.setOnMousePressed(event -> {
+		 discardCardButton.setStyle("-fx-background-color: orange;");
+     });
+
+	 discardCardButton.setOnMouseReleased(event -> {
+		 discardCardButton.setStyle("-fx-background-color: white;-fx-border-color:black;");
+     });
+	 discardCardButton.setGraphic(discardImg);
+	 
+	 ImageView drawImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/DrawCard.png")));
+	 drawImg.setFitWidth(50);
+	 drawImg.setFitHeight(50);
+	 drawCardButton.setPadding(new Insets(5, 5, 5, 5));
+	 drawCardButton.setOnMouseEntered(e -> drawCardButton.setStyle("-fx-border-color: orange;"));
+	 drawCardButton.setOnMouseExited(e -> {
+         if (!drawCardButton.isFocused()) {
+        	 drawCardButton.setStyle("-fx-border-color: black;-fx-background-color:white;");
+         }
+     });
+	 drawCardButton.setOnMousePressed(event -> {
+		 drawCardButton.setStyle("-fx-background-color:orange; "); 
+     });
+
+	 drawCardButton.setOnMouseReleased(event -> {drawCardButton.setStyle("-fx-background-color:white;-fx-border-color:black;");});
+	 drawCardButton.setGraphic(drawImg);
+	 
+	 ImageView submitImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/PlayCard.png")));
+	 submitImg.setFitWidth(50);
+	 submitImg.setFitHeight(50);
+	 submitCardButton.setPadding(new Insets(5, 5, 5, 5));
+	 submitCardButton.setOnMouseEntered(e -> submitCardButton.setStyle("-fx-border-color: orange;"));
+	 submitCardButton.setOnMouseExited(e -> {
+         if (!submitCardButton.isFocused()) {
+        	 submitCardButton.setStyle("-fx-border-color: black;-fx-background-color:white;");
+         }
+     });
+	 submitCardButton.setOnMousePressed(event -> {
+		 submitCardButton.setStyle("-fx-background-color: orange;");
+     });
+
+	 submitCardButton.setOnMouseReleased(event -> {
+		 submitCardButton.setStyle("-fx-background-color: white;-fx-border-color:black;");
+     });
+	 submitCardButton.setGraphic(submitImg);
+	 
+	 ImageView nextPlayerImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/NextPlayer.png")));
+	 nextPlayerImg.setFitWidth(50);
+	 nextPlayerImg.setFitHeight(50);
+	 submitPlayerButton.setPadding(new Insets(5, 5, 5, 5));
+	 submitPlayerButton.setOnMouseEntered(e -> submitPlayerButton.setStyle("-fx-border-color: orange;"));
+	 submitPlayerButton.setOnMouseExited(e -> {
+         if (!submitPlayerButton.isFocused()) {
+        	 submitPlayerButton.setStyle("-fx-border-color: black;-fx-background-color:white;");
+         }
+     });
+	 submitPlayerButton.setOnMousePressed(event -> {
+		 submitPlayerButton.setStyle("-fx-background-color: orange; "); 
+     });
+
+	 submitPlayerButton.setOnMouseReleased(event -> {
+		 submitPlayerButton.setStyle("-fx-background-color: white;-fx-border-color:black; "); 
+     });
+	 submitPlayerButton.setGraphic(nextPlayerImg);
    }
    private void setMenuButtonStyle() {
 	   menu.setLayoutX(primaryStage.getX()+10);
@@ -891,5 +1013,96 @@ public class ClassicGameController implements Initializable{
        menu.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
        menu.setGraphic(menuImg);
    }
- 
+   
+   private void getCharacterInfos(int player) {
+	   Character character=game.getPlayer(player).getCharacter();
+	   ImageView chImage = new ImageView(new Image(getClass().getResourceAsStream("./CharactersCardsImages/"+character.getName()+".png")));
+	   chImage.setFitWidth(300);
+	   chImage.setFitHeight(350);
+	   VBox box = new VBox(10);
+		
+		HBox lifeBox=new HBox(5);
+		Text txt=new Text("Vita rimanente:");
+		txt.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+		ProgressBar lifeBar = new ProgressBar(character.getCurrentLife()/character.getInitialLife());
+		lifeBar.setPrefWidth(150);
+		lifeBar.setPrefHeight(30);
+		lifeBar.setStyle("-fx-accent:orange;-fx-background-color:purple;-fx-border-color:purple;");
+		
+		Label lifeLabel = new Label(Integer.toString(character.getCurrentLife()));
+		lifeLabel.setTextFill(Color.WHITE); // Imposta il colore del testo a bianco
+	    lifeLabel.setFont(Font.font("System", 14)); // Imposta il carattere a bold
+	   // Sovrapponi la label sulla progress bar
+       StackPane lifePane = new StackPane();
+       lifePane.getChildren().addAll(lifeBar, lifeLabel);
+  
+       // Imposta la posizione della label al centro della progress bar
+	   StackPane.setMargin(lifeLabel, new Insets(0, 4, 0, 4));
+	   StackPane.setAlignment(lifeLabel, javafx.geometry.Pos.CENTER_LEFT);
+	   lifeBox.getChildren().addAll(txt,lifePane);
+		
+	   if(player==currentPlayer) {
+		  HBox attackBox=new HBox(5);
+		  Text txt2=new Text("Potenza d'attacco:");
+		  txt2.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+		  int attackPower=game.getPlayer(currentPlayer).getAttackPower();
+		  ProgressBar attackBar = new ProgressBar(attackPower/24.0);
+		  attackBar.setPrefWidth(123);
+		  attackBar.setPrefHeight(30);
+		  attackBar.setStyle("-fx-accent:orange;-fx-background-color:purple;-fx-border-color:purple;"+ "}");
+		  Label attackLabel = new Label(Integer.toString(attackPower));
+		  attackLabel.setTextFill(Color.WHITE); // Imposta il colore del testo a bianco
+		  attackLabel.setFont(Font.font("System", 14)); // Imposta il carattere a bold
+		// Sovrapponi la label sulla progress bar
+		  StackPane attackPane = new StackPane();
+		  attackPane.getChildren().addAll(attackBar, attackLabel);
+		  
+	    // Imposta la posizione della label al centro della progress bar
+		  StackPane.setMargin(attackLabel, new Insets(7, 0, 3, 7));
+		  StackPane.setAlignment(attackLabel, javafx.geometry.Pos.CENTER_LEFT);
+		  attackBox.getChildren().addAll(txt2,attackPane);
+		  box.getChildren().addAll(chImage,lifeBox,attackBox);
+	   }
+	   else
+		   box.getChildren().addAll(chImage,lifeBox);
+		
+	   Alert alert = new Alert(Alert.AlertType.INFORMATION);
+		alert.setTitle("Personaggio");
+		alert.setHeaderText(null);
+		alert.setGraphic(null);
+		alert.getButtonTypes().remove(ButtonType.OK);
+		alert.getButtonTypes().add(ButtonType.CLOSE);
+		alert.getDialogPane().setContent(box);
+		alert.showAndWait();
+   }
+   private void setSceneStyle() {
+       gameButtonsBox.setLayoutX(primaryStage.getWidth()-(gameButtonsBox.getPrefWidth()));
+       infoBox.setLayoutX(0);
+       cardsBox.setLayoutY(primaryStage.getHeight()-(gameButtonsBox.getPrefHeight()));
+      
+       AnchorPane.setBottomAnchor(cardsScroller, 0.0);
+       cardsScroller.setPrefWidth(primaryStage.getWidth());
+       cardsScroller.toBack();
+       
+       AnchorPane.setTopAnchor(playersBox, 10.0); // Adjust the value as needed
+       AnchorPane.setLeftAnchor(playersBox, (primaryStage.getWidth() - playersBox.getWidth()) / 2);
+      
+       AnchorPane.setTopAnchor(deckPane, (primaryStage.getHeight() - deckPane.getPrefHeight()) / 4);
+       AnchorPane.setLeftAnchor(deckPane, (primaryStage.getWidth() - deckPane.getPrefWidth())/4);
+       ImageView deckImg=new ImageView(new Image(getClass().getResourceAsStream("./CardsImages/Deck.png")));
+       deckImg.setFitHeight(300);
+       deckImg.setFitWidth(270);
+       deckPane.getChildren().add(deckImg);
+       
+       Card latest=(game.getDeck().getStockpile().size()==0?null:game.getDeck().getStockpile().getLast());
+       String latestName=(latest==null?"Vuoto":latest.getName());
+       ImageView latestPlayedCard=new ImageView(new Image(getClass().getResourceAsStream("./CardsImages/"+latestName+".png")));
+       latestPlayedCard.setFitHeight(200);
+       latestPlayedCard.setFitWidth(140);
+       AnchorPane.setTopAnchor(latestPlayedCardPane, (primaryStage.getHeight() - latestPlayedCardPane.getPrefHeight()) / 3);
+       AnchorPane.setLeftAnchor(latestPlayedCardPane, (primaryStage.getWidth() - latestPlayedCardPane.getPrefWidth())/2);
+       latestPlayedCardPane.getChildren().add(latestPlayedCard);
+
+   }
+   
 }

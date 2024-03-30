@@ -32,11 +32,11 @@ public class Deck implements Serializable {
 
 	private transient Scanner scan;
 	private LinkedList<Card> deck;
-	private ArrayList<Card> stockpile;
+	private LinkedList<Card> stockpile;
 
 	public Deck() {
 		deck = new LinkedList<Card>();
-		stockpile = new ArrayList<Card>();
+		stockpile = new LinkedList<Card>();
 		this.buildStaticCards();
 		this.buildActionCards();
 		this.buildWeaponCards();
@@ -173,8 +173,8 @@ public class Deck implements Serializable {
 	}
 
 	private void buildEventCards() {
+		deck.add(new DoomsdayCard());	
 		deck.add(new IdentityTheftCard());
-		deck.add(new DoomsdayCard());
 		deck.add(new MiracleCard());
 	}
 
@@ -226,7 +226,7 @@ public class Deck implements Serializable {
 		stockpile.add(c);
 	}
 
-	public ArrayList<Card> getStockpile() {
+	public LinkedList<Card> getStockpile() {
 		return stockpile;
 	}
 

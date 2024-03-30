@@ -7,6 +7,6 @@ import cards.Seed;
 public class ThanosCh extends Character {
 
 	public ThanosCh() {
-		super("ThanosCh",Seed.MV,70,10,6);
+		super("ThanosCh",Seed.MV,80,10,6);
 	}
 }
