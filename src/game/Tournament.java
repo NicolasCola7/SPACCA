@@ -31,6 +31,7 @@ public class Tournament extends Game{
 	private ArrayList<Player> actualGamePlayers;
 	private ArrayList<String> actualGamePlayersNames;
 	private LinkedList<Player> eliminated;
+	private String currentGameMessage;
 	
 	public Tournament(String code, String admin) {
 		super(code,admin);
@@ -42,12 +43,8 @@ public class Tournament extends Game{
 		
 		insertPlayers();
 		buildPlayersHands();
-		
-		Alert alert=new Alert(Alert.AlertType.INFORMATION);
-		alert.setTitle("Messaggio informativo");
-		alert.setHeaderText(null);
-		alert.setContentText(tournamentPhase + ", " + gameNumber +"° partita: "+ actualGamePlayersNames.get(0) + " VS " + actualGamePlayersNames.get(1));
-		alert.showAndWait();
+	
+		currentGameMessage=tournamentPhase + ", " + gameNumber +"° partita: "+ actualGamePlayersNames.get(0) + " VS " + actualGamePlayersNames.get(1);;
 	}
 	public void buildPlayersHands() {
 		actualGamePlayersNames=new ArrayList<String>();
@@ -149,14 +146,14 @@ public class Tournament extends Game{
 		
 		buildPlayersHands();
 		
-		if(tournamentPhase.equals(TournamentPhase.FINALE)) {
-			alert.setContentText("FINALE:" + actualGamePlayersNames.get(0) + " VS " + actualGamePlayersNames.get(1));
-			alert.showAndWait();
-		}
-		else {
-			alert.setContentText(tournamentPhase + ", " + gameNumber +"° partita: "+ actualGamePlayersNames.get(0) + " VS " + actualGamePlayersNames.get(1));
-			alert.showAndWait();
-		}		
+		if(tournamentPhase.equals(TournamentPhase.FINALE)) 
+			currentGameMessage="FINALE:" + actualGamePlayersNames.get(0) + " VS " + actualGamePlayersNames.get(1);
+		
+		else 
+			currentGameMessage=tournamentPhase + ", " + gameNumber +"° partita: "+ actualGamePlayersNames.get(0) + " VS " + actualGamePlayersNames.get(1);	
+		
+		alert.setContentText(currentGameMessage);
+		alert.showAndWait();
 	}
 	
 	public Player getPlayer(int player) {
@@ -376,7 +373,9 @@ public class Tournament extends Game{
 		actualGamePlayersNames.addAll(latestTwo);
 		return latestTwo;
 	}
-	
+	 public String getCurrentGameMessage() {
+		 return currentGameMessage;
+	 }
 	
 }
 	

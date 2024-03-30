@@ -144,6 +144,12 @@ public class TournamentController implements Initializable{
 			setMenuButtonStyle();
 		    setButtonStyle();
 		    setSceneStyle();
+		    
+		    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+			alert.setTitle("Informazione");
+			alert.setHeaderText(null);
+			alert.setContentText(tournament.getCurrentGameMessage());
+			alert.showAndWait();
 	    });  
 	}
 	
