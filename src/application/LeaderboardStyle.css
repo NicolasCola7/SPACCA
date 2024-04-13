@@ -1,0 +1,47 @@
+.table-view{
+	-fx-background-color:linear-gradient(#800080 0%, #8A2BE2 100%);
+	-fx-border-color:orange;
+	-fx-border-width:1px;
+}
+
+.table-view .column-header-background{
+	-fx-background-color:transparent;
+	-fx-border-width:1px;
+	-fx-border-color:transparent transparent orange transparent;
+}
+
+.table-view .column-header{
+	-fx-background-color:transparent;
+}
+
+.table-view .column-header-background .label{
+	-fx-text-fill:white;
+}
+
+.table-row-cell{
+	-fx-background-color:transparent;
+}
+
+.table-view .table-cell{
+	-fx-text-fill:white;
+	-fx-border-color: transparent orange transparent transparent ;
+}
+.table-view .filler{
+	-fx-background-color:transparent;
+}
+
+.table-view > .virtual-flow > .scroll-bar:vertical,
+.table-view > .virtual-flow > .scroll-bar:vertical > .track,
+.table-view > .virtual-flow > .scroll-bar:vertical > .track-background, 
+.table-view > .virtual-flow > .scroll-bar:horizontal,
+.table-view > .virtual-flow > .scroll-bar:horizontal > .track,
+.table-view > .virtual-flow > .scroll-bar:horizontal > .track-background {
+    -fx-background-color: transparent;
+}
+
+
+
+.table-view > .virtual-flow > .scroll-bar > .increment-button, 
+.table-view > .virtual-flow > .scroll-bar > .decrement-button {
+    -fx-opacity: 0;
+}

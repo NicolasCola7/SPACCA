@@ -65,6 +65,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -712,8 +714,6 @@ public class ClassicGameController implements Initializable{
     	Alert alert=new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Logout");
 		alert.setGraphic(null);
-		alert.getDialogPane().getStyleClass().add("game-alert");
-		alert.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
 		alert.setHeaderText("Stai per uscire dalla partita!");
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
@@ -733,8 +733,6 @@ public class ClassicGameController implements Initializable{
 		Alert alert=new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Logout");
 		alert.setGraphic(null);
-		alert.getDialogPane().getStyleClass().add("game-alert");
-		alert.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
 		alert.setHeaderText("Stai per uscire dalla partita senza salvare i progressi!");
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
@@ -764,6 +762,7 @@ public class ClassicGameController implements Initializable{
    
    private TableView<LeaderboardData>  getLeaderboard() {
 	   TableView<LeaderboardData> leaderboard = new TableView<>();
+	
        TableColumn<LeaderboardData,Integer> positionColumn = new TableColumn<>("POSIZIONE");
        TableColumn<LeaderboardData,String> nameColumn = new TableColumn<>("NOME");
        TableColumn<LeaderboardData,Integer> scoreColumn = new TableColumn<>("VITTORIE");
@@ -773,29 +772,34 @@ public class ClassicGameController implements Initializable{
        positionColumn.setCellValueFactory(new PropertyValueFactory<LeaderboardData,Integer>("position"));
        nameColumn.setCellValueFactory(new PropertyValueFactory<LeaderboardData,String>("name"));
        scoreColumn.setCellValueFactory(new PropertyValueFactory<LeaderboardData,Integer>("score"));
-      
+	  
        ObservableList<LeaderboardData> data = getDataFromLeaderboardFile();
        leaderboard.setItems(data);
-       
        return leaderboard;
    }
    
    public void showLeaderboard(ActionEvent event)throws IOException{
        VBox vbox = new VBox(getLeaderboard());
        Scene scene = new Scene(vbox, 300, 200);
+       scene.getStylesheets().add("./application/LeaderboardStyle.css");
        Stage popupLeaderboard = new Stage();
+       popupLeaderboard.setResizable(false);
+       popupLeaderboard.initModality(Modality.APPLICATION_MODAL);
        popupLeaderboard.setTitle("Leaderboard");
        popupLeaderboard.setScene(scene);
-       popupLeaderboard.show();
+       popupLeaderboard.show();;
    }
    
    public void showLeaderboard() {
 	   VBox vbox = new VBox(getLeaderboard());
        Scene scene = new Scene(vbox, 300, 200);
+       scene.getStylesheets().add("./application/LeaderboardStyle.css");
        Stage popupLeaderboard = new Stage();
+       popupLeaderboard.setResizable(false);
+       popupLeaderboard.initModality(Modality.APPLICATION_MODAL);
        popupLeaderboard.setTitle("Leaderboard");
        popupLeaderboard.setScene(scene);
-       popupLeaderboard.show();
+       popupLeaderboard.show();;
    }
    
    private  ObservableList<LeaderboardData> getDataFromLeaderboardFile() {
@@ -846,18 +850,13 @@ public class ClassicGameController implements Initializable{
    }
    
    private void setCardImage(ToggleButton btn) {
-	   // Loading an image
        Image icon = new Image(getClass().getResourceAsStream("./CardsImages/"+btn.getText().replaceAll("\\s+", "")+".png"));
-
-       // Creating an ImageView with the loaded image
        ImageView iconView = new ImageView(icon);
        iconView.setFitWidth(btn.getPrefWidth()); 
        iconView.setFitHeight(btn.getPrefHeight());
-       
        btn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
        btn.setGraphic(iconView);  
-       
-      setCardStyle(btn);
+       setCardStyle(btn);
    }
    
    private void setCardStyle(ToggleButton btn) {
@@ -922,7 +921,6 @@ public class ClassicGameController implements Initializable{
        ImageView menuImg=new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Menu1.png")));
        menuImg.setFitWidth(menu.getPrefWidth()); 
        menuImg.setFitHeight(menu.getPrefHeight());
-       menu.setStyle("-fx-background-color:transparent;-fx-background-radius: 0;");
        menu.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
        menu.setGraphic(menuImg);
    }

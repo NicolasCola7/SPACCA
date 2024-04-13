@@ -61,6 +61,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -689,8 +690,6 @@ public class TournamentController implements Initializable{
     	serialize(serializationFile);
     	Alert alert=new Alert(AlertType.CONFIRMATION);
 		alert.setGraphic(null);
-		alert.getDialogPane().getStyleClass().add("game-alert");
-		alert.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
 		alert.setTitle("Logout");
 		alert.setHeaderText("Stai per uscire dalla partita!");
 		alert.setContentText("Sei sicuro di voler continuare?");
@@ -710,8 +709,6 @@ public class TournamentController implements Initializable{
    public void quit(ActionEvent event) throws IOException{
 	   Alert alert=new Alert(AlertType.CONFIRMATION);
 		alert.setGraphic(null);
-		alert.getDialogPane().getStyleClass().add("game-alert");
-		alert.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
 		alert.setTitle("Logout");
 		alert.setHeaderText("Stai per uscire dalla partita senza salvare i progressi!");
 		alert.setContentText("Sei sicuro di voler continuare?");
@@ -759,18 +756,24 @@ public class TournamentController implements Initializable{
    }
    
    public void showLeaderboard(ActionEvent event)throws IOException{
-       VBox vbox = new VBox(getLeaderboard());
+	   VBox vbox = new VBox(getLeaderboard());
        Scene scene = new Scene(vbox, 300, 200);
+       scene.getStylesheets().add("./application/LeaderboardStyle.css");
        Stage popupLeaderboard = new Stage();
+       popupLeaderboard.setResizable(false);
+       popupLeaderboard.initModality(Modality.APPLICATION_MODAL);
        popupLeaderboard.setTitle("Leaderboard");
        popupLeaderboard.setScene(scene);
-       popupLeaderboard.show();
+       popupLeaderboard.show();;
    }
    
    public void showLeaderboard() {
 	   VBox vbox = new VBox(getLeaderboard());
        Scene scene = new Scene(vbox, 300, 200);
+       scene.getStylesheets().add("./application/LeaderboardStyle.css");
        Stage popupLeaderboard = new Stage();
+       popupLeaderboard.setResizable(false);
+       popupLeaderboard.initModality(Modality.APPLICATION_MODAL);
        popupLeaderboard.setTitle("Leaderboard");
        popupLeaderboard.setScene(scene);
        popupLeaderboard.show();
@@ -900,7 +903,6 @@ public class TournamentController implements Initializable{
        ImageView menuImg=new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Menu1.png")));
        menuImg.setFitWidth(menu.getPrefWidth()); 
        menuImg.setFitHeight(menu.getPrefHeight());
-       menu.setStyle("-fx-background-color:transparent;-fx-background-radius: 0;");
        menu.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
        menu.setGraphic(menuImg);
    }

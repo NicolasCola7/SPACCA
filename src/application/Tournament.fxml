@@ -14,7 +14,7 @@
 
 <AnchorPane fx:id="backGround" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" prefHeight="627.0" prefWidth="601.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.TournamentController">
    <children>
-      <MenuButton fx:id="menu" layoutX="14.0" layoutY="14.0" maxHeight="30.0" maxWidth="40.0" minHeight="30.0" minWidth="40.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="40.0" text="Menu">
+      <MenuButton fx:id="menu" layoutX="14.0" layoutY="14.0" maxHeight="30.0" maxWidth="40.0" minHeight="30.0" minWidth="40.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="40.0" stylesheets="@MenuStyle.css" text="Menu">
          <items>
             <MenuItem mnemonicParsing="false" onAction="#save" text="Salva" />
             <MenuItem mnemonicParsing="false" onAction="#saveAndQuit" text="Salva ed Esci" />
