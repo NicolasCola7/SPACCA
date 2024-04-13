@@ -18,6 +18,7 @@ import cards.statics.RingCard;
 import cards.statics.ShieldCard;
 import cards.statics.StaticCard;
 import game.Bot;
+import game.InformationAlert;
 import game.Player;
 import game.Tournament;
 import game.TournamentPhase;
@@ -109,7 +110,6 @@ public class TournamentController implements Initializable{
 	@FXML private AnchorPane backGround;
 	
 	private ToggleGroup group;
-	private final Insets MARGIN =new Insets(10, 2, 10, 2); // sono le spaziature tra le carte
 	private ArrayList<ToggleButton> currentPlayerHand;
 	private ArrayList<String> actualGamePlayersNames;
 	private Stage primaryStage;
@@ -123,7 +123,8 @@ public class TournamentController implements Initializable{
 	}
 	
 	@Override
-	public void initialize(URL arg0, ResourceBundle arg1) { // inizializza la partita 
+	public void initialize(URL arg0, ResourceBundle arg1) {// inizializza la partita 
+		
 		Platform.runLater(() -> {// metodo da capire meglio, serve a ritardare le istruzioni al suo interno dato che quando si passano dati da un altro controller (PlayerController in questo caso)  il metodo initialize viene eseguito prima dei metodi utilizzati nel controller che passa i dati,in guesto caso setGameCode() e setAdminUsername()
 			if(isSerialized("./Files/ConfigurationFiles/"+gameCode+".ser")){
 				tournament=deserialize("./Files/ConfigurationFiles/"+gameCode+".ser");
@@ -145,11 +146,7 @@ public class TournamentController implements Initializable{
 		    setButtonStyle();
 		    setSceneStyle();
 		    
-		    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-			alert.setTitle("Informazione");
-			alert.setHeaderText(null);
-			alert.setContentText(tournament.getCurrentGameMessage());
-			alert.showAndWait();
+		    InformationAlert.display("Messaggio informativo",tournament.getCurrentGameMessage());
 	    });  
 	}
 	
@@ -165,11 +162,7 @@ public class TournamentController implements Initializable{
 			endCurrentGame(0);
 		}
 		else if(isBot(this.currentPlayer)) {
-			Alert alert = new Alert(AlertType.INFORMATION);
-		    alert.setTitle("Informazione");
-		    alert.setHeaderText("Sta giocando "+tournament.getPlayer(this.currentPlayer).getUsername()+":"); 
-		    alert.setContentText("Premi OK per continuare!");
-	        alert.showAndWait();
+			InformationAlert.display("Messaggio informativo", "Sta giocando "+tournament.getPlayer(this.currentPlayer).getUsername()+"...");
 	        useBotRoutine();
 		}
 		else {
@@ -180,6 +173,9 @@ public class TournamentController implements Initializable{
 			}
 			setBindings();
 			initializePlayersBox();
+			String toDisplay=tournament.getActionMessage(currentPlayer);
+			if(toDisplay.length()>0)
+				InformationAlert.display("Messaggio informativo",toDisplay );
 		}
 	}
 	
@@ -236,6 +232,8 @@ public class TournamentController implements Initializable{
 		alert.setTitle("Board");
 		alert.setHeaderText(null);
 		alert.setGraphic(null);
+		alert.getDialogPane().getStyleClass().add("game-alert");
+		alert.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
 		alert.getButtonTypes().remove(ButtonType.OK);
 		alert.getButtonTypes().add(ButtonType.CLOSE);
 		
@@ -267,6 +265,8 @@ public class TournamentController implements Initializable{
 		alert.setTitle("Arma Equipaggiata");
 		alert.setHeaderText(null);
 		alert.setGraphic(null);
+		alert.getDialogPane().getStyleClass().add("game-alert");
+		alert.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
 		alert.getButtonTypes().remove(ButtonType.OK);
 		alert.getButtonTypes().add(ButtonType.CLOSE);
 		
@@ -381,10 +381,6 @@ public class TournamentController implements Initializable{
 	}
 	
 	private void useBotRoutine() {
-		Alert alert = new Alert(AlertType.INFORMATION);
-	    alert.setTitle("Informazione");
-	    alert.setHeaderText(null); 
-	    
 		Bot bot =(Bot) tournament.getPlayer(currentPlayer);
 		String botActionsMessage="Il bot ha eseguito le seguenti azioni:\n";
 		//board del bot
@@ -420,14 +416,12 @@ public class TournamentController implements Initializable{
 					checkCurrentPlayerElimination(targetPlayer);
 					//controlla se è rimasto solo un giocatore 
 					if(tournament.isTournamentGameOver()) {
-						alert.setContentText(botActionsMessage);
-				        alert.showAndWait();
+						InformationAlert.display("Messaggio informativo",botActionsMessage);
 						endTournament(currentPlayer);
 						return;
 					}
 					else if(tournament.isActualGameOver()) {
-						alert.setContentText(botActionsMessage);
-				        alert.showAndWait();
+						InformationAlert.display("Messaggio informativo",botActionsMessage);
 						 endCurrentGame(currentPlayer);
 						 return;
 					}
@@ -450,14 +444,12 @@ public class TournamentController implements Initializable{
 				checkCurrentPlayerElimination(targetPlayer);
 				//controlla se è rimasto solo un giocatore 
 				if(tournament.isTournamentGameOver()) {
-					alert.setContentText(botActionsMessage);
-			        alert.showAndWait();
+					InformationAlert.display("Messaggio informativo",botActionsMessage);
 					endTournament(currentPlayer);
 					return;
 				}
 				else if(tournament.isActualGameOver()) {
-					alert.setContentText(botActionsMessage);
-			        alert.showAndWait();
+					InformationAlert.display("Messaggio informativo",botActionsMessage);
 					endCurrentGame(currentPlayer);
 					return;
 				}
@@ -473,14 +465,12 @@ public class TournamentController implements Initializable{
 						checkCurrentPlayerElimination(targetPlayer);
 						//controlla se è rimasto solo un giocatore 
 						if(tournament.isTournamentGameOver()) {
-							alert.setContentText(botActionsMessage);
-					        alert.showAndWait();
+							InformationAlert.display("Messaggio informativo",botActionsMessage);
 							endTournament(currentPlayer);
 							return;
 						}
 						else if(tournament.isActualGameOver()) {
-							alert.setContentText(botActionsMessage);
-					        alert.showAndWait();
+							InformationAlert.display("Messaggio informativo",botActionsMessage);
 							 endCurrentGame(currentPlayer);
 							 return;
 						}
@@ -526,8 +516,7 @@ public class TournamentController implements Initializable{
 		}
 		
 		//mostro le azioni  rilevanti effettuate dal bot
-		alert.setContentText(botActionsMessage);
-        alert.showAndWait();
+		InformationAlert.display("Messaggio informativo",botActionsMessage);
 		
 		//8° azione: passo turno
 		updateCurrentPlayer(currentPlayer);  
@@ -544,23 +533,22 @@ public class TournamentController implements Initializable{
 	 // caso in cui l'attaccate venga eliminato dal veleno di vedova nera o specchio o entrambi
 	private void checkCurrentPlayerElimination(int targetPlayer) {
 		if(tournament.getPlayer(currentPlayer).getCharacter().getCurrentLife()<=0) {
-			Alert alert=new Alert(Alert.AlertType.INFORMATION);
-			alert.setTitle("Messaggio informativo");
-			alert.setHeaderText(null);
+			String message="";
 			Player target =tournament.getPlayer(targetPlayer);
+			
 			if(target.hasEnchantedMirror() && target.hasBlackWidowsPoison()) {
 				target.removeFromBoardInPosition(0);
-				alert.setContentText("Il veleno di vedova nera e lo specchio ti hanno ucciso!Sei stato eliminato da "+target.getUsername()+".");
+				message="Il veleno di vedova nera e lo specchio ti hanno ucciso!Sei stato eliminato da "+target.getUsername()+".";
 			}
 			else if(target.hasEnchantedMirror() && !target.hasBlackWidowsPoison()) {
 				target.removeFromBoardInPosition(0);
-				alert.setContentText("Lo specchio ti ha ucciso!Sei stato eliminato da "+target.getUsername()+".");
+				message="Lo specchio ti ha ucciso!Sei stato eliminato da "+target.getUsername()+".";
 			}
 			else
-				alert.setContentText("Il veleno di vedova nera ti ha ucciso!Sei stato eliminato da "+target.getUsername()+".");
+				message="Il veleno di vedova nera ti ha ucciso!Sei stato eliminato da "+target.getUsername()+".";
 			
-			if(!(tournament.getPlayer(currentPlayer) instanceof Bot))
-				alert.showAndWait();
+			if(!(tournament.getPlayer(currentPlayer) instanceof Bot)) 
+				InformationAlert.display("Messaggio informativo",message);
 			
 			tournament.eliminatePlayer(currentPlayer);
 			currentPlayer=0;
@@ -574,20 +562,14 @@ public class TournamentController implements Initializable{
 	private void checkConcurrentElimination() {
 		if(tournament.getActualGamePlayers().size()==0) { 
 			ArrayList<String> latestTwo=tournament.getLatestTwoEliminated();
-			Alert alert=new Alert(Alert.AlertType.INFORMATION);
-			alert.setTitle("Messaggio informativo");
-			alert.setHeaderText(null);
-			alert.setContentText("Vi siete eliminati a vicenda, verrà lanciata una moneta per decretare il vincitore: se esce testa vince "+latestTwo.get(0)+", se esce croce "+latestTwo.get(1));
-			alert.showAndWait();
+			InformationAlert.display("Messaggio informativo", "Vi siete eliminati a vicenda, verrà lanciata una moneta per decretare il vincitore: se esce testa vince "+latestTwo.get(0)+", se esce croce "+latestTwo.get(1));
 			int winner=(int)(Math.random()*2);
 			if (winner==0) {
-				alert.setContentText("E' uscito TESTA");
-				alert.showAndWait();
+				InformationAlert.display("Messaggio informativo", "E' uscito TESTA");
 				tournament.eliminatePlayer(1);
 			}
 			else {
-				alert.setContentText("E' uscito CROCE");
-				alert.showAndWait();
+				InformationAlert.display("Messaggio informativo", "E' uscito CROCE");
 				tournament.eliminatePlayer(0);
 			}
 		}
@@ -629,11 +611,7 @@ public class TournamentController implements Initializable{
 	}
 	
 	private void endTournament(int currentPlayer) { //termina il gioco
-		Alert alert=new Alert(Alert.AlertType.INFORMATION);
-		alert.setTitle("Messaggio informativo");
-		alert.setHeaderText(null);
-		alert.setContentText("Congratulazioni "+actualGamePlayersNames.get(currentPlayer)+", hai vinto il torneo!");
-		alert.showAndWait();
+		InformationAlert.display("Messaggio informativo","Congratulazioni "+actualGamePlayersNames.get(currentPlayer)+", hai vinto il torneo!");
 		assignScore(actualGamePlayersNames.get(currentPlayer));
 		deleteGameFromGamesDatasFile();
 		deleteSerializationFile();
@@ -643,17 +621,12 @@ public class TournamentController implements Initializable{
 	}
 	private void endCurrentGame(int currentPlayer) {
 		String actualWinner=actualGamePlayersNames.get(currentPlayer);
-		Alert alert=new Alert(Alert.AlertType.INFORMATION);
-		alert.setTitle("Messaggio informativo");
-		alert.setHeaderText(null);
-		alert.setContentText("Congratulazioni "+actualWinner+", hai vinto la partita e sei passato alla fase successiva!");
-		alert.showAndWait();
+		InformationAlert.display("Messaggio informativo","Congratulazioni "+actualWinner+", hai vinto la partita e sei passato alla fase successiva!");
 		
 		tournament.switchGame();
 		
 		actualGamePlayersNames=tournament.getActualGamePlayersNames();
 		refreshCardsBox(tournament.getCurrentPlayer());
-	
 	}
 	
 	private void disableButtons() {
@@ -715,6 +688,9 @@ public class TournamentController implements Initializable{
     	String serializationFile="./Files/ConfigurationFiles/"+gameCode+".ser";
     	serialize(serializationFile);
     	Alert alert=new Alert(AlertType.CONFIRMATION);
+		alert.setGraphic(null);
+		alert.getDialogPane().getStyleClass().add("game-alert");
+		alert.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
 		alert.setTitle("Logout");
 		alert.setHeaderText("Stai per uscire dalla partita!");
 		alert.setContentText("Sei sicuro di voler continuare?");
@@ -732,7 +708,10 @@ public class TournamentController implements Initializable{
    }
    
    public void quit(ActionEvent event) throws IOException{
-		Alert alert=new Alert(AlertType.CONFIRMATION);
+	   Alert alert=new Alert(AlertType.CONFIRMATION);
+		alert.setGraphic(null);
+		alert.getDialogPane().getStyleClass().add("game-alert");
+		alert.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
 		alert.setTitle("Logout");
 		alert.setHeaderText("Stai per uscire dalla partita senza salvare i progressi!");
 		alert.setContentText("Sei sicuro di voler continuare?");
@@ -879,131 +858,42 @@ public class TournamentController implements Initializable{
    }
    
    private void setButtonStyle() {
-	 ImageView chButtonImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Character.png")));
-	 chButtonImg.setFitWidth(50);
-	 chButtonImg.setFitHeight(50);
-	 characterInfosButton.setPadding(new Insets(5, 5, 5, 5));
-	 characterInfosButton.setOnMouseEntered(e -> characterInfosButton.setStyle("-fx-border-color: orange;"));
-	 characterInfosButton.setOnMouseExited(e -> {
-         if (!characterInfosButton.isFocused()) {
-        	 characterInfosButton.setStyle("-fx-border-color: black;-fx-background-color:white;");
-         }
-     });
-	 characterInfosButton.setOnMousePressed(event -> {
-		 characterInfosButton.setStyle("-fx-background-color:orange; "); 
-     });
-
-	 characterInfosButton.setOnMouseReleased(event -> {characterInfosButton.setStyle("-fx-background-color:white;-fx-border-color:black;");});
-	 characterInfosButton.setGraphic(chButtonImg);
+	   ImageView chButtonImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Character.png")));
+	   chButtonImg.setFitWidth(50);
+	   chButtonImg.setFitHeight(50);
+	   characterInfosButton.setGraphic(chButtonImg);
+		 
+	   ImageView equipedWeaponImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Weapon3.png")));
+	   equipedWeaponImg.setFitWidth(50);
+	   equipedWeaponImg.setFitHeight(50);
+	   equipedWeaponButton.setGraphic(equipedWeaponImg);
+		 
+	   ImageView boardImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Board.png")));
+	   boardImg.setFitWidth(50);
+	   boardImg.setFitHeight(50);
+	   boardInfosButton.setGraphic(boardImg);
+		
+	   ImageView discardImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/DiscardCard.png")));
+	   discardImg.setFitWidth(50);
+	   discardImg.setFitHeight(50);
+	   discardCardButton.setGraphic(discardImg);
 	 
-	 ImageView equipedWeaponImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Weapon3.png")));
-	 equipedWeaponImg.setFitWidth(50);
-	 equipedWeaponImg.setFitHeight(50);
-	 equipedWeaponButton.setPadding(new Insets(5, 5, 5, 5));
-	 equipedWeaponButton.setOnMouseEntered(e -> equipedWeaponButton.setStyle("-fx-border-color: orange;"));
-	 equipedWeaponButton.setOnMouseExited(e -> {
-         if (!equipedWeaponButton.isFocused()) {
-        	 equipedWeaponButton.setStyle("-fx-border-color: black;-fx-background-color:white;");
-         }
-     });
-	 equipedWeaponButton.setOnMousePressed(event -> {
-		 equipedWeaponButton.setStyle("-fx-background-color:orange; "); 
-     });
-
-	 equipedWeaponButton.setOnMouseReleased(event -> {equipedWeaponButton.setStyle("-fx-background-color:white;-fx-border-color:black;");});
-	 equipedWeaponButton.setGraphic(equipedWeaponImg);
-	 
-	 ImageView boardImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Board.png")));
-	 boardImg.setFitWidth(50);
-	 boardImg.setFitHeight(50);
-	 boardInfosButton.setPadding(new Insets(5, 5, 5, 5));
-	 boardInfosButton.setOnMouseEntered(e -> boardInfosButton.setStyle("-fx-border-color: orange;"));
-	 boardInfosButton.setOnMouseExited(e -> {
-         if (!boardInfosButton.isFocused()) {
-        	 boardInfosButton.setStyle("-fx-border-color: black;-fx-background-color:white;");
-         }
-     });
-	 boardInfosButton.setOnMousePressed(event -> {
-		 boardInfosButton.setStyle("-fx-background-color:orange; "); 
-     });
-
-	 boardInfosButton.setOnMouseReleased(event -> {boardInfosButton.setStyle("-fx-background-color:white;-fx-border-color:black;");});
-	 boardInfosButton.setGraphic(boardImg);
-	 
-	 ImageView discardImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/DiscardCard.png")));
-	 discardImg.setFitWidth(50);
-	 discardImg.setFitHeight(50);
-	 discardCardButton.setPadding(new Insets(5, 5, 5, 5));
-	 discardCardButton.setOnMouseEntered(e -> discardCardButton.setStyle("-fx-border-color: orange;"));
-	 discardCardButton.setOnMouseExited(e -> {
-         if (!discardCardButton.isFocused()) {
-        	 discardCardButton.setStyle("-fx-border-color: black;-fx-background-color:white;");
-         }
-     });
-	 discardCardButton.setOnMousePressed(event -> {
-		 discardCardButton.setStyle("-fx-background-color: orange;");
-     });
-
-	 discardCardButton.setOnMouseReleased(event -> {
-		 discardCardButton.setStyle("-fx-background-color: white;-fx-border-color:black;");
-     });
-	 discardCardButton.setGraphic(discardImg);
-	 
-	 ImageView drawImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/DrawCard.png")));
-	 drawImg.setFitWidth(50);
-	 drawImg.setFitHeight(50);
-	 drawCardButton.setPadding(new Insets(5, 5, 5, 5));
-	 drawCardButton.setOnMouseEntered(e -> drawCardButton.setStyle("-fx-border-color: orange;"));
-	 drawCardButton.setOnMouseExited(e -> {
-         if (!drawCardButton.isFocused()) {
-        	 drawCardButton.setStyle("-fx-border-color: black;-fx-background-color:white;");
-         }
-     });
-	 drawCardButton.setOnMousePressed(event -> {
-		 drawCardButton.setStyle("-fx-background-color:orange; "); 
-     });
-
-	 drawCardButton.setOnMouseReleased(event -> {drawCardButton.setStyle("-fx-background-color:white;-fx-border-color:black;");});
-	 drawCardButton.setGraphic(drawImg);
-	 
-	 ImageView submitImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/PlayCard.png")));
-	 submitImg.setFitWidth(50);
-	 submitImg.setFitHeight(50);
-	 submitCardButton.setPadding(new Insets(5, 5, 5, 5));
-	 submitCardButton.setOnMouseEntered(e -> submitCardButton.setStyle("-fx-border-color: orange;"));
-	 submitCardButton.setOnMouseExited(e -> {
-         if (!submitCardButton.isFocused()) {
-        	 submitCardButton.setStyle("-fx-border-color: black;-fx-background-color:white;");
-         }
-     });
-	 submitCardButton.setOnMousePressed(event -> {
-		 submitCardButton.setStyle("-fx-background-color: orange;");
-     });
-
-	 submitCardButton.setOnMouseReleased(event -> {
-		 submitCardButton.setStyle("-fx-background-color: white;-fx-border-color:black;");
-     });
-	 submitCardButton.setGraphic(submitImg);
-	 
-	 ImageView nextPlayerImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/NextPlayer.png")));
-	 nextPlayerImg.setFitWidth(50);
-	 nextPlayerImg.setFitHeight(50);
-	 submitPlayerButton.setPadding(new Insets(5, 5, 5, 5));
-	 submitPlayerButton.setOnMouseEntered(e -> submitPlayerButton.setStyle("-fx-border-color: orange;"));
-	 submitPlayerButton.setOnMouseExited(e -> {
-         if (!submitPlayerButton.isFocused()) {
-        	 submitPlayerButton.setStyle("-fx-border-color: black;-fx-background-color:white;");
-         }
-     });
-	 submitPlayerButton.setOnMousePressed(event -> {
-		 submitPlayerButton.setStyle("-fx-background-color: orange; "); 
-     });
-
-	 submitPlayerButton.setOnMouseReleased(event -> {
-		 submitPlayerButton.setStyle("-fx-background-color: white;-fx-border-color:black; "); 
-     });
-	 submitPlayerButton.setGraphic(nextPlayerImg);
-   }
+	   ImageView drawImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/DrawCard.png")));
+	   drawImg.setFitWidth(50);
+	   drawImg.setFitHeight(50);
+	   drawCardButton.setGraphic(drawImg);
+		 
+	   ImageView submitImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/PlayCard.png")));
+	   submitImg.setFitWidth(50);
+	   submitImg.setFitHeight(50);
+	   submitCardButton.setGraphic(submitImg);
+	   
+	   ImageView nextPlayerImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/NextPlayer.png")));
+	   nextPlayerImg.setFitWidth(50);
+	   nextPlayerImg.setFitHeight(50);
+	   submitPlayerButton.setGraphic(nextPlayerImg);
+   }	
+   
    private void setMenuButtonStyle() {
 	   menu.setLayoutX(primaryStage.getX()+10);
        menu.setLayoutY(primaryStage.getY()+10);
@@ -1031,9 +921,9 @@ public class TournamentController implements Initializable{
 		lifeBar.setStyle("-fx-accent:orange;-fx-background-color:purple;-fx-border-color:purple;");
 		
 		Label lifeLabel = new Label(Integer.toString(character.getCurrentLife()));
-		lifeLabel.setTextFill(Color.WHITE); // Imposta il colore del testo a bianco
+		lifeLabel.setTextFill(Color.PURPLE); // Imposta il colore del testo a bianco
 	    lifeLabel.setFont(Font.font("System", 14)); // Imposta il carattere a bold
-	   // Sovrapponi la label sulla progress bar
+	   // Sovrappone la label sulla progress bar
        StackPane lifePane = new StackPane();
        lifePane.getChildren().addAll(lifeBar, lifeLabel);
   
@@ -1068,13 +958,15 @@ public class TournamentController implements Initializable{
 		   box.getChildren().addAll(chImage,lifeBox);
 		
 	   Alert alert = new Alert(Alert.AlertType.INFORMATION);
-		alert.setTitle("Personaggio");
-		alert.setHeaderText(null);
-		alert.setGraphic(null);
-		alert.getButtonTypes().remove(ButtonType.OK);
-		alert.getButtonTypes().add(ButtonType.CLOSE);
-		alert.getDialogPane().setContent(box);
-		alert.showAndWait();
+	   alert.setHeaderText(null);
+	   alert.setGraphic(null);
+	   alert.getDialogPane().getStyleClass().add("game-alert");
+	   alert.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
+	   alert.setTitle("Personaggio");
+	   alert.getButtonTypes().remove(ButtonType.OK);
+	   alert.getButtonTypes().add(ButtonType.CLOSE);
+	   alert.getDialogPane().setContent(box);
+	   alert.showAndWait();
    }
    private void setSceneStyle() {
        gameButtonsBox.setLayoutX(primaryStage.getWidth()-(gameButtonsBox.getPrefWidth()));

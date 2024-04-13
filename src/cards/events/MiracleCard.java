@@ -8,8 +8,8 @@ public class MiracleCard extends EventCard{
 	public MiracleCard() {
 		super("Miracolo",Seed.NS);
 	}
-	public void onUse(Player targetPlayer,Deck deck) { //permette di recuperare tutti i p.ti vita persi, quindi se utilizzata quando si hanno tutti i punti vita iniziali non serve a ninte
+	public static void onUse(Player targetPlayer,Deck deck) { //permette di recuperare tutti i p.ti vita persi, quindi se utilizzata quando si hanno tutti i punti vita iniziali non serve a ninte
 		targetPlayer.getCharacter().resetLife();
-		deck.addToStockPile(this);
+		deck.addToStockPile(new MiracleCard());
 	}
 }

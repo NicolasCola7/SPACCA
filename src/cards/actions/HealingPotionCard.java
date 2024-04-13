@@ -10,11 +10,10 @@ public class HealingPotionCard extends ActionCard{
 	
 	public HealingPotionCard() {
 		super("Pozione Curativa",Seed.SA);
-		healRate = 15;
 	}
 	
-	public void onUse(Player attackingPlayer,Deck deck) { //permette di aggiungere 15 p.ti vita
-		attackingPlayer.getCharacter().increaseLife(healRate);
-		deck.addToStockPile(this);
+	public static void onUse(Player attackingPlayer,Deck deck) { //permette di aggiungere 15 p.ti vita
+		attackingPlayer.getCharacter().increaseLife(15);
+		deck.addToStockPile(new HealingPotionCard());
 	}
 }

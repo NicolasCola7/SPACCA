@@ -8,7 +8,7 @@ public class BlackWidowsPoisonCard extends StaticCard { //se nella board, quando
 	public BlackWidowsPoisonCard() {
 		super("Veleno Di Vedova Nera",Seed.MV);
 	}
-	public void getEffect(Player targetPlayer) {
+	public static void getEffect(Player targetPlayer) {
 		targetPlayer.getCharacter().decreaseLife(5);
 	}
 }

@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import leaderboard.Leaderboard;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.Alert;
+import javafx.scene.control.DialogPane;
 import cards.*;
 import decks.*;	
 	public abstract class Game implements Serializable{
@@ -20,7 +21,6 @@ import decks.*;
 	protected  int nOfPlayers;;
 	protected String admin;
 	protected  transient File datas=new File("./Files/ConfigurationFiles/GamesDatas.csv");
-	protected transient Alert alert;
 	protected int turn;
 	protected int currentPlayer;
 	protected transient SimpleBooleanProperty hasDrawed;
@@ -31,6 +31,7 @@ import decks.*;
 	protected boolean hasDiscardedValue;
 	protected GameType gameType;
 	protected  Leaderboard leaderboard;
+	protected  ArrayList<String> actionMessages;
 	
 	public Game(String code, String admin) {
 		gameCode=code;
@@ -38,7 +39,6 @@ import decks.*;
 		chDeck=new CharactersDeck();
 		turn=1;
 		currentPlayer=0;
-		
 	}
 	abstract public void insertPlayers();
 	abstract public void buildPlayersHands();
@@ -114,5 +114,9 @@ import decks.*;
 	public GameType getGameType() {
 		return gameType;
 	}
-	
+	public String getActionMessage(int currentPlayer) {
+		String message=actionMessages.get(currentPlayer);
+		actionMessages.set(currentPlayer, "");
+		return message;
+	}
 }

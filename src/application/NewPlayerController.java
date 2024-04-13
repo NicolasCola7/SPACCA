@@ -89,7 +89,7 @@ public class NewPlayerController implements Initializable {
 			String player=scan.nextLine();
 			players.add(player);	
 		}
-        	if(!players.contains(name) && !name.substring(0, 3).equalsIgnoreCase("bot")) {
+        	if(!players.contains(name) && (name.length()<3 || !name.substring(0, 3).equalsIgnoreCase("bot"))){
         		addToPlayersList();
         		addToClassicGamesLeaderboard(name);
         		addToTournamentsLeaderboard(name);

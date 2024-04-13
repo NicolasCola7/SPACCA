@@ -8,8 +8,8 @@ public class DoomsdayCard extends EventCard{ //elimina un giocatore a scelta
 	public DoomsdayCard() {
 		super("Giorno Del Giudizio",Seed.NS);
 	}
-	public Player onUse(Player attackingPlayer, Player targetPlayer, Deck deck) {
-		deck.addToStockPile(this);
+	public static Player onUse(Player attackingPlayer, Player targetPlayer, Deck deck) {
+		deck.addToStockPile(new DoomsdayCard());
 		return targetPlayer;
 	}
 }

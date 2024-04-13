@@ -11,14 +11,14 @@ public class GauntletCard extends ActionCard{
 		super("Guanto Di Thanos",Seed.MV);
 			
 	}
-	public Card onUse(Player attackingPlayer,Player targetPlayer, Deck deck) { //permetrte di scartare una carta casuale dalla mano dell'avversario
+	public static Card onUse(Player attackingPlayer,Player targetPlayer, Deck deck) { //permetrte di scartare una carta casuale dalla mano dell'avversario
 		ArrayList<Card> tH=targetPlayer.getHand();
 		ArrayList<Card> aH=attackingPlayer.getHand();
 		Random random = new Random();
 	     int i=random.nextInt(tH.size());
 	     Card discarded=tH.get(i);
 		deck.addToStockPile(discarded);
-		deck.addToStockPile(this);
+		deck.addToStockPile(new GauntletCard());
 		return discarded;
 	}
 }

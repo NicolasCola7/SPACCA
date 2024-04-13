@@ -13,6 +13,7 @@ import cards.characters.*;
 import cards.characters.Character;
 import game.Player;
 import game.GameType;
+import game.InformationAlert;
 import game.Bot;
 import game.ClassicGame;
 import leaderboard.Leaderboard;
@@ -129,7 +130,9 @@ public class ClassicGameController implements Initializable{
 	private ToggleGroup group;
 	private ArrayList<ToggleButton> currentPlayerHand;
 	private ArrayList<String> players;
-	Stage primaryStage;
+	private Stage primaryStage;
+	private Alert alert;
+	
 	
 	public void setGameCode(String code) { // metodo che viene chiamato dal playerController per settare il gameCode
 		gameCode=code;
@@ -179,8 +182,12 @@ public class ClassicGameController implements Initializable{
 		}
 		setBindings();
 		initializePlayersBox();
+		String toDisplay=game.getActionMessage(currentPlayer);
+		if(toDisplay.length()>0)
+			InformationAlert.display("Messaggio informativo",toDisplay );
 	}
 	private void initializePlayersBox() {
+		actualNumberOfPlayers=game.getNOfPlayers();
 		for (int i=0;i<actualNumberOfPlayers;i++) {
 			if(i!=currentPlayer) {
 				Player player=game.getPlayer(i);
@@ -238,6 +245,8 @@ public class ClassicGameController implements Initializable{
 		alert.setTitle("Board");
 		alert.setHeaderText(null);
 		alert.setGraphic(null);
+		alert.getDialogPane().getStyleClass().add("game-alert");
+		alert.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
 		alert.getButtonTypes().remove(ButtonType.OK);
 		alert.getButtonTypes().add(ButtonType.CLOSE);
 		
@@ -269,6 +278,8 @@ public class ClassicGameController implements Initializable{
 		alert.setTitle("Arma Equipaggiata");
 		alert.setHeaderText(null);
 		alert.setGraphic(null);
+		alert.getDialogPane().getStyleClass().add("game-alert");
+		alert.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
 		alert.getButtonTypes().remove(ButtonType.OK);
 		alert.getButtonTypes().add(ButtonType.CLOSE);
 		
@@ -313,6 +324,9 @@ public class ClassicGameController implements Initializable{
 			else {
 				ChoiceDialog<String> dialog = new ChoiceDialog<>(toAttack.get(0),toAttack);
 				dialog.setTitle("Selezione");
+				dialog.setGraphic(null);
+				dialog.getDialogPane().getStyleClass().add("game-alert");
+				dialog.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
 		        dialog.setHeaderText("Seleziona un giocatore:");
 		        Optional<String> result = dialog.showAndWait();
 		        targetPlayer=players.indexOf(dialog.getSelectedItem());
@@ -337,6 +351,9 @@ public class ClassicGameController implements Initializable{
 			else {
 				ChoiceDialog<String> dialog = new ChoiceDialog<>(toAttack.get(0),toAttack);
 				dialog.setTitle("Selezione");
+				dialog.setGraphic(null);
+				dialog.getDialogPane().getStyleClass().add("game-alert");
+				dialog.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
 		        dialog.setHeaderText("Seleziona un giocatore:");
 		        Optional<String> result = dialog.showAndWait();
 		        targetPlayer=players.indexOf(dialog.getSelectedItem());
@@ -389,14 +406,14 @@ public class ClassicGameController implements Initializable{
 		if(players.size()<actualNumberOfPlayers) {
 			playersBox.getChildren().clear();
 			initializePlayersBox();
-		}
-		
-		if(players.size()<actualNumberOfPlayers && targetPlayer<currentPlayer) {
-			currentPlayer=game.getPlayersNames().indexOf(playerUsernameLabel.getText().substring(9));
-			game.setCurrentPlayer(currentPlayer);
-			actualNumberOfPlayers=game.getNOfPlayers();
-			playersBox.getChildren().clear();
-			initializePlayersBox();
+			
+			if(targetPlayer<currentPlayer) {
+				currentPlayer=game.getPlayersNames().indexOf(playerUsernameLabel.getText().substring(9));
+				game.setCurrentPlayer(currentPlayer);
+				actualNumberOfPlayers=game.getNOfPlayers();
+				playersBox.getChildren().clear();
+				initializePlayersBox();
+			}
 		}
 	}
 	
@@ -404,23 +421,22 @@ public class ClassicGameController implements Initializable{
 	private void checkCurrentPlayerElimination(int targetPlayer) {
 		if(game.getPlayer(currentPlayer).getCharacter().getCurrentLife()<=0) {
 			
-			Alert alert=new Alert(Alert.AlertType.INFORMATION);
-			alert.setTitle("Messaggio informativo");
-			alert.setHeaderText(null);
 			Player target =game.getPlayer(targetPlayer);
+			String message="";
+			
 			if(target.hasEnchantedMirror() && target.hasBlackWidowsPoison()) {
 				target.removeFromBoardInPosition(0);
-				alert.setContentText("Il veleno di vedova nera e lo specchio ti hanno ucciso!Sei stato eliminato da "+target.getUsername()+".");
+				message="Il veleno di vedova nera e lo specchio ti hanno ucciso!Sei stato eliminato da "+target.getUsername()+".";
 			}
 			else if(target.hasEnchantedMirror() && !target.hasBlackWidowsPoison()) {
 				target.removeFromBoardInPosition(0);
-				alert.setContentText("Lo specchio ti ha ucciso!Sei stato eliminato da "+target.getUsername()+".");
+				message="Lo specchio ti ha ucciso!Sei stato eliminato da "+target.getUsername()+".";
 			}
 			else
-				alert.setContentText("Il veleno di vedova nera ti ha ucciso!Sei stato eliminato da "+target.getUsername()+".");
+				message="Il veleno di vedova nera ti ha ucciso!Sei stato eliminato da "+target.getUsername()+".";
 			
-			if(!(game.getPlayer(currentPlayer) instanceof Bot))
-				alert.showAndWait();			
+			if(!(game.getPlayer(currentPlayer) instanceof Bot)) 
+				InformationAlert.display("Messaggio informativo",message);
 			
 			game.eliminatePlayer(currentPlayer);
 			
@@ -435,11 +451,7 @@ public class ClassicGameController implements Initializable{
 				try {
 					throw new NoWinnerException("Partita terminata in pareggio, non ci sono vincitori!");
 				}catch(NoWinnerException exception) {
-					Alert alert=new Alert(Alert.AlertType.INFORMATION);
-					alert.setTitle("Messaggio informativo");
-					alert.setHeaderText(null);
-					alert.setContentText(exception.getMessage());
-					alert.showAndWait();
+					InformationAlert.display("Messaggio informativo",exception.getMessage());
 					deleteSerializationFile();
 					disableButtons();	
 				}
@@ -459,11 +471,7 @@ public class ClassicGameController implements Initializable{
 			return false;		
 	}
 	
-	private synchronized void useBotRoutine() {
-		Alert alert = new Alert(AlertType.INFORMATION);
-	    alert.setTitle("Informazione");
-	    alert.setHeaderText(null); 
-	    
+	private synchronized void useBotRoutine() {	    
 		Bot bot =(Bot) game.getPlayer(currentPlayer);
 		String botActionsMessage="Il bot ha eseguito le seguenti azioni:\n";
 		//board del bot
@@ -500,8 +508,7 @@ public class ClassicGameController implements Initializable{
 					checkCurrentPlayerElimination(targetPlayer);
 					//controlla se è rimasto solo un giocatore 
 					if(game.isGameOver()) {
-						alert.setContentText(botActionsMessage);
-				        alert.showAndWait();
+						InformationAlert.display("Messaggio informativo",botActionsMessage);
 						endGame(currentPlayer);
 						return;
 					}
@@ -524,8 +531,7 @@ public class ClassicGameController implements Initializable{
 				checkCurrentPlayerElimination(targetPlayer);
 				//controlla se è rimasto solo un giocatore 
 				if(game.isGameOver()) {
-					alert.setContentText(botActionsMessage);
-			        alert.showAndWait();
+					InformationAlert.display("Messaggio informativo",botActionsMessage);
 					endGame(currentPlayer);
 					return;
 				}
@@ -542,8 +548,7 @@ public class ClassicGameController implements Initializable{
 						checkCurrentPlayerElimination(targetPlayer);
 						//controlla se è rimasto solo un giocatore 
 						if(game.isGameOver()) {
-							alert.setContentText(botActionsMessage);
-					        alert.showAndWait();
+							InformationAlert.display("Messaggio informativo",botActionsMessage);
 							endGame(currentPlayer);
 							return;
 						}
@@ -589,8 +594,7 @@ public class ClassicGameController implements Initializable{
 		}
 		
 		//mostro le azioni  rilevanti effettuate dal bot
-		alert.setContentText(botActionsMessage);
-        alert.showAndWait();
+		InformationAlert.display("Messaggio informativo",botActionsMessage);
 		
 		//8° azione: passo turno
 		updateCurrentPlayer(currentPlayer);  
@@ -623,16 +627,12 @@ public class ClassicGameController implements Initializable{
 		game.setCurrentPlayer(this.currentPlayer);
 		
 		if(isBot(this.currentPlayer)) {
-			Alert alert = new Alert(AlertType.INFORMATION);
-		    alert.setTitle("Informazione");
-		    alert.setHeaderText("Sta giocando "+game.getPlayer(this.currentPlayer).getUsername()+":"); 
-		    alert.setContentText("Premi OK per continuare!");
-	        alert.showAndWait();
-			
-	        useBotRoutine();
+		   InformationAlert.display("Messaggio informativo", "Sta giocando "+game.getPlayer(this.currentPlayer).getUsername()+"...");
+	       useBotRoutine();
 		}
-		else
+		else {
 			refreshCardsBox(this.currentPlayer);
+		}
 	}
 	
 	private void refreshCardsBox(int currentPlayer) { //aggiorna la UI
@@ -644,11 +644,7 @@ public class ClassicGameController implements Initializable{
 	}
 	
 	private void endGame(int currentPlayer) { //termina il gioco
-		Alert alert=new Alert(Alert.AlertType.INFORMATION);
-		alert.setTitle("Messaggio informativo");
-		alert.setHeaderText(null);
-		alert.setContentText("Congratulazioni "+players.get(currentPlayer)+", hai vinto la partita!");
-		alert.showAndWait();
+		InformationAlert.display("Messaggio informativo","Congratulazioni "+players.get(currentPlayer)+", hai vinto la partita!");
 		assignScore(currentPlayer);
 		deleteGameFromGamesDatasFile();
 		deleteSerializationFile();
@@ -715,6 +711,9 @@ public class ClassicGameController implements Initializable{
     	serialize(serializationFile);
     	Alert alert=new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Logout");
+		alert.setGraphic(null);
+		alert.getDialogPane().getStyleClass().add("game-alert");
+		alert.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
 		alert.setHeaderText("Stai per uscire dalla partita!");
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
@@ -733,6 +732,9 @@ public class ClassicGameController implements Initializable{
    public void quit(ActionEvent event) throws IOException{
 		Alert alert=new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Logout");
+		alert.setGraphic(null);
+		alert.getDialogPane().getStyleClass().add("game-alert");
+		alert.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
 		alert.setHeaderText("Stai per uscire dalla partita senza salvare i progressi!");
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
@@ -881,128 +883,39 @@ public class ClassicGameController implements Initializable{
 	 ImageView chButtonImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Character.png")));
 	 chButtonImg.setFitWidth(50);
 	 chButtonImg.setFitHeight(50);
-	 characterInfosButton.setPadding(new Insets(5, 5, 5, 5));
-	 characterInfosButton.setOnMouseEntered(e -> characterInfosButton.setStyle("-fx-border-color: orange;"));
-	 characterInfosButton.setOnMouseExited(e -> {
-         if (!characterInfosButton.isFocused()) {
-        	 characterInfosButton.setStyle("-fx-border-color: black;-fx-background-color:white;");
-         }
-     });
-	 characterInfosButton.setOnMousePressed(event -> {
-		 characterInfosButton.setStyle("-fx-background-color:orange; "); 
-     });
-
-	 characterInfosButton.setOnMouseReleased(event -> {characterInfosButton.setStyle("-fx-background-color:white;-fx-border-color:black;");});
 	 characterInfosButton.setGraphic(chButtonImg);
 	 
 	 ImageView equipedWeaponImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Weapon3.png")));
 	 equipedWeaponImg.setFitWidth(50);
 	 equipedWeaponImg.setFitHeight(50);
-	 equipedWeaponButton.setPadding(new Insets(5, 5, 5, 5));
-	 equipedWeaponButton.setOnMouseEntered(e -> equipedWeaponButton.setStyle("-fx-border-color: orange;"));
-	 equipedWeaponButton.setOnMouseExited(e -> {
-         if (!equipedWeaponButton.isFocused()) {
-        	 equipedWeaponButton.setStyle("-fx-border-color: black;-fx-background-color:white;");
-         }
-     });
-	 equipedWeaponButton.setOnMousePressed(event -> {
-		 equipedWeaponButton.setStyle("-fx-background-color:orange; "); 
-     });
-
-	 equipedWeaponButton.setOnMouseReleased(event -> {equipedWeaponButton.setStyle("-fx-background-color:white;-fx-border-color:black;");});
 	 equipedWeaponButton.setGraphic(equipedWeaponImg);
 	 
 	 ImageView boardImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Board.png")));
 	 boardImg.setFitWidth(50);
 	 boardImg.setFitHeight(50);
-	 boardInfosButton.setPadding(new Insets(5, 5, 5, 5));
-	 boardInfosButton.setOnMouseEntered(e -> boardInfosButton.setStyle("-fx-border-color: orange;"));
-	 boardInfosButton.setOnMouseExited(e -> {
-         if (!boardInfosButton.isFocused()) {
-        	 boardInfosButton.setStyle("-fx-border-color: black;-fx-background-color:white;");
-         }
-     });
-	 boardInfosButton.setOnMousePressed(event -> {
-		 boardInfosButton.setStyle("-fx-background-color:orange; "); 
-     });
-
-	 boardInfosButton.setOnMouseReleased(event -> {boardInfosButton.setStyle("-fx-background-color:white;-fx-border-color:black;");});
 	 boardInfosButton.setGraphic(boardImg);
-	 
+	
 	 ImageView discardImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/DiscardCard.png")));
 	 discardImg.setFitWidth(50);
 	 discardImg.setFitHeight(50);
-	 discardCardButton.setPadding(new Insets(5, 5, 5, 5));
-	 discardCardButton.setOnMouseEntered(e -> discardCardButton.setStyle("-fx-border-color: orange;"));
-	 discardCardButton.setOnMouseExited(e -> {
-         if (!discardCardButton.isFocused()) {
-        	 discardCardButton.setStyle("-fx-border-color: black;-fx-background-color:white;");
-         }
-     });
-	 discardCardButton.setOnMousePressed(event -> {
-		 discardCardButton.setStyle("-fx-background-color: orange;");
-     });
-
-	 discardCardButton.setOnMouseReleased(event -> {
-		 discardCardButton.setStyle("-fx-background-color: white;-fx-border-color:black;");
-     });
 	 discardCardButton.setGraphic(discardImg);
 	 
 	 ImageView drawImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/DrawCard.png")));
 	 drawImg.setFitWidth(50);
 	 drawImg.setFitHeight(50);
-	 drawCardButton.setPadding(new Insets(5, 5, 5, 5));
-	 drawCardButton.setOnMouseEntered(e -> drawCardButton.setStyle("-fx-border-color: orange;"));
-	 drawCardButton.setOnMouseExited(e -> {
-         if (!drawCardButton.isFocused()) {
-        	 drawCardButton.setStyle("-fx-border-color: black;-fx-background-color:white;");
-         }
-     });
-	 drawCardButton.setOnMousePressed(event -> {
-		 drawCardButton.setStyle("-fx-background-color:orange; "); 
-     });
-
-	 drawCardButton.setOnMouseReleased(event -> {drawCardButton.setStyle("-fx-background-color:white;-fx-border-color:black;");});
 	 drawCardButton.setGraphic(drawImg);
 	 
 	 ImageView submitImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/PlayCard.png")));
 	 submitImg.setFitWidth(50);
 	 submitImg.setFitHeight(50);
-	 submitCardButton.setPadding(new Insets(5, 5, 5, 5));
-	 submitCardButton.setOnMouseEntered(e -> submitCardButton.setStyle("-fx-border-color: orange;"));
-	 submitCardButton.setOnMouseExited(e -> {
-         if (!submitCardButton.isFocused()) {
-        	 submitCardButton.setStyle("-fx-border-color: black;-fx-background-color:white;");
-         }
-     });
-	 submitCardButton.setOnMousePressed(event -> {
-		 submitCardButton.setStyle("-fx-background-color: orange;");
-     });
-
-	 submitCardButton.setOnMouseReleased(event -> {
-		 submitCardButton.setStyle("-fx-background-color: white;-fx-border-color:black;");
-     });
 	 submitCardButton.setGraphic(submitImg);
 	 
 	 ImageView nextPlayerImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/NextPlayer.png")));
 	 nextPlayerImg.setFitWidth(50);
 	 nextPlayerImg.setFitHeight(50);
-	 submitPlayerButton.setPadding(new Insets(5, 5, 5, 5));
-	 submitPlayerButton.setOnMouseEntered(e -> submitPlayerButton.setStyle("-fx-border-color: orange;"));
-	 submitPlayerButton.setOnMouseExited(e -> {
-         if (!submitPlayerButton.isFocused()) {
-        	 submitPlayerButton.setStyle("-fx-border-color: black;-fx-background-color:white;");
-         }
-     });
-	 submitPlayerButton.setOnMousePressed(event -> {
-		 submitPlayerButton.setStyle("-fx-background-color: orange; "); 
-     });
-
-	 submitPlayerButton.setOnMouseReleased(event -> {
-		 submitPlayerButton.setStyle("-fx-background-color: white;-fx-border-color:black; "); 
-     });
 	 submitPlayerButton.setGraphic(nextPlayerImg);
    }
+   
    private void setMenuButtonStyle() {
 	   menu.setLayoutX(primaryStage.getX()+10);
        menu.setLayoutY(primaryStage.getY()+10);
@@ -1030,7 +943,7 @@ public class ClassicGameController implements Initializable{
 		lifeBar.setStyle("-fx-accent:orange;-fx-background-color:purple;-fx-border-color:purple;");
 		
 		Label lifeLabel = new Label(Integer.toString(character.getCurrentLife()));
-		lifeLabel.setTextFill(Color.WHITE); // Imposta il colore del testo a bianco
+		lifeLabel.setTextFill(Color.BLACK); // Imposta il colore del testo a bianco
 	    lifeLabel.setFont(Font.font("System", 14)); // Imposta il carattere a bold
 	   // Sovrapponi la label sulla progress bar
        StackPane lifePane = new StackPane();
@@ -1051,7 +964,7 @@ public class ClassicGameController implements Initializable{
 		  attackBar.setPrefHeight(30);
 		  attackBar.setStyle("-fx-accent:orange;-fx-background-color:purple;-fx-border-color:purple;"+ "}");
 		  Label attackLabel = new Label(Integer.toString(attackPower));
-		  attackLabel.setTextFill(Color.WHITE); // Imposta il colore del testo a bianco
+		  attackLabel.setTextFill(Color.BLACK); // Imposta il colore del testo a bianco
 		  attackLabel.setFont(Font.font("System", 14)); // Imposta il carattere a bold
 		// Sovrapponi la label sulla progress bar
 		  StackPane attackPane = new StackPane();
@@ -1070,6 +983,8 @@ public class ClassicGameController implements Initializable{
 		alert.setTitle("Personaggio");
 		alert.setHeaderText(null);
 		alert.setGraphic(null);
+		alert.getDialogPane().getStyleClass().add("game-alert");
+		alert.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
 		alert.getButtonTypes().remove(ButtonType.OK);
 		alert.getButtonTypes().add(ButtonType.CLOSE);
 		alert.getDialogPane().setContent(box);

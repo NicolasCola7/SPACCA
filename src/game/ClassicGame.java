@@ -27,7 +27,8 @@ import cards.characters.*;
 import decks.*;	
 
 public class ClassicGame extends Game {
-
+	private static final long serialVersionUID = 5043888774594965422L;
+	
 	public ClassicGame(String code, String admin) {
 		super(code,admin);
 		deck=new Deck();
@@ -47,6 +48,7 @@ public class ClassicGame extends Game {
 	}
 	
 	public void insertPlayers() {
+		actionMessages=new ArrayList<String>();
 		players=new LinkedList<Player>();
 		try {
 			Scanner scan=new Scanner(datas);
@@ -58,7 +60,7 @@ public class ClassicGame extends Game {
 					
 					for(int i=0;i<nOfPlayers;i++) {
 						playersNames.add(line[4+i]);
-						
+						actionMessages.add("");
 						if(line[4+i].equals("bot"+i))
 							players.add(new Bot(playersNames.get(i),chDeck.getCharacter()));
 						else
@@ -71,13 +73,14 @@ public class ClassicGame extends Game {
 			}
 			scan.close();
 		}catch(FileNotFoundException e) {
-			System.out.println("File not found");
+			e.printStackTrace();
 		}
 	}
 	
 	public void eliminatePlayer(int i) {
 		players.remove(i);
 		playersNames.remove(i);
+		actionMessages.remove(i);
 		nOfPlayers--;
 	}
 	
@@ -102,17 +105,16 @@ public class ClassicGame extends Game {
 			case "Attacco":{
 				hasAttackedValue=true;
 				hasAttacked.set(hasAttackedValue);
-				AttackCard ac=new AttackCard();
-				ac.onUse(attackingPlayer,targetPlayer, deck);
+				AttackCard.onUse(attackingPlayer,targetPlayer, deck);
 				if(targetPlayer.getCharacter().getCurrentLife()<=0) {// caso in cui con l'attacco si elimina un giocatore
 					this.eliminatePlayer(target);
 					message="Hai eliminato "+targetPlayer.getUsername()+".";
 				}
+				actionMessages.set(target, actionMessages.get(target)+ "-Sei stato attaccato da "+ attackingPlayer.getUsername()+"\n");
 				break;	
 			}
 			case "Occhio Di Sauron":{
-				SauronEyeCard sec=new SauronEyeCard();
-				sec.onUse(players, attackingPlayer, deck);
+				SauronEyeCard.onUse(players, attackingPlayer, deck);
 				String eliminated="";
 				int index=0;
 				while(index<players.size()){ // controllo se ho eliminato qualce giocatore utilizzano l'occhio di sauron
@@ -121,50 +123,46 @@ public class ClassicGame extends Game {
 						this.eliminatePlayer(index);
 						index=(index==0?0:index-1);
 					}
-					else
+					else {
+						actionMessages.set(index, actionMessages.get(index)+ "-Hai subito 20 p.ti danno dall'Occhio di Sauron \n");
 						index++;
+					}
 				}
 				if(eliminated.length()!=0) 
 					message="Hai inflitto 20 p.ti danno a tutti i giocatori, e hai eliminato:\n "+eliminated;
 				else
 					message="Hai inflitto 20 p.ti danno ha tutti i giocatori!";
-
+			
 				break;
 			}
 			case "Guanto Di Thanos":{
-				GauntletCard gc=new GauntletCard();
-				Card discarded=gc.onUse(attackingPlayer,targetPlayer, deck);
+				Card discarded=GauntletCard.onUse(attackingPlayer,targetPlayer, deck);
 				targetPlayer.getHand().remove(discarded);
-				
 				message="La carta '"+discarded.getName()+"' è stata scartata dalla mano di "+targetPlayer.getUsername();
+				actionMessages.set(target,actionMessages.get(target)+"-"+attackingPlayer.getUsername()+" ti ha scartato la carta "+discarded.getName()+"\n");
 				break;
 			}
 			case "Arrembaggio":{
-				BoardingCard bc=new BoardingCard();
-				Card stolen=bc.onUse(attackingPlayer,players.get(target) , deck);
+				Card stolen=BoardingCard.onUse(attackingPlayer,players.get(target) , deck);
 				attackingPlayer.getHand().add(stolen);
-				
+				targetPlayer.getHand().remove(stolen);
 				message="La carta '"+stolen.getName()+"' è stata rubata dalla mano di "+targetPlayer.getUsername();
+				actionMessages.set(target,actionMessages.get(target)+"-"+attackingPlayer.getUsername()+" ti ha rubato la carta "+stolen.getName()+"\n");
 				break;
 			}
 			case "Pozione Curativa":{
-				HealingPotionCard hpc=new HealingPotionCard();
-				hpc.onUse(attackingPlayer, deck);
+				HealingPotionCard.onUse(attackingPlayer, deck);
 				break;
 			}
 			case "Pioggia Di Meteore":{
-				MeteorsRainCard mrc=new MeteorsRainCard();
-				mrc.onUse(attackingPlayer, targetPlayer, deck);
+				MeteorsRainCard.onUse(attackingPlayer, targetPlayer, deck);
+				actionMessages.set(target,actionMessages.get(target)+  "-La tua board è stata distrutta  da "+ attackingPlayer.getUsername()+"\n");
 				break;
 			}
 		}
 		
 		if(!isBot && message.length()>0) {
-			alert=new Alert(Alert.AlertType.INFORMATION);
-			alert.setTitle("Messaggio informativo");
-			alert.setHeaderText(null);
-			alert.setContentText(message);
-			alert.showAndWait();
+			InformationAlert.display("Messaggio informativo",message);
 		}
 		
 		this.currentPlayer=currentPlayer;
@@ -181,7 +179,10 @@ public class ClassicGame extends Game {
 		}
 		else {
 			Alert alert=new Alert(AlertType.CONFIRMATION);
-			alert.setTitle("Attenzione!");
+			alert.setGraphic(null);
+			alert.getDialogPane().getStyleClass().add("game-alert");
+			alert.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
+			alert.setTitle("Conferma");
 			alert.setHeaderText("Hai già una carta statica posizionata!");
 			alert.setContentText("Sei sicuro di volerla sostituire?");
 			if(alert.showAndWait().get()==ButtonType.OK) {
@@ -208,7 +209,10 @@ public class ClassicGame extends Game {
 		}
 		else{
 			Alert alert=new Alert(AlertType.CONFIRMATION);
-			alert.setTitle("Attenzione!");
+			alert.setGraphic(null);
+			alert.getDialogPane().getStyleClass().add("game-alert");
+			alert.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
+			alert.setTitle("Conferma");
 			alert.setHeaderText("Hai già un'arma equipaggiata!");
 			alert.setContentText("Sei sicuro di volerla sostituire?");
 			if(alert.showAndWait().get()==ButtonType.OK) {
@@ -229,26 +233,20 @@ public class ClassicGame extends Game {
 		EventCard submittedEventCard=(EventCard)currentPlayer.getHand().get(submittedCard);
 		switch(submittedEventCard.getName()) {
 			case "Furto Di Identità":{
-				IdentityTheftCard itc=new IdentityTheftCard();
-				itc.onUse(currentPlayer,targetPlayer,deck);
+				IdentityTheftCard.onUse(currentPlayer,targetPlayer,deck);
+				actionMessages.set(target, actionMessages.get(target)+ "-Il tuo personaggio è stato scambiato con quello di "+ currentPlayer.getUsername()+"\n");
 				break;
 			}
 			case "Giorno Del Giudizio":{
-				DoomsdayCard dc=new DoomsdayCard();
-				dc.onUse(currentPlayer,targetPlayer,deck);
+				DoomsdayCard.onUse(currentPlayer,targetPlayer,deck);
 				if(!(players.get(this.currentPlayer) instanceof Bot)) {
-					alert=new Alert(Alert.AlertType.INFORMATION);
-					alert.setTitle("Messaggio informativo");
-					alert.setHeaderText(null);
-					alert.setContentText("Il giorno del giudizio è arrivato per "+targetPlayer.getUsername());
-					alert.showAndWait();
+					InformationAlert.display("Messaggio informativo","Il giorno del giudizio è arrivato per "+targetPlayer.getUsername());
 				}
 				this.eliminatePlayer(target);
 				break;
 			}
 			case "Miracolo":{
-				MiracleCard mc=new MiracleCard();
-				mc.onUse(currentPlayer, deck);
+				MiracleCard.onUse(currentPlayer, deck);
 				break;
 			}
 		}

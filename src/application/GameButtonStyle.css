@@ -1,11 +1,13 @@
 /* Define style for all buttons in the VBox */
 .button-container > .button {
     -fx-padding: 5;
+    -fx-border-color:black;
+    -fx-background-color:white;
 }
 
 /* Hover effect */
 .button-container > .button:hover {
-    -fx-border-color: orange;
+    -fx-border-color:  rgb(204, 85, 0);
 }
 
 /* Pressed effect */
@@ -13,8 +15,7 @@
     -fx-background-color: orange;
 }
 
-/* Reset style after mouse release */
-.button-container > .button:armed {
-    -fx-background-color: white;
-    -fx-border-color: black;
+.button-container > .label{
+	-fx-background-color:white;
+	-fx-border-color:black;
 }

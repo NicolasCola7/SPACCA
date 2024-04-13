@@ -14,12 +14,12 @@ public class SauronEyeCard extends ActionCard{
 		super("Occhio Di Sauron",Seed.SA);
 		
 	}
-	public void onUse(List<Player> players,Player attackingPlayer,Deck deck) {
+	public static void onUse(List<Player> players,Player attackingPlayer,Deck deck) {
 		for(int i=0;i<players.size();i++) {
 			if(players.get(i).getUsername()!=attackingPlayer.getUsername()) 
 				players.get(i).getCharacter().decreaseLife(20);
 		}
-		attackingPlayer.getHand().remove(this);
-		deck.addToStockPile(this);
+		
+		deck.addToStockPile(new SauronEyeCard());
 	}
 }

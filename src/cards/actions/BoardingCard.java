@@ -13,13 +13,13 @@ public class BoardingCard extends ActionCard{ //permette di rubare una carta cas
 	public BoardingCard() {
 		super("Arrembaggio",Seed.PC);
 	}
-	public Card onUse(Player attackingPlayer,Player targetPlayer, Deck deck) {
+	public static Card onUse(Player attackingPlayer,Player targetPlayer, Deck deck) {
 		ArrayList<Card> tH=targetPlayer.getHand();
 		ArrayList<Card> aH=attackingPlayer.getHand();
 		 Random random = new Random();
 	     int i=random.nextInt(tH.size());
 	     Card stolen=tH.get(i);
-	     deck.addToStockPile(this);
+	     deck.addToStockPile(new BoardingCard());
 		return stolen;
 	}
 }

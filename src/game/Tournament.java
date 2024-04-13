@@ -25,7 +25,8 @@ import cards.events.*;
 import cards.characters.*;
 import decks.*;	
 public class Tournament extends Game{
-	
+
+	private static final long serialVersionUID = 8046043559234131541L;
 	private TournamentPhase tournamentPhase;
 	private int gameNumber;
 	private ArrayList<Player> actualGamePlayers;
@@ -47,6 +48,7 @@ public class Tournament extends Game{
 		currentGameMessage=tournamentPhase + ", " + gameNumber +"° partita: "+ actualGamePlayersNames.get(0) + " VS " + actualGamePlayersNames.get(1);;
 	}
 	public void buildPlayersHands() {
+		actionMessages=new ArrayList<String>();
 		actualGamePlayersNames=new ArrayList<String>();
 		actualGamePlayers=new ArrayList<Player>();
 		hasDrawedValue=false;
@@ -66,6 +68,7 @@ public class Tournament extends Game{
 			
 			actualGamePlayers.add(players.get(i));
 			actualGamePlayersNames.add(players.get(i).getUsername());
+			actionMessages.add("");
 		}
 	}
 	public void insertPlayers() {
@@ -117,14 +120,10 @@ public class Tournament extends Game{
 	}
 	
 	public void switchGame() {
-		Alert alert=new Alert(Alert.AlertType.INFORMATION);
-		alert.setTitle("Messaggio informativo");
-		alert.setHeaderText(null);
 		if (tournamentPhase.equals(TournamentPhase.QUARTI)) {
 			if(gameNumber==4) {
 				players.removeAll(eliminated);
-				alert.setContentText("Quarti di finale terminati, si passa alle semifinali!");
-				alert.showAndWait();
+				InformationAlert.display("Messaggio informativo", "Quarti di finale terminati, si passa alle semifinali!");
 				tournamentPhase=TournamentPhase.SEMIFINALI;
 				gameNumber=1;
 			}
@@ -135,8 +134,7 @@ public class Tournament extends Game{
 		else if(tournamentPhase.equals(TournamentPhase.SEMIFINALI)){
 			if(gameNumber==2) {
 				players.removeAll(eliminated);
-				alert.setContentText("Semifinali terminate, si passa alla finale!");
-				alert.showAndWait();
+				InformationAlert.display("Messaggio informativo","Semifinali terminate, si passa alla finale!"); 
 				tournamentPhase=TournamentPhase.FINALE;
 				gameNumber=1;
 				}
@@ -152,8 +150,7 @@ public class Tournament extends Game{
 		else 
 			currentGameMessage=tournamentPhase + ", " + gameNumber +"° partita: "+ actualGamePlayersNames.get(0) + " VS " + actualGamePlayersNames.get(1);	
 		
-		alert.setContentText(currentGameMessage);
-		alert.showAndWait();
+		InformationAlert.display("Messaggio informativo",currentGameMessage);
 	}
 	
 	public Player getPlayer(int player) {
@@ -170,17 +167,16 @@ public class Tournament extends Game{
 			case "Attacco":{
 				hasAttackedValue=true;
 				hasAttacked.set(hasAttackedValue);
-				AttackCard ac=new AttackCard();
-				ac.onUse(attackingPlayer,targetPlayer, deck);
+				AttackCard.onUse(attackingPlayer,targetPlayer, deck);
 				if(targetPlayer.getCharacter().getCurrentLife()<=0) {// caso in cui con l'attacco si elimina un giocatore
 					this.eliminatePlayer(target);
 					message="Hai eliminato "+targetPlayer.getUsername()+".";
 				}
+				actionMessages.set(target, actionMessages.get(target)+ "-Sei stato attaccato da "+ attackingPlayer.getUsername()+"\n");
 				break;	
 			}
 			case "Occhio Di Sauron":{
-				SauronEyeCard sec=new SauronEyeCard();
-				sec.onUse(actualGamePlayers, attackingPlayer, deck);
+				SauronEyeCard.onUse(actualGamePlayers, attackingPlayer, deck);
 				int hit=1-currentPlayer;
 
 				if(this.getPlayer(hit).getCharacter().getCurrentLife()<=0){// controllo se ho eliminato l'avversario  utilizzando l'occhio di sauron
@@ -190,43 +186,36 @@ public class Tournament extends Game{
 				else
 					message="Hai inflitto 20 p.ti danno all'avversario!";
 				
-				
+				actionMessages.set(hit, actionMessages.get(hit)+ "-Hai subito 20 p.ti danno dall'Occhio di Sauron \n");
 				break;
 			}
 			case "Guanto Di Thanos":{
-				GauntletCard gc=new GauntletCard();
-				Card discarded=gc.onUse(attackingPlayer,targetPlayer, deck);
+				Card discarded=GauntletCard.onUse(attackingPlayer,targetPlayer, deck);
 				targetPlayer.getHand().remove(discarded);
-				
 				message="La carta '"+discarded.getName()+"' è stata scartata dalla mano di "+targetPlayer.getUsername();
+				actionMessages.set(target,actionMessages.get(target)+"-"+attackingPlayer.getUsername()+" ti ha scartato la carta "+discarded.getName()+"\n");
 				break;
 			}
 			case "Arrembaggio":{
-				BoardingCard bc=new BoardingCard();
-				Card stolen=bc.onUse(attackingPlayer,players.get(target) , deck);
+				Card stolen=BoardingCard.onUse(attackingPlayer,players.get(target) , deck);
 				attackingPlayer.getHand().add(stolen);
 				targetPlayer.getHand().remove(stolen);
-				
 				message="La carta '"+stolen.getName()+"' è stata rubata dalla mano di "+targetPlayer.getUsername();
+				actionMessages.set(target,actionMessages.get(target)+"-"+attackingPlayer.getUsername()+" ti ha rubato la carta "+stolen.getName()+"\n");
 				break;
 			}
 			case "Pozione Curativa":{
-				HealingPotionCard hpc=new HealingPotionCard();
-				hpc.onUse(attackingPlayer, deck);
+				HealingPotionCard.onUse(attackingPlayer, deck);
 				break;
 			}
 			case "Pioggia Di Meteore":{
-				MeteorsRainCard mrc=new MeteorsRainCard();
-				mrc.onUse(attackingPlayer, targetPlayer, deck);
+				MeteorsRainCard.onUse(attackingPlayer, targetPlayer, deck);
+				actionMessages.set(target,actionMessages.get(target)+  "-La tua board è stata distrutta  da "+ attackingPlayer.getUsername()+"\n");
 				break;
 			}
 		}
 		if(!isBot && message.length()>0) {
-			alert=new Alert(Alert.AlertType.INFORMATION);
-			alert.setTitle("Messaggio informativo");
-			alert.setHeaderText(null);
-			alert.setContentText(message);
-			alert.showAndWait();
+			InformationAlert.display("Messaggio informativo",message);
 		}
 		this.currentPlayer=currentPlayer;
 		attackingPlayer.getHand().remove(submittedCard);	
@@ -242,7 +231,10 @@ public class Tournament extends Game{
 		}
 		else {
 			Alert alert=new Alert(AlertType.CONFIRMATION);
-			alert.setTitle("Attenzione!");
+			alert.setGraphic(null);
+			alert.getDialogPane().getStyleClass().add("game-alert");
+			alert.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
+			alert.setTitle("Conferma");
 			alert.setHeaderText("Hai già una carta statica posizionata!");
 			alert.setContentText("Sei sicuro di volerla sostituire?");
 			if(alert.showAndWait().get()==ButtonType.OK) {
@@ -269,7 +261,10 @@ public class Tournament extends Game{
 		}
 		else{
 			Alert alert=new Alert(AlertType.CONFIRMATION);
-			alert.setTitle("Attenzione!");
+			alert.setGraphic(null);
+			alert.getDialogPane().getStyleClass().add("game-alert");
+			alert.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
+			alert.setTitle("Conferma");
 			alert.setHeaderText("Hai già un'arma equipaggiata!");
 			alert.setContentText("Sei sicuro di volerla sostituire?");
 			if(alert.showAndWait().get()==ButtonType.OK) {
@@ -291,26 +286,20 @@ public class Tournament extends Game{
 		EventCard submittedEventCard=(EventCard)currentPlayer.getHand().get(submittedCard);
 		switch(submittedEventCard.getName()) {
 			case "Furto Di Identità":{
-				IdentityTheftCard itc=new IdentityTheftCard();
-				itc.onUse(currentPlayer,targetPlayer,deck);
+				IdentityTheftCard.onUse(currentPlayer,targetPlayer,deck);
+				actionMessages.set(target, actionMessages.get(target)+ "-Il tuo personaggio è stato scambiato con quello di "+ currentPlayer.getUsername()+"\n");
 				break;
 			}
 			case "Giorno Del Giudizio":{
-				DoomsdayCard dc=new DoomsdayCard();
-				dc.onUse(currentPlayer,targetPlayer,deck);
+				DoomsdayCard.onUse(currentPlayer,targetPlayer,deck);
 				if(!(actualGamePlayers.get(this.currentPlayer) instanceof Bot)) {
-					alert=new Alert(Alert.AlertType.INFORMATION);
-					alert.setTitle("Messaggio informativo");
-					alert.setHeaderText(null);
-					alert.setContentText("Il giorno del giudizio è arrivato per "+targetPlayer.getUsername());
-					alert.showAndWait();
+					InformationAlert.display("Messaggio informativo","Il giorno del giudizio è arrivato per "+targetPlayer.getUsername());
 				}
 				this.eliminatePlayer(target);
 				break;
 			}
 			case "Miracolo":{
-				MiracleCard mc=new MiracleCard();
-				mc.onUse(currentPlayer, deck);
+				MiracleCard.onUse(currentPlayer, deck);
 				break;
 			}
 		}
@@ -373,9 +362,9 @@ public class Tournament extends Game{
 		actualGamePlayersNames.addAll(latestTwo);
 		return latestTwo;
 	}
-	 public String getCurrentGameMessage() {
-		 return currentGameMessage;
-	 }
+	public String getCurrentGameMessage() {
+		return currentGameMessage;
+	}
 	
 }
 	
