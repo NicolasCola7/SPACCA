@@ -116,7 +116,6 @@ public class PlayerController implements Initializable{
 				check=false;
 		}
 		} catch (FileNotFoundException e) {
-			System.out.println("File not found");
 			e.printStackTrace();
 		}
 		return check;

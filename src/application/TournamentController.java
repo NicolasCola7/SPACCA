@@ -25,6 +25,7 @@ import game.TournamentPhase;
 import leaderboard.Leaderboard;
 import leaderboard.LeaderboardData;
 import javafx.application.Platform;
+import javafx.beans.property.BooleanPropertyBase;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -78,17 +79,21 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
+
 
 public class TournamentController implements Initializable{
 	private String gameCode;
 	private String  adminUsername;
 	private Tournament tournament;
 	private int currentPlayer;
-	private SimpleBooleanProperty hasDrawed;
-	private SimpleBooleanProperty hasAttacked;
-	private SimpleBooleanProperty hasDiscarded;
 	private SimpleBooleanProperty isSelected;
-	private SimpleBooleanProperty isSelectedAttackCard;
+	private Clip backgroundTrack;
+	private Clip cardSound;
 	
 	@FXML private ScrollPane cardsScroller;
 	@FXML private Label playerUsernameLabel;
@@ -109,11 +114,13 @@ public class TournamentController implements Initializable{
 	@FXML private Pane deckPane;
 	@FXML private Pane latestPlayedCardPane;
 	@FXML private AnchorPane backGround;
+	@FXML private ToggleButton volumeButton;
 	
 	private ToggleGroup group;
 	private ArrayList<ToggleButton> currentPlayerHand;
 	private ArrayList<String> actualGamePlayersNames;
 	private Stage primaryStage;
+
 	
 	public void setGameCode(String code) { // metodo che viene chiamato dal playerController per settare il gameCode
 		gameCode=code;
@@ -144,7 +151,7 @@ public class TournamentController implements Initializable{
 		    primaryStage.setMaximized(true);
 		    
 			setMenuButtonStyle();
-		    setButtonStyle();
+		    setButtonImages();
 		    setSceneStyle();
 		    
 		    InformationAlert.display("Messaggio informativo",tournament.getCurrentGameMessage());
@@ -207,24 +214,36 @@ public class TournamentController implements Initializable{
 	}
 	
 	private void setBindings() { // serve a fare in modo che i bottoni vengano disattivati e attivati  in determinate situazioni
-		hasDrawed=tournament.getHasDrawed();
-		hasAttacked=tournament.getHasAttacked();
-		hasDiscarded=tournament.getHasDiscarded();
+		SimpleBooleanProperty hasDrawed=tournament.getHasDrawed();
+		SimpleBooleanProperty hasAttacked=tournament.getHasAttacked();
+		SimpleBooleanProperty hasDiscarded=tournament.getHasDiscarded();
+		SimpleBooleanProperty isSelectedAttackCard=new SimpleBooleanProperty(false);
+		SimpleBooleanProperty isSelectedEventOrActionCard=new SimpleBooleanProperty(false);
+		SimpleBooleanProperty isFirstTurn=new SimpleBooleanProperty(tournament.getTurn()==1);
 		isSelected=new SimpleBooleanProperty(false);
-		isSelectedAttackCard=new SimpleBooleanProperty(false);
 		
 		isSelected.bind(group.selectedToggleProperty().isNull());// isSelected diventa true  è selezionata una carta
 		group.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
-	            if (newValue != null) 
-	                isSelectedAttackCard.bind(((ToggleButton)group.getSelectedToggle()).textProperty().isEqualTo("Attacco"));// isSelectedAttackCard diventa true se è selezionata la carta attacco
-	            else 
+			 if (newValue != null) {
+	            	isSelectedAttackCard.bind(((ToggleButton)group.getSelectedToggle()).textProperty().isEqualTo("Attacco"));// isSelectedAttackCard diventa true se è selezionata la carta attacco
+	            	 
+	            	ArrayList<Card> hand=tournament.getPlayer(currentPlayer).getHand();
+	            	ToggleButton btn=(ToggleButton) group.getSelectedToggle();
+	            	Card c=hand.get(currentPlayerHand.indexOf(btn));
+	            	SimpleBooleanProperty isActionOrEventCard= new SimpleBooleanProperty(false);
+	            	isActionOrEventCard.set(c instanceof ActionCard || c instanceof EventCard);
+	            	isSelectedEventOrActionCard.bind(isActionOrEventCard);
+	            }	
+	            else {
+	            	isSelectedEventOrActionCard.unbind();
 	            	isSelectedAttackCard.unbind();
+	            }
 	            
 	        });
 		
     	drawCardButton.disableProperty().bind(hasDrawed); //disattiva il bottone per pescare se ha già pescato
 		discardCardButton.disableProperty().bind(hasDiscarded.or(isSelected)); //disattiva il bottone per scartare se il giocatore ha già scartato una carta o non ne ha selezionata alcuna
-		submitCardButton.disableProperty().bind(isSelected.or(hasAttacked.and(isSelectedAttackCard)));//disattiva il bottone per giocare una carta se non c'è alcuna carta selezionata, oppure se il giocatore ha già attaccato e la carta selezionata è una carta attacco
+		submitCardButton.disableProperty().bind(isSelected.or(hasAttacked.and(isSelectedAttackCard)).or(isFirstTurn.and(isSelectedEventOrActionCard)));//disattiva il bottone per giocare una carta se non c'è alcuna carta selezionata, oppure se il giocatore ha già attaccato e la carta selezionata è una carta attacco
 	}
 	
 	public void seeBoard(ActionEvent event)throws IOException{ // permette di visualizzare le carte presenti nella board del giocatore corrrente
@@ -854,13 +873,17 @@ public class TournamentController implements Initializable{
        btn.selectedProperty().addListener((observable, oldValue, newValue) -> {
            if (newValue) {
         	   btn.setStyle("-fx-background-color:orange;");
+        	   if(!volumeButton.isSelected()) {
+	        	   cardSound.setMicrosecondPosition(0);
+	        	   cardSound.start();
+        	   }
            } else {
         	   btn.setStyle("-fx-background-color: transparent;");
            }
        });
    }
    
-   private void setButtonStyle() {
+   private void setButtonImages() {
 	   ImageView chButtonImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Character.png")));
 	   chButtonImg.setFitWidth(50);
 	   chButtonImg.setFitHeight(50);
@@ -895,6 +918,34 @@ public class TournamentController implements Initializable{
 	   nextPlayerImg.setFitWidth(50);
 	   nextPlayerImg.setFitHeight(50);
 	   submitPlayerButton.setGraphic(nextPlayerImg);
+	   
+	   volumeButton.setLayoutX(menu.getLayoutX()+60);
+	   volumeButton.setLayoutY(primaryStage.getY()+20);
+	   ImageView volumeOnImage = new ImageView(new Image("./application/ButtonImages/VolumeOn.png"));
+	   volumeOnImage.setFitWidth(35);
+	   volumeOnImage.setFitHeight(35);
+	   ImageView volumeOffImage = new ImageView(new Image("./application/ButtonImages/VolumeOff.png"));
+	   volumeOffImage.setFitWidth(35);
+	   volumeOffImage.setFitHeight(35);
+	   volumeButton.setGraphic(volumeOnImage);
+	   volumeButton.setSelected(false);
+	   volumeButton.setOnAction((event) -> {
+	        
+         if (volumeButton.isSelected()) {
+             volumeButton.setGraphic(volumeOffImage);
+             volumeButton.setSelected(true);
+             backgroundTrack.stop();
+             cardSound.stop();
+         }
+         else {
+        	 volumeButton.setGraphic(volumeOnImage);
+        	 volumeButton.setSelected(false);
+        	 
+        	 backgroundTrack.setMicrosecondPosition(backgroundTrack.getMicrosecondPosition());
+        	 backgroundTrack.start();
+     
+         }
+     });
    }	
    
    private void setMenuButtonStyle() {
@@ -998,6 +1049,25 @@ public class TournamentController implements Initializable{
        AnchorPane.setLeftAnchor(latestPlayedCardPane, (primaryStage.getWidth() - latestPlayedCardPane.getPrefWidth())/2);
        latestPlayedCardPane.getChildren().add(latestPlayedCard);
 
+       File filePath1=new File("soundtrack1.wav");
+       File filePath2=new File("CardSound.wav");
+       try {   
+    	   AudioInputStream backgroundAudioStream=AudioSystem.getAudioInputStream(filePath1);
+    	   backgroundTrack=AudioSystem.getClip();
+    	   backgroundTrack.open(backgroundAudioStream);
+    	   backgroundTrack.start();
+    	   backgroundTrack.loop(Clip.LOOP_CONTINUOUSLY);
+    	   
+    	   AudioInputStream cardsAudioStream=AudioSystem.getAudioInputStream(filePath2);
+    	   cardSound=AudioSystem.getClip();
+    	   cardSound.open(cardsAudioStream);
+       } catch (UnsupportedAudioFileException e) {
+    	   e.printStackTrace();
+       } catch (IOException e) {
+    	   e.printStackTrace();
+       }catch(LineUnavailableException e) {
+    	   e.printStackTrace();
+       }
    }
  
 }

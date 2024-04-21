@@ -1,11 +1,8 @@
 package decks;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.LinkedList;
-import java.util.Scanner;
 
 import cards.characters.*;
 import cards.characters.Character;

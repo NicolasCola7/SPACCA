@@ -124,7 +124,8 @@ public class ClassicGame extends Game {
 						index=(index==0?0:index-1);
 					}
 					else {
-						actionMessages.set(index, actionMessages.get(index)+ "-Hai subito 20 p.ti danno dall'Occhio di Sauron \n");
+						if(players.get(index).getUsername()!=attackingPlayer.getUsername()) 
+							actionMessages.set(index, actionMessages.get(index)+ "-Hai subito 20 p.ti danno dall'Occhio di Sauron \n");
 						index++;
 					}
 				}

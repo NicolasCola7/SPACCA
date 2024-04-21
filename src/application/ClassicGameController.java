@@ -1,7 +1,6 @@
 /*TODO
- * fare in modo che quando è il turno di un giocatore, questo venga informato delle azioni eseguite su di lui(con arrayList du stringhe)
  * fare in modo che nel primo turno non si possano usare carte evento o azione?
- * grafica
+ * controllo errori/provare il gioco
  * avanzamento torneo(da considerare come componente aggiuntiva?)
  */
 package application;
@@ -65,6 +64,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.AudioClip;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
@@ -97,6 +97,12 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
+
 
 public class ClassicGameController implements Initializable{
 	private String gameCode;
@@ -104,11 +110,9 @@ public class ClassicGameController implements Initializable{
 	private ClassicGame game;
 	private int currentPlayer;
 	private int actualNumberOfPlayers;
-	private SimpleBooleanProperty hasDrawed;
-	private SimpleBooleanProperty hasAttacked;
-	private SimpleBooleanProperty hasDiscarded;
 	private SimpleBooleanProperty isSelected;
-	private SimpleBooleanProperty isSelectedAttackCard;
+	private Clip backgroundTrack;
+	private Clip cardSound;
 	
 	@FXML private ScrollPane cardsScroller;
 	@FXML private Label playerUsernameLabel;
@@ -128,12 +132,12 @@ public class ClassicGameController implements Initializable{
 	@FXML private Pane deckPane;
 	@FXML private Pane latestPlayedCardPane;
 	@FXML private AnchorPane backGround;
+	@FXML private ToggleButton volumeButton;
 	
 	private ToggleGroup group;
 	private ArrayList<ToggleButton> currentPlayerHand;
 	private ArrayList<String> players;
 	private Stage primaryStage;
-	private Alert alert;
 	
 	
 	public void setGameCode(String code) { // metodo che viene chiamato dal playerController per settare il gameCode
@@ -146,7 +150,7 @@ public class ClassicGameController implements Initializable{
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {// inizializza la partita 
-		Platform.runLater(() -> {// metodo da capire meglio, serve a ritardare le istruzioni al suo interno dato che quando si passano dati da un altro controller (PlayerController in questo caso)  il metodo initialize viene eseguito prima dei metodi utilizzati nel controller che passa i dati,in guesto caso setGameCode() e setAdminUsername()
+		Platform.runLater(() -> {//serve a ritardare le istruzioni al suo interno dato che quando si passano dati da un altro controller (PlayerController in questo caso)  il metodo initialize viene eseguito prima dei metodi utilizzati nel controller che passa i dati,in guesto caso setGameCode() e setAdminUsername()
 			if(isSerialized("./Files/ConfigurationFiles/"+gameCode+".ser")){
 				game=deserialize("./Files/ConfigurationFiles/"+gameCode+".ser");
 				currentPlayer=game.getCurrentPlayer();
@@ -164,7 +168,7 @@ public class ClassicGameController implements Initializable{
 		    primaryStage.setMaximized(true);
 		    
 			setMenuButtonStyle();
-		    setButtonStyle();
+		    setButtonImages();
 		    setSceneStyle();
 	    });  
 		 
@@ -184,6 +188,7 @@ public class ClassicGameController implements Initializable{
 		}
 		setBindings();
 		initializePlayersBox();
+    
 		String toDisplay=game.getActionMessage(currentPlayer);
 		if(toDisplay.length()>0)
 			InformationAlert.display("Messaggio informativo",toDisplay );
@@ -220,25 +225,37 @@ public class ClassicGameController implements Initializable{
 		}
 	}
 	private void setBindings() { // serve a fare in modo che i bottoni vengano disattivati e attivati  in determinate situazioni
-		hasDrawed=game.getHasDrawed();
-		hasAttacked=game.getHasAttacked();
-		hasDiscarded=game.getHasDiscarded();
+		SimpleBooleanProperty hasDrawed=game.getHasDrawed();
+		SimpleBooleanProperty hasAttacked=game.getHasAttacked();
+		SimpleBooleanProperty hasDiscarded=game.getHasDiscarded();
+		SimpleBooleanProperty isSelectedAttackCard=new SimpleBooleanProperty(false);
+		SimpleBooleanProperty isSelectedEventOrActionCard=new SimpleBooleanProperty(false);
+		SimpleBooleanProperty isFirstTurn=new SimpleBooleanProperty(game.getTurn()==1);
 		isSelected=new SimpleBooleanProperty(false);
-		isSelectedAttackCard=new SimpleBooleanProperty(false);
 		
 		isSelected.bind(group.selectedToggleProperty().isNull());// isSelected diventa true  è selezionata una carta
 		
 		group.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
-	            if (newValue != null) 
-	                isSelectedAttackCard.bind(((ToggleButton)group.getSelectedToggle()).textProperty().isEqualTo("Attacco"));// isSelectedAttackCard diventa true se è selezionata la carta attacco
-	            else 
-	            	isSelectedAttackCard.unbind();
-	            
-	        });
+            if (newValue != null) {
+            	isSelectedAttackCard.bind(((ToggleButton)group.getSelectedToggle()).textProperty().isEqualTo("Attacco"));// isSelectedAttackCard diventa true se è selezionata la carta attacco
+            	 
+            	ArrayList<Card> hand=game.getPlayer(currentPlayer).getHand();
+            	ToggleButton btn=(ToggleButton) group.getSelectedToggle();
+            	Card c=hand.get(currentPlayerHand.indexOf(btn));
+            	SimpleBooleanProperty isActionOrEventCard= new SimpleBooleanProperty(false);
+            	isActionOrEventCard.set(c instanceof ActionCard || c instanceof EventCard);
+            	isSelectedEventOrActionCard.bind(isActionOrEventCard);
+            }	
+            else {
+            	isSelectedEventOrActionCard.unbind();
+            	isSelectedAttackCard.unbind();
+            }
+            
+        });
 		
     	drawCardButton.disableProperty().bind(hasDrawed); //disattiva il bottone per pescare se ha già pescato
 		discardCardButton.disableProperty().bind(hasDiscarded.or(isSelected)); //disattiva il bottone per scartare se il giocatore ha già scartato una carta o non ne ha selezionata alcuna
-		submitCardButton.disableProperty().bind(isSelected.or(hasAttacked.and(isSelectedAttackCard)));//disattiva il bottone per giocare una carta se non c'è alcuna carta selezionata, oppure se il giocatore ha già attaccato e la carta selezionata è una carta attacco
+		submitCardButton.disableProperty().bind(isSelected.or(hasAttacked.and(isSelectedAttackCard)).or(isFirstTurn.and(isSelectedEventOrActionCard)));//disattiva il bottone per giocare una carta se non c'è alcuna carta selezionata, oppure se il giocatore ha già attaccato e la carta selezionata è una carta attacco
 	}
 	
 	public void seeBoard(ActionEvent event)throws IOException{ // permette di visualizzare le carte presenti nella board del giocatore corrrente
@@ -298,7 +315,6 @@ public class ClassicGameController implements Initializable{
 		Card drawedCard=game.drawCard(currentPlayer);
 		ToggleButton btn=new ToggleButton(drawedCard.getName());
 		addToCardsBox(btn); // aggiunge la carta pescata alla UI del giocatore corrente
-		
 	}
 	
 	public void discardCard(ActionEvent event)throws IOException{ //per scartare una carta
@@ -445,6 +461,7 @@ public class ClassicGameController implements Initializable{
 			checkConcurrentElimination();
 		}
 	}
+	
 	//caso in cui entrambi i giocatori si eliminino a vicenda
 	private void checkConcurrentElimination() {
 		if(currentPlayer==actualNumberOfPlayers-1 || players.size()<actualNumberOfPlayers) {
@@ -606,7 +623,6 @@ public class ClassicGameController implements Initializable{
 		currentPlayerHand.remove(btn);
 		cardsBox.getChildren().remove(btn);
 		group.getToggles().remove(btn);
-		
 	}
 	
 	private void addToCardsBox(ToggleButton btn) { //aggiunge una determinata carta/bottone dalla UI
@@ -626,6 +642,7 @@ public class ClassicGameController implements Initializable{
 		}
 		else
 			this.currentPlayer++;
+		
 		game.setCurrentPlayer(this.currentPlayer);
 		
 		if(isBot(this.currentPlayer)) {
@@ -651,6 +668,7 @@ public class ClassicGameController implements Initializable{
 		deleteGameFromGamesDatasFile();
 		deleteSerializationFile();
 		disableButtons();
+		backgroundTrack.stop();
 		showLeaderboard();
 	}
 	
@@ -717,6 +735,7 @@ public class ClassicGameController implements Initializable{
 		alert.setHeaderText("Stai per uscire dalla partita!");
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
+			backgroundTrack.stop();
 			Stage stage = (Stage) ((MenuItem) event.getTarget()).getParentPopup().getOwnerWindow();
 	        Parent root = FXMLLoader.load(getClass().getResource("home.fxml"));
 	        Scene scene = new Scene(root);
@@ -736,6 +755,7 @@ public class ClassicGameController implements Initializable{
 		alert.setHeaderText("Stai per uscire dalla partita senza salvare i progressi!");
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
+			backgroundTrack.stop();
 			Stage stage = (Stage) ((MenuItem) event.getTarget()).getParentPopup().getOwnerWindow();
 	        Parent root = FXMLLoader.load(getClass().getResource("home.fxml"));
 	        Scene scene = new Scene(root);
@@ -872,13 +892,17 @@ public class ClassicGameController implements Initializable{
        btn.selectedProperty().addListener((observable, oldValue, newValue) -> {
            if (newValue) {
         	   btn.setStyle("-fx-background-color:orange;");
+        	   if(!volumeButton.isSelected()) {
+	        	   cardSound.setMicrosecondPosition(0);
+	        	   cardSound.start();
+        	   }
            } else {
         	   btn.setStyle("-fx-background-color: transparent;");
            }
        });
    }
    
-   private void setButtonStyle() {
+   private void setButtonImages() {
 	 ImageView chButtonImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Character.png")));
 	 chButtonImg.setFitWidth(50);
 	 chButtonImg.setFitHeight(50);
@@ -913,11 +937,39 @@ public class ClassicGameController implements Initializable{
 	 nextPlayerImg.setFitWidth(50);
 	 nextPlayerImg.setFitHeight(50);
 	 submitPlayerButton.setGraphic(nextPlayerImg);
+	 
+	 volumeButton.setLayoutX(menu.getLayoutX()+60);
+	 volumeButton.setLayoutY(primaryStage.getY()+10);
+	 ImageView volumeOnImage = new ImageView(new Image("./application/ButtonImages/VolumeOn.png"));
+	 volumeOnImage.setFitWidth(35);
+	 volumeOnImage.setFitHeight(35);
+     ImageView volumeOffImage = new ImageView(new Image("./application/ButtonImages/VolumeOff.png"));
+     volumeOffImage.setFitWidth(35);
+     volumeOffImage.setFitHeight(35);
+     volumeButton.setGraphic(volumeOnImage);
+     volumeButton.setSelected(false);
+     volumeButton.setOnAction((event) -> {
+        
+         if (volumeButton.isSelected()) {
+             volumeButton.setGraphic(volumeOffImage);
+             volumeButton.setSelected(true);
+             backgroundTrack.stop();
+             cardSound.stop();
+         }
+         else {
+        	 volumeButton.setGraphic(volumeOnImage);
+        	 volumeButton.setSelected(false);
+        	 
+        	 backgroundTrack.setMicrosecondPosition(backgroundTrack.getMicrosecondPosition());
+        	 backgroundTrack.start();
+     
+         }
+     });
    }
    
    private void setMenuButtonStyle() {
 	   menu.setLayoutX(primaryStage.getX()+10);
-       menu.setLayoutY(primaryStage.getY()+10);
+       menu.setLayoutY(primaryStage.getY()+20);
        ImageView menuImg=new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Menu1.png")));
        menuImg.setFitWidth(menu.getPrefWidth()); 
        menuImg.setFitHeight(menu.getPrefHeight());
@@ -978,15 +1030,15 @@ public class ClassicGameController implements Initializable{
 		   box.getChildren().addAll(chImage,lifeBox);
 		
 	   Alert alert = new Alert(Alert.AlertType.INFORMATION);
-		alert.setTitle("Personaggio");
-		alert.setHeaderText(null);
-		alert.setGraphic(null);
-		alert.getDialogPane().getStyleClass().add("game-alert");
-		alert.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
-		alert.getButtonTypes().remove(ButtonType.OK);
-		alert.getButtonTypes().add(ButtonType.CLOSE);
-		alert.getDialogPane().setContent(box);
-		alert.showAndWait();
+	   alert.setTitle("Personaggio");
+	   alert.setHeaderText(null);
+	   alert.setGraphic(null);
+	   alert.getDialogPane().getStyleClass().add("game-alert");
+	   alert.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
+	   alert.getButtonTypes().remove(ButtonType.OK);
+	   alert.getButtonTypes().add(ButtonType.CLOSE);
+	   alert.getDialogPane().setContent(box);
+	   alert.showAndWait();
    }
    private void setSceneStyle() {
        gameButtonsBox.setLayoutX(primaryStage.getWidth()-(gameButtonsBox.getPrefWidth()));
@@ -1007,7 +1059,7 @@ public class ClassicGameController implements Initializable{
        deckImg.setFitWidth(270);
        deckPane.getChildren().add(deckImg);
        
-       Card latest=(game.getDeck().getStockpile().size()==0?null:game.getDeck().getStockpile().getLast());
+       Card latest=(game.getDeck().getStockpile().size()==0 ? null : game.getDeck().getStockpile().getLast());
        String latestName=(latest==null?"Vuoto":latest.getName());
        ImageView latestPlayedCard=new ImageView(new Image(getClass().getResourceAsStream("./CardsImages/"+latestName+".png")));
        latestPlayedCard.setFitHeight(200);
@@ -1015,7 +1067,25 @@ public class ClassicGameController implements Initializable{
        AnchorPane.setTopAnchor(latestPlayedCardPane, (primaryStage.getHeight() - latestPlayedCardPane.getPrefHeight()) / 3);
        AnchorPane.setLeftAnchor(latestPlayedCardPane, (primaryStage.getWidth() - latestPlayedCardPane.getPrefWidth())/2);
        latestPlayedCardPane.getChildren().add(latestPlayedCard);
-
+       
+       File filePath1=new File("soundtrack1.wav");
+       File filePath2=new File("CardSound.wav");
+       try {   
+    	   AudioInputStream backgroundAudioStream=AudioSystem.getAudioInputStream(filePath1);
+    	   backgroundTrack=AudioSystem.getClip();
+    	   backgroundTrack.open(backgroundAudioStream);
+    	   backgroundTrack.start();
+    	   backgroundTrack.loop(Clip.LOOP_CONTINUOUSLY);
+    	   
+    	   AudioInputStream cardsAudioStream=AudioSystem.getAudioInputStream(filePath2);
+    	   cardSound=AudioSystem.getClip();
+    	   cardSound.open(cardsAudioStream);
+       } catch (UnsupportedAudioFileException e) {
+    	   e.printStackTrace();
+       } catch (IOException e) {
+    	   e.printStackTrace();
+       }catch(LineUnavailableException e) {
+    	   e.printStackTrace();
+       }
    }
-   
 }

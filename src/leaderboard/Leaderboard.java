@@ -15,6 +15,7 @@ import java.util.Scanner;
 import game.GameType;
 
 public class Leaderboard implements Serializable{
+	
 	private LinkedList<String> names;
 	private LinkedList<Integer> scores;
 	private File leaderboardFile;
@@ -30,8 +31,9 @@ public class Leaderboard implements Serializable{
 			initializeLeaderboardFile();
 		getData();
 	}
+	
 	public void getData() {
-		 int score=0;
+		int score=0;
 		try {
 			Scanner scan=new Scanner(leaderboardFile);
 			int i=0;
@@ -45,6 +47,7 @@ public class Leaderboard implements Serializable{
 			e.printStackTrace();
 		}
 	}
+	
 	public void orderLeaderboard() {
 		//insertion sort
 		 for (int i = 1; i < scores.size(); i++) {
@@ -62,6 +65,7 @@ public class Leaderboard implements Serializable{
 	        }
         updateLeaderboard();
 	}
+	
 	private void updateLeaderboard() {
 		try {
 			PrintWriter pw=new PrintWriter(leaderboardFile);
@@ -81,6 +85,7 @@ public class Leaderboard implements Serializable{
 			orderLeaderboard();
 		}
 	}
+	
 	public void increaseScore(String player) {
 		if(names.contains(player)) {
 			int position=names.indexOf(player);
@@ -89,6 +94,7 @@ public class Leaderboard implements Serializable{
 			orderLeaderboard();
 		}
 	}
+	
 	public void renamePlayerInLeaderboard(String oldName,String newName) {
 		if(names.contains(oldName)) {
 			int position=names.indexOf(oldName);
@@ -96,6 +102,7 @@ public class Leaderboard implements Serializable{
 			orderLeaderboard();
 		}
 	}
+	
 	private void getPlayersNames() {
 		playersNames=new ArrayList<String>();
 		File playersList=new File("./Files/ConfigurationFiles/"+adminUsername+"ListaGiocatori.csv");
@@ -108,6 +115,7 @@ public class Leaderboard implements Serializable{
 			e.printStackTrace();
 		}
 	}
+	
 	public void initializeLeaderboardFile() {
 		getPlayersNames();
 		try {

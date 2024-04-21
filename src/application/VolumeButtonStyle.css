@@ -1,0 +1,9 @@
+.volume-button {
+  -fx-background-color: transparent;
+  -fx-background-radius: 50%;
+  -fx-padding: 10px;
+  -fx-cursor: pointer;
+  -fx-transition: transform 0.2s;
+  -fx-background-size: cover;
+}
+
