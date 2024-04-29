@@ -6,7 +6,8 @@ import cards.characters.Character;
 import cards.events.EventCard;
 
 public class Bot extends Player {
-	
+
+	private static final long serialVersionUID = -5387030367091611978L;
 	public Bot(String username, Character character) {
 		super(username,character);
 	}

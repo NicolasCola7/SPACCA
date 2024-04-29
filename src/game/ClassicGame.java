@@ -1,20 +1,9 @@
 
 package game;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Scanner;
-
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
@@ -23,7 +12,6 @@ import cards.*;
 import cards.actions.*;
 import cards.statics.*;
 import cards.events.*;
-import cards.characters.*;
 import decks.*;	
 
 public class ClassicGame extends Game {

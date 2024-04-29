@@ -6,16 +6,13 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Scanner;
 import game.GameType;
 
 public class Leaderboard implements Serializable{
 	
+	private static final long serialVersionUID = 3946677509468116035L;
 	private LinkedList<String> names;
 	private LinkedList<Integer> scores;
 	private File leaderboardFile;
@@ -36,13 +33,13 @@ public class Leaderboard implements Serializable{
 		int score=0;
 		try {
 			Scanner scan=new Scanner(leaderboardFile);
-			int i=0;
 			while(scan.hasNextLine()) {
 				String[] line=scan.nextLine().split(",");
 				names.addLast(line[0]);
 				score=Integer.parseInt(line[1]);
 				scores.addLast(score);
 			}
+			scan.close();
 		}catch(IOException e) {
 			e.printStackTrace();
 		}
@@ -77,6 +74,7 @@ public class Leaderboard implements Serializable{
 			e.printStackTrace();
 		}
 	}
+	
 	public void deleteFromLeaderboard(String player) {
 		if(names.contains(player)) {
 			int position=names.indexOf(player);
@@ -111,6 +109,7 @@ public class Leaderboard implements Serializable{
 			while(scan.hasNextLine()) {
 				playersNames.add(scan.nextLine());
 			}
+			scan.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}

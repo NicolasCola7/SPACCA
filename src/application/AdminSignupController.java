@@ -82,9 +82,7 @@ public class AdminSignupController implements Initializable {
 			addNewAdmin();
     		createPlayersList();
     		updateCurrentAdmin();
-    		Leaderboard classicGamesLeaderboard=new Leaderboard(adminUsername.getText(),GameType.CLASSIC);
-    		Leaderboard tournamentsLeaderboard=new Leaderboard(adminUsername.getText(),GameType.TOURNAMENT);
-    		
+    
 			root = FXMLLoader.load(getClass().getResource("Admin.fxml"));
 			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 			scene=new Scene(root);

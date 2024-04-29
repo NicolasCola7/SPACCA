@@ -1,8 +1,6 @@
 package game;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.LinkedList;
-
 import cards.Card;
 import cards.WeaponCard;
 import cards.characters.Character;
@@ -13,15 +11,10 @@ import cards.statics.HologramCard;
 import cards.statics.RingCard;
 import cards.statics.ShieldCard;
 import cards.statics.StaticCard;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Alert.AlertType;
-import javafx.stage.Stage;
+
 public class Player implements Serializable{
-	
+
+	private static final long serialVersionUID = -6306867171263360441L;
 	protected String username;
 	protected Character character;
 	protected StaticCard[] board;

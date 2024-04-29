@@ -1,9 +1,8 @@
 package cards;
 
-import java.io.Serializable;
-
 public class WeaponCard extends Card {
-
+	
+	private static final long serialVersionUID = -6683575635773691701L;
 	private int damage;
 
 	public WeaponCard(String n, Seed seed, int d) {
@@ -14,9 +13,4 @@ public class WeaponCard extends Card {
 	public int getDamage() {
 		return damage;
 	}
-	/*
-	 * public boolean equipe(Player a) { if(a.setEquipedWeapon(this)) {
-	 * a.setEquipedWeapon(this); a.discardCardFromHand(this); return true; } else
-	 * return false; }
-	 */
 }

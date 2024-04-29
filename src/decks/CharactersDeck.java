@@ -8,6 +8,8 @@ import cards.characters.*;
 import cards.characters.Character;
 
 public class CharactersDeck implements Serializable {
+	
+	private static final long serialVersionUID = 4378656253029144470L;
 	private LinkedList<Character> charactersDeck;
 
 	public CharactersDeck() {

@@ -6,8 +6,8 @@ import game.Player;
 
 public class HealingPotionCard extends ActionCard{
 
-	private int healRate;
-	
+	private static final long serialVersionUID = -1966149291035799273L;
+
 	public HealingPotionCard() {
 		super("Pozione Curativa",Seed.SA);
 	}

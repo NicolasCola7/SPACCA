@@ -91,7 +91,6 @@ public class TournamentController implements Initializable{
 	private String  adminUsername;
 	private Tournament tournament;
 	private int currentPlayer;
-	private SimpleBooleanProperty isSelected;
 	private Clip backgroundTrack;
 	private Clip cardSound;
 	
@@ -106,6 +105,7 @@ public class TournamentController implements Initializable{
 	@FXML private Button playersInfosButton;
 	@FXML private Button boardInfosButton;
 	@FXML private Button equipedWeaponButton;
+	@FXML private Button tournamentBracketButton;
 	@FXML private HBox cardsBox;
 	@FXML private VBox infoBox;
 	@FXML private VBox gameButtonsBox;
@@ -120,7 +120,12 @@ public class TournamentController implements Initializable{
 	private ArrayList<ToggleButton> currentPlayerHand;
 	private ArrayList<String> actualGamePlayersNames;
 	private Stage primaryStage;
-
+	private FXMLLoader tournamentBracketLoader;
+	private Parent tournamentBracketScene;
+	@FXML private TournamentBracketController tournamentBracketController;
+	private  Stage bracketStage;
+	private  Scene bracketScene;
+	
 	
 	public void setGameCode(String code) { // metodo che viene chiamato dal playerController per settare il gameCode
 		gameCode=code;
@@ -133,17 +138,50 @@ public class TournamentController implements Initializable{
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {// inizializza la partita 
 		
-		Platform.runLater(() -> {// metodo da capire meglio, serve a ritardare le istruzioni al suo interno dato che quando si passano dati da un altro controller (PlayerController in questo caso)  il metodo initialize viene eseguito prima dei metodi utilizzati nel controller che passa i dati,in guesto caso setGameCode() e setAdminUsername()
+		Platform.runLater(() -> {//serve a ritardare le istruzioni al suo interno dato che quando si passano dati da un altro controller (PlayerController in questo caso)  il metodo initialize viene eseguito prima dei metodi utilizzati nel controller che passa i dati,in guesto caso setGameCode() e setAdminUsername()
+			tournamentBracketLoader =new FXMLLoader(getClass().getResource("TournamentBracket.fxml"));
+			
+			try {
+				tournamentBracketScene=tournamentBracketLoader.load();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			tournamentBracketController=tournamentBracketLoader.getController();
+			
 			if(isSerialized("./Files/ConfigurationFiles/"+gameCode+".ser")){
 				tournament=deserialize("./Files/ConfigurationFiles/"+gameCode+".ser");
 				currentPlayer=tournament.getCurrentPlayer();
 				tournament.initializeProperties();
+				
+				//carico l'avanzamento del torneo
+				for(int i=0;i<tournament.getSemifinalists().size();i++) {
+					tournamentBracketController.setPlayer(tournament.getSemifinalists().get(i), i+1, TournamentPhase.SEMIFINALI);
+				}
+				for(int i=0;i<tournament.getFinalists().size();i++) {
+					tournamentBracketController.setPlayer(tournament.getFinalists().get(i), i+1, TournamentPhase.FINALE);
+				}
 			}
+			
 			else {
 				tournament=new Tournament(gameCode,adminUsername);
 				currentPlayer=0;
 			}
+			currentPlayerHand=new ArrayList<ToggleButton>();
 			actualGamePlayersNames=tournament.getActualGamePlayersNames();
+			
+			
+			for(int i=0;i<tournament.getNOfPlayers();i++)
+				tournamentBracketController.setPlayer(tournament.getPlayersNames().get(i), i+1, TournamentPhase.QUARTI);
+			
+			 bracketScene=new Scene(tournamentBracketScene);
+			 bracketStage=new Stage();
+			 bracketStage.setResizable(false);
+			 bracketStage.initModality(Modality.APPLICATION_MODAL);
+			 bracketStage.initOwner(primaryStage);
+			 bracketStage.setTitle("Avanzamento Torneo");
+			 bracketStage.setScene(bracketScene);
+			
 			initializeCardsBox(currentPlayer);
 			
 			primaryStage=(Stage) drawCardButton.getScene().getWindow();
@@ -159,7 +197,7 @@ public class TournamentController implements Initializable{
 	}
 	
 	private void initializeCardsBox(int currentPlayer) {// inizializza la UI del giocatore corrente
-		currentPlayerHand=new ArrayList<ToggleButton>();
+		currentPlayerHand.clear();
 		turnLabel.setText(tournament.getTurn()+"° turno");
 		playerUsernameLabel.setText("Username:"+tournament.getPlayer(currentPlayer).getUsername());
 		group=new ToggleGroup();
@@ -193,20 +231,27 @@ public class TournamentController implements Initializable{
 		HBox playerBox=new HBox(1);
 		playerBox.setStyle("-fx-border-width:3;-fx-border-color:orange;");
 		playerBox.prefWidthProperty().bind(playersBox.prefWidthProperty());
+		
 		ImageView chImage=new ImageView(new Image(getClass().getResourceAsStream("./CharactersImages/"+ch.getName()+".png")));
 		chImage.setFitHeight(playersBox.getPrefHeight());
 		chImage.setFitWidth(80);
+		
 		Label playerName=new Label(player.getUsername());
 		playerName.setTextFill(Color.WHITE);
+		
 		HBox hbox=new HBox(3);
+		
 		Button moreInfos=new Button("");
 		moreInfos.setPrefHeight(playersBox.getPrefHeight());
 		moreInfos.setPrefWidth(50);
+		
 		ImageView infoImg=new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Info.png")));
 		infoImg.setFitHeight(50);
 		infoImg.setFitWidth(50);
+		
 		moreInfos.setGraphic(infoImg);
 		moreInfos.setOnAction(e -> getCharacterInfos(actualGamePlayersNames.indexOf(playerName.getText())));
+		
 		hbox.getChildren().addAll(playerName,moreInfos);
 		playerBox.getChildren().addAll(chImage,hbox);
 		moreInfos.setPrefWidth(playerBox.getPrefWidth());
@@ -220,7 +265,7 @@ public class TournamentController implements Initializable{
 		SimpleBooleanProperty isSelectedAttackCard=new SimpleBooleanProperty(false);
 		SimpleBooleanProperty isSelectedEventOrActionCard=new SimpleBooleanProperty(false);
 		SimpleBooleanProperty isFirstTurn=new SimpleBooleanProperty(tournament.getTurn()==1);
-		isSelected=new SimpleBooleanProperty(false);
+		SimpleBooleanProperty isSelected=new SimpleBooleanProperty(false);
 		
 		isSelected.bind(group.selectedToggleProperty().isNull());// isSelected diventa true  è selezionata una carta
 		group.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
@@ -291,8 +336,8 @@ public class TournamentController implements Initializable{
 		alert.getButtonTypes().add(ButtonType.CLOSE);
 		
 		ImageView weaponImage = new ImageView(new Image(getClass().getResourceAsStream("./CardsImages/"+fileName)));
-		 weaponImage.setFitWidth(280);
-		 weaponImage.setFitHeight(350);	
+		weaponImage.setFitWidth(280);
+		weaponImage.setFitHeight(350);	
 		
 		alert.getDialogPane().setContent(weaponImage);
 		alert.getDialogPane().setPadding(new Insets(10));
@@ -303,15 +348,13 @@ public class TournamentController implements Initializable{
 		Card drawedCard=tournament.drawCard(currentPlayer);
 		ToggleButton btn=new ToggleButton(drawedCard.getName());
 		addToCardsBox(btn); // aggiunge la carta pescata alla UI del giocatore corrente
-		
 	}
 	
 	public void discardCard(ActionEvent event)throws IOException{ //per scartare una carta
 		ToggleButton btn=(ToggleButton) group.getSelectedToggle();
 		setLatestPlayedCard(tournament.getPlayersHand(currentPlayer).get(currentPlayerHand.indexOf(btn)));
 		tournament.discardCard(currentPlayer,currentPlayerHand.indexOf(btn));
-		removeFromCardsBox(btn);// rimuove la carta scartata dalla UI del giocatore corrente
-		
+		removeFromCardsBox(btn);// rimuove la carta scartata dalla UI del giocatore corrente	
 	}
 
 	public void submitCard(ActionEvent event)throws IOException{ // per giocare una carta
@@ -320,8 +363,8 @@ public class TournamentController implements Initializable{
 		Card submittedCard=tournament.getPlayer(currentPlayer).getHand().get(submittedCardIndex); // ottengo la carta nella mano del giocatore corrispondente all'indice del bottone
 		String toAttack=actualGamePlayersNames.get(1-currentPlayer); // nome avversario
 		int targetPlayer=0;
+		
 		if(submittedCard instanceof ActionCard ) {
-			
 	        targetPlayer=actualGamePlayersNames.indexOf(toAttack);
         	tournament.submitActionCard(submittedCardIndex, currentPlayer,targetPlayer);
         	removeFromCardsBox(btn);
@@ -332,7 +375,6 @@ public class TournamentController implements Initializable{
 		}
 		
 		else if(submittedCard instanceof EventCard) {
-		
 			targetPlayer=actualGamePlayersNames.indexOf(toAttack);
 			tournament.submitEventCard(submittedCardIndex, currentPlayer,targetPlayer);
 	        removeFromCardsBox(btn);
@@ -365,7 +407,6 @@ public class TournamentController implements Initializable{
 		else if(tournament.isActualGameOver()) {
 			 endCurrentGame(currentPlayer);
 		}
-		
 	}
 	
 	private void setLatestPlayedCard(Card c) {
@@ -434,6 +475,7 @@ public class TournamentController implements Initializable{
 					tournament.submitActionCard(bot.getHand().indexOf(c),currentPlayer,targetPlayer);
 					checkElimination();
 					checkCurrentPlayerElimination(targetPlayer);
+					
 					//controlla se è rimasto solo un giocatore 
 					if(tournament.isTournamentGameOver()) {
 						InformationAlert.display("Messaggio informativo",botActionsMessage);
@@ -584,6 +626,9 @@ public class TournamentController implements Initializable{
 			ArrayList<String> latestTwo=tournament.getLatestTwoEliminated();
 			InformationAlert.display("Messaggio informativo", "Vi siete eliminati a vicenda, verrà lanciata una moneta per decretare il vincitore: se esce testa vince "+latestTwo.get(0)+", se esce croce "+latestTwo.get(1));
 			int winner=(int)(Math.random()*2);
+			 
+			// si potrebbe provare a fare un'animazione di una moneta
+			
 			if (winner==0) {
 				InformationAlert.display("Messaggio informativo", "E' uscito TESTA");
 				tournament.eliminatePlayer(1);
@@ -594,6 +639,7 @@ public class TournamentController implements Initializable{
 			}
 		}
 	}
+	
 	private void removeFromCardsBox(ToggleButton btn) { //rimuove una determinata carta/bottone dalla UI
 		currentPlayerHand.remove(btn);
 		cardsBox.getChildren().remove(btn);
@@ -633,6 +679,7 @@ public class TournamentController implements Initializable{
 	private void endTournament(int currentPlayer) { //termina il gioco
 		InformationAlert.display("Messaggio informativo","Congratulazioni "+actualGamePlayersNames.get(currentPlayer)+", hai vinto il torneo!");
 		assignScore(actualGamePlayersNames.get(currentPlayer));
+		tournamentBracketController.setWinner(actualGamePlayersNames.get(currentPlayer));
 		deleteGameFromGamesDatasFile();
 		deleteSerializationFile();
 		disableButtons();
@@ -643,6 +690,8 @@ public class TournamentController implements Initializable{
 		String actualWinner=actualGamePlayersNames.get(currentPlayer);
 		InformationAlert.display("Messaggio informativo","Congratulazioni "+actualWinner+", hai vinto la partita e sei passato alla fase successiva!");
 		
+		TournamentPhase phase=(tournament.getTournamentPhase().equals(TournamentPhase.QUARTI) ? TournamentPhase.SEMIFINALI : TournamentPhase.FINALE );
+		tournamentBracketController.setPlayer(actualWinner, tournament.getGameNumber(), phase);
 		tournament.switchGame();
 		
 		actualGamePlayersNames=tournament.getActualGamePlayersNames();
@@ -653,18 +702,18 @@ public class TournamentController implements Initializable{
 		tournament.setHasAttacked(true);
 		tournament.setHasDiscarded(true);
 		tournament.setHasDrawed(true);
-		isSelected.unbind();
-		isSelected.set(true);
 
 		submitPlayerButton.disableProperty().set(true);
 		characterInfosButton.disableProperty().set(true);
 		boardInfosButton.disableProperty().set(true);
 		equipedWeaponButton.disableProperty().set(true);
-		menu.setDisable(true);
+		cardsScroller.disableProperty().set(true);
+		
+		menu.getItems().get(0).setDisable(true);
+		menu.getItems().get(1).setDisable(true);
 	}
 	
 	public void serialize(String filename) {
-		
         try {
             FileOutputStream fileOut = new FileOutputStream(filename);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
@@ -713,6 +762,7 @@ public class TournamentController implements Initializable{
 		alert.setHeaderText("Stai per uscire dalla partita!");
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
+			backgroundTrack.stop();
 			Stage stage = (Stage) ((MenuItem) event.getTarget()).getParentPopup().getOwnerWindow();
 	        Parent root = FXMLLoader.load(getClass().getResource("home.fxml"));
 	        Scene scene = new Scene(root);
@@ -732,6 +782,7 @@ public class TournamentController implements Initializable{
 		alert.setHeaderText("Stai per uscire dalla partita senza salvare i progressi!");
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
+			backgroundTrack.stop();
 			Stage stage = (Stage) ((MenuItem) event.getTarget()).getParentPopup().getOwnerWindow();
 	        Parent root = FXMLLoader.load(getClass().getResource("home.fxml"));
 	        Scene scene = new Scene(root);
@@ -744,7 +795,6 @@ public class TournamentController implements Initializable{
 	   if(!tournament.isTournamentGameOver()) {
 		   Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		   alert.getButtonTypes().remove(ButtonType.OK);
-		   
 		   alert.getButtonTypes().add(ButtonType.CANCEL);
 		   alert.getButtonTypes().add(ButtonType.YES);
 		   alert.setTitle("Chiusura applicazione");
@@ -846,10 +896,7 @@ public class TournamentController implements Initializable{
    }
    
    private void setCardImage(ToggleButton btn) {
-	   // Loading an image
        Image icon = new Image(getClass().getResourceAsStream("./CardsImages/"+btn.getText().replaceAll("\\s+", "")+".png"));
-
-       // Creating an ImageView with the loaded image
        ImageView iconView = new ImageView(icon);
        iconView.setFitWidth(btn.getPrefWidth()); 
        iconView.setFitHeight(btn.getPrefHeight());
@@ -920,7 +967,7 @@ public class TournamentController implements Initializable{
 	   submitPlayerButton.setGraphic(nextPlayerImg);
 	   
 	   volumeButton.setLayoutX(menu.getLayoutX()+60);
-	   volumeButton.setLayoutY(primaryStage.getY()+20);
+	   volumeButton.setLayoutY(primaryStage.getY());
 	   ImageView volumeOnImage = new ImageView(new Image("./application/ButtonImages/VolumeOn.png"));
 	   volumeOnImage.setFitWidth(35);
 	   volumeOnImage.setFitHeight(35);
@@ -943,9 +990,14 @@ public class TournamentController implements Initializable{
         	 
         	 backgroundTrack.setMicrosecondPosition(backgroundTrack.getMicrosecondPosition());
         	 backgroundTrack.start();
+        	 backgroundTrack.loop(Clip.LOOP_CONTINUOUSLY);
      
          }
      });
+	   ImageView bracketImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/bracket.png")));
+	   nextPlayerImg.setFitWidth(50);
+	   nextPlayerImg.setFitHeight(50);
+	   tournamentBracketButton.setGraphic(bracketImg);
    }	
    
    private void setMenuButtonStyle() {
@@ -965,17 +1017,17 @@ public class TournamentController implements Initializable{
 	   chImage.setFitHeight(350);
 	   VBox box = new VBox(10);
 		
-		HBox lifeBox=new HBox(5);
-		Text txt=new Text("Vita rimanente:");
-		txt.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-		ProgressBar lifeBar = new ProgressBar(character.getCurrentLife()/character.getInitialLife());
-		lifeBar.setPrefWidth(150);
-		lifeBar.setPrefHeight(30);
-		lifeBar.setStyle("-fx-accent:orange;-fx-background-color:purple;-fx-border-color:purple;");
+	   HBox lifeBox=new HBox(5);
+	   Text txt=new Text("Vita rimanente:");
+	   txt.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+	   ProgressBar lifeBar = new ProgressBar(character.getCurrentLife()/character.getInitialLife());
+	   lifeBar.setPrefWidth(150);
+	   lifeBar.setPrefHeight(30);
+	   lifeBar.setStyle("-fx-accent:orange;-fx-background-color:purple;-fx-border-color:purple;");
 		
-		Label lifeLabel = new Label(Integer.toString(character.getCurrentLife()));
-		lifeLabel.setTextFill(Color.PURPLE); // Imposta il colore del testo a bianco
-	    lifeLabel.setFont(Font.font("System", 14)); // Imposta il carattere a bold
+	   Label lifeLabel = new Label(Integer.toString(character.getCurrentLife()));
+	   lifeLabel.setTextFill(Color.PURPLE); // Imposta il colore del testo a bianco
+	   lifeLabel.setFont(Font.font("System", 14)); // Imposta il carattere a bold
 	   // Sovrappone la label sulla progress bar
        StackPane lifePane = new StackPane();
        lifePane.getChildren().addAll(lifeBar, lifeLabel);
@@ -990,18 +1042,18 @@ public class TournamentController implements Initializable{
 		  Text txt2=new Text("Potenza d'attacco:");
 		  txt2.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 		  int attackPower=tournament.getPlayer(currentPlayer).getAttackPower();
+		 
 		  ProgressBar attackBar = new ProgressBar(attackPower/24.0);
 		  attackBar.setPrefWidth(123);
 		  attackBar.setPrefHeight(30);
 		  attackBar.setStyle("-fx-accent:orange;-fx-background-color:purple;-fx-border-color:purple;"+ "}");
+		 
 		  Label attackLabel = new Label(Integer.toString(attackPower));
 		  attackLabel.setTextFill(Color.WHITE); // Imposta il colore del testo a bianco
 		  attackLabel.setFont(Font.font("System", 14)); // Imposta il carattere a bold
-		// Sovrapponi la label sulla progress bar
+
 		  StackPane attackPane = new StackPane();
 		  attackPane.getChildren().addAll(attackBar, attackLabel);
-		  
-	    // Imposta la posizione della label al centro della progress bar
 		  StackPane.setMargin(attackLabel, new Insets(7, 0, 3, 7));
 		  StackPane.setAlignment(attackLabel, javafx.geometry.Pos.CENTER_LEFT);
 		  attackBox.getChildren().addAll(txt2,attackPane);
@@ -1022,7 +1074,7 @@ public class TournamentController implements Initializable{
 	   alert.showAndWait();
    }
    private void setSceneStyle() {
-       gameButtonsBox.setLayoutX(primaryStage.getWidth()-(gameButtonsBox.getPrefWidth()));
+	   gameButtonsBox.setLayoutX(primaryStage.getWidth()-(gameButtonsBox.getPrefWidth()));
        infoBox.setLayoutX(0);
        cardsBox.setLayoutY(primaryStage.getHeight()-(gameButtonsBox.getPrefHeight()));
       
@@ -1030,27 +1082,31 @@ public class TournamentController implements Initializable{
        cardsScroller.setPrefWidth(primaryStage.getWidth());
        cardsScroller.toBack();
        
-       AnchorPane.setTopAnchor(playersBox, 10.0); // Adjust the value as needed
+       AnchorPane.setTopAnchor(playersBox, 10.0); 
        AnchorPane.setLeftAnchor(playersBox, (primaryStage.getWidth() - playersBox.getWidth()) / 2);
       
        AnchorPane.setTopAnchor(deckPane, (primaryStage.getHeight() - deckPane.getPrefHeight()) / 4);
        AnchorPane.setLeftAnchor(deckPane, (primaryStage.getWidth() - deckPane.getPrefWidth())/4);
+      
        ImageView deckImg=new ImageView(new Image(getClass().getResourceAsStream("./CardsImages/Deck.png")));
        deckImg.setFitHeight(300);
        deckImg.setFitWidth(270);
        deckPane.getChildren().add(deckImg);
        
        Card latest=(tournament.getDeck().getStockpile().size()==0?null:tournament.getDeck().getStockpile().getLast());
-       String latestName=(latest==null?"Vuoto":latest.getName());
+       String latestName=(latest==null?"Vuoto":latest.getName().replaceAll("\\s+", ""));
+     
        ImageView latestPlayedCard=new ImageView(new Image(getClass().getResourceAsStream("./CardsImages/"+latestName+".png")));
        latestPlayedCard.setFitHeight(200);
        latestPlayedCard.setFitWidth(140);
+      
        AnchorPane.setTopAnchor(latestPlayedCardPane, (primaryStage.getHeight() - latestPlayedCardPane.getPrefHeight()) / 3);
        AnchorPane.setLeftAnchor(latestPlayedCardPane, (primaryStage.getWidth() - latestPlayedCardPane.getPrefWidth())/2);
        latestPlayedCardPane.getChildren().add(latestPlayedCard);
 
        File filePath1=new File("soundtrack1.wav");
        File filePath2=new File("CardSound.wav");
+      
        try {   
     	   AudioInputStream backgroundAudioStream=AudioSystem.getAudioInputStream(filePath1);
     	   backgroundTrack=AudioSystem.getClip();
@@ -1068,6 +1124,9 @@ public class TournamentController implements Initializable{
        }catch(LineUnavailableException e) {
     	   e.printStackTrace();
        }
+   }
+   public void showTournamentBracket(ActionEvent event) throws IOException{
+	   bracketStage.showAndWait();
    }
  
 }

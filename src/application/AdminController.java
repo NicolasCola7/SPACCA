@@ -1,9 +1,13 @@
 package application;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.Scanner;
 
+import game.GameType;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -18,11 +22,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
+import leaderboard.Leaderboard;
 
 public class AdminController implements Initializable{
 	private Scene scene;
 	private Stage stage;
 	private Parent root;
+	private String adminUsername;
 	@FXML private Button homeButton;
 	
 	@Override
@@ -31,6 +37,11 @@ public class AdminController implements Initializable{
 		homeImg.setFitWidth(homeButton.getPrefWidth());
 		homeImg.setFitHeight(homeButton.getPrefHeight());
 		homeButton.setGraphic(homeImg);
+		
+		//creo i file leaderboard
+		Leaderboard classicGamesLeaderboard=new Leaderboard(adminUsername,GameType.CLASSIC);
+		Leaderboard tournamentsLeaderboard=new Leaderboard(adminUsername,GameType.TOURNAMENT);
+		
 	}
 	
 	public void goToHome(ActionEvent event) throws IOException {
@@ -59,6 +70,19 @@ public class AdminController implements Initializable{
 		scene=new Scene(root);
 		stage.setScene(scene);
 		stage.show();
+	}
+	
+	private void getCurrentAdmin() {	
+		try {
+			Scanner scan = new Scanner(new File("./Files/ConfigurationFiles/AdminAttuale.csv"));
+			  while (scan.hasNextLine()) {
+		        	String line=scan.nextLine();
+		        	adminUsername=line;
+		        }
+			  scan.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

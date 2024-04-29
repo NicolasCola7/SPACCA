@@ -19,7 +19,6 @@ public class MainSpacca extends Application {
 			Scene scene = new Scene(root);
 			primaryStage.setScene(scene);
 			
-		
 			primaryStage.setResizable(false);
 			primaryStage.initStyle(StageStyle.UTILITY);
 			

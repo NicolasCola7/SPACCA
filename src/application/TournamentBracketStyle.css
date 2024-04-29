@@ -1,0 +1,11 @@
+.root{
+    -fx-background-image: url("../application/BackGroundImages/BackGround.jpg");
+    -fx-background-size:cover;
+}
+
+.label {
+    -fx-background-color: linear-gradient(to bottom, #8A2BE2, #800080); /* Gradient viola */
+    -fx-border-color: #FFA500; /* Bordo arancione */
+    -fx-text-fill: white; /* Testo bianco */
+     -fx-font-size: 9px;
+}

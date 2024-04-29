@@ -5,6 +5,8 @@ import decks.Deck;
 import game.Player;
 
 public class MeteorsRainCard extends ActionCard {
+
+	private static final long serialVersionUID = -4438267731422159950L;
 	public MeteorsRainCard() {
 		super("Pioggia Di Meteore",Seed.SW);
 	}

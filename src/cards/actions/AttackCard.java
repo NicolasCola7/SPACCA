@@ -1,7 +1,4 @@
 package cards.actions;
-
-import java.util.ArrayList;
-
 import cards.Seed;
 import cards.characters.Character;
 import cards.statics.BlackWidowsPoisonCard;
@@ -11,10 +8,10 @@ import decks.Deck;
 import game.Bot;
 import game.InformationAlert;
 import game.Player;
-import javafx.scene.control.Alert;
 
 public class AttackCard extends ActionCard{
 	
+	private static final long serialVersionUID = 869320498933823179L;
 	public AttackCard() {
 		super("Attacco",Seed.NS);	
 	}
@@ -68,6 +65,7 @@ public class AttackCard extends ActionCard{
 				}
 				if(targetPlayer.hasEnchantedMirror()) {//se l'attacco è partito e l'attaccato ha lo specchio incantato, l'attaccante si autocolpisce danni
 					EnchantedMirrorCard.getEffect(attackingPlayer);
+					deck.addToStockPile(targetPlayer.removeFromBoardInPosition(0));
 					message=message+"Sei stato incantato dallo specchio, ti sei autocolpito!";
 				}
 				else 
@@ -89,6 +87,7 @@ public class AttackCard extends ActionCard{
 				
 				 if(targetPlayer.hasEnchantedMirror()) {//se l'attacco è partito e l'attaccato ha lo specchio incantato, l'attaccante si autocolpisce danni
 					 EnchantedMirrorCard.getEffect(attackingPlayer);
+					 deck.addToStockPile(targetPlayer.removeFromBoardInPosition(0));
 					 message=message+"Sei stato incantato dallo specchio, ti sei autocolpito!";
 				}
 				else
@@ -113,6 +112,7 @@ public class AttackCard extends ActionCard{
 				}
 				if(targetPlayer.hasEnchantedMirror()) {//se l'attacco è partito e l'attaccato ha lo specchio incantato, l'attaccante si autocolpisce danni
 					EnchantedMirrorCard.getEffect(attackingPlayer);
+					deck.addToStockPile(targetPlayer.removeFromBoardInPosition(0));
 					message=message+"Sei stato incantato dallo specchio, ti sei autocolpito!";
 				}
 				else
@@ -131,6 +131,7 @@ public class AttackCard extends ActionCard{
 			
 				if(targetPlayer.hasEnchantedMirror()) {//se l'attacco è partito e l'attaccato ha lo specchio incantato, l'attaccante si autocolpisce danni
 					EnchantedMirrorCard.getEffect(attackingPlayer);
+					deck.addToStockPile(targetPlayer.removeFromBoardInPosition(0));
 					message=message+"Ma sei stato incantato dallo specchio, ti sei autocolpito!";
 				}	
 				else 

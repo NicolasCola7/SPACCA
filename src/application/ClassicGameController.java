@@ -110,7 +110,6 @@ public class ClassicGameController implements Initializable{
 	private ClassicGame game;
 	private int currentPlayer;
 	private int actualNumberOfPlayers;
-	private SimpleBooleanProperty isSelected;
 	private Clip backgroundTrack;
 	private Clip cardSound;
 	
@@ -160,7 +159,8 @@ public class ClassicGameController implements Initializable{
 				game=new ClassicGame(gameCode,adminUsername);
 				currentPlayer=0;
 			}
-			
+			currentPlayerHand=new ArrayList<ToggleButton>();
+			group=new ToggleGroup();
 			initializeCardsBox(currentPlayer);
 			
 			primaryStage= (Stage) drawCardButton.getScene().getWindow();
@@ -171,16 +171,15 @@ public class ClassicGameController implements Initializable{
 		    setButtonImages();
 		    setSceneStyle();
 	    });  
-		 
 	}
 	
 	private void initializeCardsBox(int currentPlayer) {// inizializza la UI del giocatore corrente
-		currentPlayerHand=new ArrayList<ToggleButton>();
+		currentPlayerHand.clear();
+		players=game.getPlayersNames(); 
 		actualNumberOfPlayers=game.getNOfPlayers();
-		players=game.getPlayersNames();
 		turnLabel.setText(game.getTurn()+"° turno");
 		playerUsernameLabel.setText("Username:"+game.getPlayer(currentPlayer).getUsername());
-		group=new ToggleGroup();
+		group.getToggles().clear();
 		for(int i=0;i<game.getPlayer(currentPlayer).getHand().size();i++) {
 			Card card=game.getPlayer(currentPlayer).getHand().get(i);
 			ToggleButton btn=new ToggleButton(card.getName());
@@ -203,20 +202,27 @@ public class ClassicGameController implements Initializable{
 				
 				playerBox.setStyle("-fx-border-width:3;-fx-border-color:orange;");
 				playerBox.prefWidthProperty().bind(playersBox.prefWidthProperty());
+				
 				ImageView chImage=new ImageView(new Image(getClass().getResourceAsStream("./CharactersImages/"+ch.getName()+".png")));
 				chImage.setFitHeight(playersBox.getPrefHeight());
 				chImage.setFitWidth(80);
+				
 				Label playerName=new Label(player.getUsername());
 				playerName.setTextFill(Color.WHITE);
+				
 				HBox hbox=new HBox(3);
+				
 				Button moreInfos=new Button("");
 				moreInfos.setPrefHeight(playersBox.getPrefHeight());
 				moreInfos.setPrefWidth(50);
+				
 				ImageView infoImg=new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Info.png")));
 				infoImg.setFitHeight(50);
 				infoImg.setFitWidth(50);
+				
 				moreInfos.setGraphic(infoImg);
 				moreInfos.setOnAction(e -> getCharacterInfos(players.indexOf(playerName.getText())));
+				
 				hbox.getChildren().addAll(playerName,moreInfos);
 				playerBox.getChildren().addAll(chImage,hbox);
 				moreInfos.setPrefWidth(playerBox.getPrefWidth());
@@ -231,7 +237,7 @@ public class ClassicGameController implements Initializable{
 		SimpleBooleanProperty isSelectedAttackCard=new SimpleBooleanProperty(false);
 		SimpleBooleanProperty isSelectedEventOrActionCard=new SimpleBooleanProperty(false);
 		SimpleBooleanProperty isFirstTurn=new SimpleBooleanProperty(game.getTurn()==1);
-		isSelected=new SimpleBooleanProperty(false);
+		SimpleBooleanProperty isSelected=new SimpleBooleanProperty(false);
 		
 		isSelected.bind(group.selectedToggleProperty().isNull());// isSelected diventa true  è selezionata una carta
 		
@@ -303,8 +309,8 @@ public class ClassicGameController implements Initializable{
 		alert.getButtonTypes().add(ButtonType.CLOSE);
 		
 		ImageView weaponImage = new ImageView(new Image(getClass().getResourceAsStream("./CardsImages/"+fileName)));
-		 weaponImage.setFitWidth(280);
-		 weaponImage.setFitHeight(350);	
+		weaponImage.setFitWidth(280);
+		weaponImage.setFitHeight(350);	
 		
 		alert.getDialogPane().setContent(weaponImage);
 		alert.getDialogPane().setPadding(new Insets(10));
@@ -377,7 +383,7 @@ public class ClassicGameController implements Initializable{
 		        targetPlayer=players.indexOf(dialog.getSelectedItem());
 		        if(result.isPresent() || result.get()!=null ) {
 		        	game.submitEventCard(submittedCardIndex, currentPlayer,targetPlayer);
-		        	 removeFromCardsBox(btn);
+		        	removeFromCardsBox(btn);
 		        }
 		        if(submittedCard instanceof IdentityTheftCard) {
 		        	playersBox.getChildren().clear();
@@ -398,7 +404,6 @@ public class ClassicGameController implements Initializable{
 		}
 		
 		checkElimination(targetPlayer);
-		 
 		checkCurrentPlayerElimination(targetPlayer);
 		
 		if(game.isGameOver()) //controlla se è rimasto solo un giocatore 
@@ -412,6 +417,7 @@ public class ClassicGameController implements Initializable{
 		latestPlayedCard.setFitWidth(140);
 		latestPlayedCardPane.getChildren().add(latestPlayedCard);
 	}
+	
 	public void submitPlayer(ActionEvent event)throws IOException{ //passa la giocata al prossimo giocatore
 		updateCurrentPlayer(currentPlayer);
 		game.setHasAttacked(false);
@@ -655,10 +661,8 @@ public class ClassicGameController implements Initializable{
 	}
 	
 	private void refreshCardsBox(int currentPlayer) { //aggiorna la UI
-		group.getToggles().clear();
 		cardsBox.getChildren().clear();
 		playersBox.getChildren().clear();
-		currentPlayerHand.clear();
 		initializeCardsBox(currentPlayer);
 	}
 	
@@ -676,14 +680,15 @@ public class ClassicGameController implements Initializable{
 		game.setHasAttacked(true);
 		game.setHasDiscarded(true);
 		game.setHasDrawed(true);
-		isSelected.unbind();
-		isSelected.set(true);
 
 		submitPlayerButton.disableProperty().set(true);
 		characterInfosButton.disableProperty().set(true);
 		boardInfosButton.disableProperty().set(true);
 		equipedWeaponButton.disableProperty().set(true);
-		menu.setDisable(true);
+		cardsScroller.disableProperty().set(true);
+		
+		menu.getItems().get(0).setDisable(true);
+		menu.getItems().get(1).setDisable(true);
 	}
 	
 	public void serialize(String filename) {
@@ -962,7 +967,7 @@ public class ClassicGameController implements Initializable{
         	 
         	 backgroundTrack.setMicrosecondPosition(backgroundTrack.getMicrosecondPosition());
         	 backgroundTrack.start();
-     
+        	 backgroundTrack.loop(Clip.LOOP_CONTINUOUSLY);
          }
      });
    }
@@ -982,19 +987,21 @@ public class ClassicGameController implements Initializable{
 	   ImageView chImage = new ImageView(new Image(getClass().getResourceAsStream("./CharactersCardsImages/"+character.getName()+".png")));
 	   chImage.setFitWidth(300);
 	   chImage.setFitHeight(350);
+	  
 	   VBox box = new VBox(10);
 		
-		HBox lifeBox=new HBox(5);
-		Text txt=new Text("Vita rimanente:");
-		txt.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-		ProgressBar lifeBar = new ProgressBar(character.getCurrentLife()/character.getInitialLife());
-		lifeBar.setPrefWidth(150);
-		lifeBar.setPrefHeight(30);
-		lifeBar.setStyle("-fx-accent:orange;-fx-background-color:purple;-fx-border-color:purple;");
+	   HBox lifeBox=new HBox(5);
+	   Text txt=new Text("Vita rimanente:");
+	   txt.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+	   
+	   ProgressBar lifeBar = new ProgressBar(character.getCurrentLife()/character.getInitialLife());
+	   lifeBar.setPrefWidth(150);
+	   lifeBar.setPrefHeight(30);
+	   lifeBar.setStyle("-fx-accent:orange;-fx-background-color:purple;-fx-border-color:purple;");
 		
-		Label lifeLabel = new Label(Integer.toString(character.getCurrentLife()));
-		lifeLabel.setTextFill(Color.BLACK); // Imposta il colore del testo a bianco
-	    lifeLabel.setFont(Font.font("System", 14)); // Imposta il carattere a bold
+	   Label lifeLabel = new Label(Integer.toString(character.getCurrentLife()));
+	   lifeLabel.setTextFill(Color.BLACK); // Imposta il colore del testo a bianco
+	   lifeLabel.setFont(Font.font("System", 14)); // Imposta il carattere a bold
 	   // Sovrapponi la label sulla progress bar
        StackPane lifePane = new StackPane();
        lifePane.getChildren().addAll(lifeBar, lifeLabel);
@@ -1009,18 +1016,18 @@ public class ClassicGameController implements Initializable{
 		  Text txt2=new Text("Potenza d'attacco:");
 		  txt2.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 		  int attackPower=game.getPlayer(currentPlayer).getAttackPower();
+		 
 		  ProgressBar attackBar = new ProgressBar(attackPower/24.0);
 		  attackBar.setPrefWidth(123);
 		  attackBar.setPrefHeight(30);
 		  attackBar.setStyle("-fx-accent:orange;-fx-background-color:purple;-fx-border-color:purple;"+ "}");
+		 
 		  Label attackLabel = new Label(Integer.toString(attackPower));
 		  attackLabel.setTextFill(Color.BLACK); // Imposta il colore del testo a bianco
 		  attackLabel.setFont(Font.font("System", 14)); // Imposta il carattere a bold
-		// Sovrapponi la label sulla progress bar
+	
 		  StackPane attackPane = new StackPane();
 		  attackPane.getChildren().addAll(attackBar, attackLabel);
-		  
-	    // Imposta la posizione della label al centro della progress bar
 		  StackPane.setMargin(attackLabel, new Insets(7, 0, 3, 7));
 		  StackPane.setAlignment(attackLabel, javafx.geometry.Pos.CENTER_LEFT);
 		  attackBox.getChildren().addAll(txt2,attackPane);
@@ -1040,6 +1047,7 @@ public class ClassicGameController implements Initializable{
 	   alert.getDialogPane().setContent(box);
 	   alert.showAndWait();
    }
+   
    private void setSceneStyle() {
        gameButtonsBox.setLayoutX(primaryStage.getWidth()-(gameButtonsBox.getPrefWidth()));
        infoBox.setLayoutX(0);
@@ -1048,7 +1056,7 @@ public class ClassicGameController implements Initializable{
        AnchorPane.setBottomAnchor(cardsScroller, 0.0);
        cardsScroller.setPrefWidth(primaryStage.getWidth());
        cardsScroller.toBack();
-       
+      
        AnchorPane.setTopAnchor(playersBox, 10.0); // Adjust the value as needed
        AnchorPane.setLeftAnchor(playersBox, (primaryStage.getWidth() - playersBox.getWidth()) / 2);
       
@@ -1060,7 +1068,7 @@ public class ClassicGameController implements Initializable{
        deckPane.getChildren().add(deckImg);
        
        Card latest=(game.getDeck().getStockpile().size()==0 ? null : game.getDeck().getStockpile().getLast());
-       String latestName=(latest==null?"Vuoto":latest.getName());
+       String latestName=(latest==null?"Vuoto":latest.getName().replaceAll("\\s+", ""));
        ImageView latestPlayedCard=new ImageView(new Image(getClass().getResourceAsStream("./CardsImages/"+latestName+".png")));
        latestPlayedCard.setFitHeight(200);
        latestPlayedCard.setFitWidth(140);

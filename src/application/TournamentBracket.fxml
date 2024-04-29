@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="334.0" prefWidth="600.0" stylesheets="@TournamentBracketStyle.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.TournamentBracketController">
+   <children>
+      <Label fx:id="quarter1" alignment="CENTER" layoutX="9.0" layoutY="247.0" prefHeight="39.0" prefWidth="66.0" />
+      <Label fx:id="quarter2" alignment="CENTER" layoutX="79.0" layoutY="247.0" prefHeight="39.0" prefWidth="66.0" />
+      <Label fx:id="semi1" alignment="CENTER" layoutX="42.0" layoutY="172.0" prefHeight="39.0" prefWidth="83.0" />
+      <Label fx:id="semi2" alignment="CENTER" layoutX="186.0" layoutY="172.0" prefHeight="39.0" prefWidth="83.0" />
+      <Label fx:id="finalist2" alignment="CENTER" layoutX="393.0" layoutY="96.0" prefHeight="39.0" prefWidth="90.0" />
+      <Label fx:id="finalist1" alignment="CENTER" layoutX="112.0" layoutY="96.0" prefHeight="39.0" prefWidth="90.0" />
+      <Label fx:id="winner" alignment="CENTER" layoutX="255.0" layoutY="27.0" prefHeight="39.0" prefWidth="90.0" />
+      <Label fx:id="quarter3" alignment="CENTER" layoutX="157.0" layoutY="247.0" prefHeight="39.0" prefWidth="66.0" />
+      <Label fx:id="quarter4" alignment="CENTER" layoutX="228.0" layoutY="247.0" prefHeight="39.0" prefWidth="66.0" />
+      <Label fx:id="quarter5" alignment="CENTER" layoutX="300.0" layoutY="247.0" prefHeight="39.0" prefWidth="66.0" />
+      <Label fx:id="quarter6" alignment="CENTER" layoutX="374.0" layoutY="247.0" prefHeight="39.0" prefWidth="66.0" />
+      <Label fx:id="quarter7" alignment="CENTER" layoutX="451.0" layoutY="247.0" prefHeight="39.0" prefWidth="66.0" />
+      <Label fx:id="quarter8" alignment="CENTER" layoutX="526.0" layoutY="247.0" prefHeight="39.0" prefWidth="66.0" />
+      <Label fx:id="semi3" alignment="CENTER" layoutX="332.0" layoutY="172.0" prefHeight="39.0" prefWidth="83.0" />
+      <Label fx:id="semi4" alignment="CENTER" layoutX="484.0" layoutY="172.0" prefHeight="39.0" prefWidth="83.0" />
+   </children>
+</AnchorPane>

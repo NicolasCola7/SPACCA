@@ -1,8 +1,9 @@
 package game;
 
 public class NoWinnerException extends Exception {
-    // Constructor with a message
-    public NoWinnerException(String message) {
+	private static final long serialVersionUID = -1979150823001233047L;
+   
+	public NoWinnerException(String message) {
         super(message);
     }
 }

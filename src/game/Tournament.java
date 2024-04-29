@@ -1,19 +1,13 @@
 package game;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Scanner;
 
-import javafx.beans.property.SimpleBooleanProperty;
+import application.TournamentBracketController;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
@@ -22,7 +16,6 @@ import cards.*;
 import cards.actions.*;
 import cards.statics.*;
 import cards.events.*;
-import cards.characters.*;
 import decks.*;	
 public class Tournament extends Game{
 
@@ -31,12 +24,20 @@ public class Tournament extends Game{
 	private int gameNumber;
 	private ArrayList<Player> actualGamePlayers;
 	private ArrayList<String> actualGamePlayersNames;
+	private ArrayList<String>  semifinalists;
+	private ArrayList<String>  finalists;
 	private LinkedList<Player> eliminated;
 	private String currentGameMessage;
 	
-	public Tournament(String code, String admin) {
+	public Tournament(String code, String admin){
 		super(code,admin);
+		semifinalists=new ArrayList<String>(4);
+		finalists=new ArrayList<String>(2);
+		actionMessages=new ArrayList<String>();
+		actualGamePlayersNames=new ArrayList<String>(2);
+		actualGamePlayers=new ArrayList<Player>(2);
 		eliminated=new LinkedList<Player>();
+		deck=new Deck();
 		gameNumber=1;
 		tournamentPhase=TournamentPhase.QUARTI;
 		gameType=GameType.TOURNAMENT;
@@ -48,16 +49,17 @@ public class Tournament extends Game{
 		currentGameMessage=tournamentPhase + ", " + gameNumber +"° partita: "+ actualGamePlayersNames.get(0) + " VS " + actualGamePlayersNames.get(1);;
 	}
 	public void buildPlayersHands() {
-		actionMessages=new ArrayList<String>();
-		actualGamePlayersNames=new ArrayList<String>();
-		actualGamePlayers=new ArrayList<Player>();
+		actionMessages.clear();
+		actualGamePlayersNames.clear();
+		actualGamePlayers.clear();
+		
 		hasDrawedValue=false;
 		hasDiscardedValue=false;
 		hasAttackedValue=false;
 		initializeProperties();
 		currentPlayer=0;
 		turn=1;
-		deck=new Deck();
+		deck.reset();
 	
 		for(int i=(gameNumber-1)*2;i<gameNumber*2;i++) {
 			
@@ -82,7 +84,7 @@ public class Tournament extends Game{
 					playersNames=new ArrayList<String>(nOfPlayers);
 					for(int i=0;i<nOfPlayers;i++) {
 						playersNames.add(line[4+i]);
-						
+
 						if( line[4+i].length()>3 && line[4+i].substring(0, 3).equals("bot"))
 							players.add(new Bot(playersNames.get(i),chDeck.getCharacter()));
 						else
@@ -105,8 +107,9 @@ public class Tournament extends Game{
 	}
 	
 	public boolean isTournamentGameOver() {
-		if (tournamentPhase.equals(TournamentPhase.FINALE) && eliminated.size()==7)
+		if (tournamentPhase.equals(TournamentPhase.FINALE) && eliminated.size()==7) {
 			return true;
+		}
 		else 
 			return false;
 	}
@@ -121,23 +124,26 @@ public class Tournament extends Game{
 	
 	public void switchGame() {
 		if (tournamentPhase.equals(TournamentPhase.QUARTI)) {
+			semifinalists.add(actualGamePlayersNames.get(0));
 			if(gameNumber==4) {
 				players.removeAll(eliminated);
 				InformationAlert.display("Messaggio informativo", "Quarti di finale terminati, si passa alle semifinali!");
 				tournamentPhase=TournamentPhase.SEMIFINALI;
 				gameNumber=1;
 			}
-			else 
+			else {
 				gameNumber++;
+			}
 		}
 		
 		else if(tournamentPhase.equals(TournamentPhase.SEMIFINALI)){
+			finalists.add(actualGamePlayersNames.get(0));
 			if(gameNumber==2) {
 				players.removeAll(eliminated);
 				InformationAlert.display("Messaggio informativo","Semifinali terminate, si passa alla finale!"); 
 				tournamentPhase=TournamentPhase.FINALE;
 				gameNumber=1;
-				}
+			}
 			else 
 				gameNumber++;
 		}
@@ -362,9 +368,17 @@ public class Tournament extends Game{
 		actualGamePlayersNames.addAll(latestTwo);
 		return latestTwo;
 	}
+	
 	public String getCurrentGameMessage() {
 		return currentGameMessage;
 	}
 	
+	public  ArrayList<String> getSemifinalists(){
+		return semifinalists;
+	}
+	
+	public  ArrayList<String> getFinalists(){
+		return finalists;
+	}
 }
 	

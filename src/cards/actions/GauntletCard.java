@@ -7,13 +7,14 @@ import cards.Seed;
 import decks.Deck;
 import game.Player;
 public class GauntletCard extends ActionCard{
+
+	private static final long serialVersionUID = 559366357330063678L;
 	public GauntletCard() {
 		super("Guanto Di Thanos",Seed.MV);
 			
 	}
 	public static Card onUse(Player attackingPlayer,Player targetPlayer, Deck deck) { //permetrte di scartare una carta casuale dalla mano dell'avversario
 		ArrayList<Card> tH=targetPlayer.getHand();
-		ArrayList<Card> aH=attackingPlayer.getHand();
 		Random random = new Random();
 	     int i=random.nextInt(tH.size());
 	     Card discarded=tH.get(i);

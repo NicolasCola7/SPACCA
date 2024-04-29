@@ -6,7 +6,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
-import java.util.Random;
 import java.util.Scanner;
 
 import cards.Card;
@@ -29,8 +28,8 @@ import cards.statics.RingCard;
 import cards.statics.ShieldCard;
 
 public class Deck implements Serializable {
-
-	private transient Scanner scan;
+	
+	private static final long serialVersionUID = -5509099123307094083L;
 	private LinkedList<Card> deck;
 	private LinkedList<Card> stockpile;
 
@@ -48,12 +47,11 @@ public class Deck implements Serializable {
 	private void buildStaticCards() {
 		try {
 			File staticCards = new File("./Files/CardsFiles/StaticCards.csv");
-			scan = new Scanner(staticCards);
+			Scanner scan = new Scanner(staticCards);
 			while (scan.hasNextLine()) {
 				String[] line = scan.nextLine().split(",");
 				String name = line[0];
 				int copy = Integer.parseInt(line[2]);
-				Seed s = null;
 				switch (name) {
 				case "Ring":
 					for (int i = 0; i < copy; i++)
@@ -82,6 +80,7 @@ public class Deck implements Serializable {
 					break;
 				}
 			}
+			scan.close();
 		} catch (FileNotFoundException e) {
 			System.out.println("File not found");
 		}
@@ -91,13 +90,13 @@ public class Deck implements Serializable {
 	private void buildActionCards() {
 		try {
 			File actionCards = new File("./Files/CardsFiles/ActionCards.csv");
-			scan = new Scanner(actionCards);
+			Scanner scan = new Scanner(actionCards);
 			while (scan.hasNextLine()) {
 				String[] line = scan.nextLine().split(",");
 				String name = line[0];
 				int copy = Integer.parseInt(line[2]);
-				Seed s = null;
 				switch (name) {
+				
 				case "Attack":
 					for (int i = 0; i < copy; i++)
 						deck.add(new AttackCard());
@@ -107,6 +106,7 @@ public class Deck implements Serializable {
 					for (int i = 0; i < copy; i++)
 						deck.add(new GauntletCard());
 					break;
+					
 				case "Healing Potion":
 					for (int i = 0; i < copy; i++)
 						deck.add(new HealingPotionCard());
@@ -120,6 +120,7 @@ public class Deck implements Serializable {
 					for (int i = 0; i < copy; i++)
 						deck.add(new SauronEyeCard());
 					break;
+					
 				case "Pirates Boarding":
 					for (int i = 0; i < copy; i++)
 						deck.add(new BoardingCard());
@@ -127,6 +128,7 @@ public class Deck implements Serializable {
 				}
 
 			}
+			scan.close();
 		} catch (FileNotFoundException e) {
 			System.out.println("File not found");
 		}
@@ -136,7 +138,7 @@ public class Deck implements Serializable {
 	private void buildWeaponCards() {
 		try {
 			File weaponCards = new File("./Files/CardsFiles/WeaponCards.csv");
-			scan = new Scanner(weaponCards);
+			Scanner scan = new Scanner(weaponCards);
 			while (scan.hasNextLine()) {
 				String[] line = scan.nextLine().split(",");
 				String name = line[0];
@@ -145,6 +147,7 @@ public class Deck implements Serializable {
 				int copy = Integer.parseInt(line[3]);
 				Seed s = null;
 				switch (seed) {
+				
 				case "HP":
 					s = Seed.HP;
 					break;
@@ -152,27 +155,31 @@ public class Deck implements Serializable {
 				case "SW":
 					s = Seed.SW;
 					break;
+					
 				case "MV":
 					s = Seed.MV;
 					break;
+					
 				case "PC":
 					s = Seed.PC;
 					break;
+					
 				case "SA":
 					s = Seed.SA;
 					break;
 				}
+				
 				for (int i = 0; i < copy; i++)
 					deck.add(new WeaponCard(name, s, damage));
-
 			}
-
+			scan.close();
 		} catch (FileNotFoundException e) {
 			System.out.println("File not found");
 		}
 	}
 
 	private void buildEventCards() {
+		for(int i=0;i<100;i++)
 		deck.add(new DoomsdayCard());	
 		deck.add(new IdentityTheftCard());
 		deck.add(new MiracleCard());
@@ -199,12 +206,10 @@ public class Deck implements Serializable {
 			deck.addLast(c);
 			return c.getSeed().equals(s);
 		}
-
 		else {
 			this.replaceDeckWithStockpile();
 			return drawAndCheck(s);
 		}
-
 	}
 
 	public ArrayList<Card> drawHand() { // metodo per pescare la mano a inizio partita
@@ -230,4 +235,8 @@ public class Deck implements Serializable {
 		return stockpile;
 	}
 
+	public void reset() {
+		deck.addAll(stockpile);
+	this.shuffle();
+	}
 }

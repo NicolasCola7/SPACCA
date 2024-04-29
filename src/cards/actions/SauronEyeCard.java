@@ -1,15 +1,12 @@
 package cards.actions;
-
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
-
 import cards.Seed;
 import decks.Deck;
 import game.Player;
 
 public class SauronEyeCard extends ActionCard{
 	
+	private static final long serialVersionUID = -3319638517347241358L;
 	public SauronEyeCard() {
 		super("Occhio Di Sauron",Seed.SA);
 		
