@@ -43,11 +43,6 @@ public class AdminSignupController implements Initializable {
 		registerButton.disableProperty().bind(adminUsername.textProperty().isEmpty().or(
 				psw.textProperty().isEmpty().or(
 				confirmPsw.textProperty().isEmpty())));
-		
-		ImageView homeImg=new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Home2.png")));
-		homeImg.setFitWidth(homeButton.getPrefWidth());
-		homeImg.setFitHeight(homeButton.getPrefHeight());
-		homeButton.setGraphic(homeImg);
 	}
 	
 	public void goToHome(ActionEvent event) throws IOException {
@@ -82,7 +77,9 @@ public class AdminSignupController implements Initializable {
 			addNewAdmin();
     		createPlayersList();
     		updateCurrentAdmin();
-    
+    		Leaderboard classicGamesLeaderboard=new Leaderboard(adminUsername.getText(),GameType.CLASSIC);
+    		Leaderboard tournamentsLeaderboard=new Leaderboard(adminUsername.getText(),GameType.TOURNAMENT);
+    		
 			root = FXMLLoader.load(getClass().getResource("Admin.fxml"));
 			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 			scene=new Scene(root);

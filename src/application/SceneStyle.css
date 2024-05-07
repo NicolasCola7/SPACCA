@@ -1,4 +1,53 @@
 .root{
-    -fx-background-image: url("../application/BackGroundImages/BackGround.jpg");
+    -fx-background-image: url("../application/BackgroundImage/BackGround.jpg");
     -fx-background-size:cover;
 }
+
+.volume-button {
+  -fx-background-color: transparent;
+  -fx-background-radius: 50%;
+  -fx-padding: 10px;
+  -fx-cursor: pointer;
+  -fx-transition: transform 0.2s;
+  -fx-background-size: cover;
+}
+
+.menu-button{
+	-fx-background-color:transparent;
+}
+
+.menu-button .arrow-button .arrow {
+    -fx-opacity: 0; /* Hide the arrow icon */
+}
+
+.menu-button .menu-item:hover{
+    -fx-background: orange ;
+    -fx-text-fill: white;
+}
+
+.menu-button .menu-item{
+    -fx-background: orange ;
+    -fx-text-fill: white;
+}
+
+.button-container > .button {
+    -fx-padding: 5;
+    -fx-border-color:black;
+    -fx-background-color:white;
+}
+
+/* Hover effect */
+.button-container > .button:hover {
+    -fx-border-color:  rgb(204, 85, 0);
+}
+
+/* Pressed effect */
+.button-container > .button:pressed {
+    -fx-background-color: orange;
+}
+
+.button-container > .label{
+	-fx-background-color:white;
+	-fx-border-color:black;
+}
+

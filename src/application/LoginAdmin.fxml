@@ -5,24 +5,35 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.LoginAdminController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@Style_home.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.LoginAdminController">
    <children>
-      <Button fx:id="homeButton" contentDisplay="GRAPHIC_ONLY" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#goToHome" prefHeight="35.0" prefWidth="49.0" text="Home" />
-      <Button fx:id="loginButton" layoutX="266.0" layoutY="233.0" mnemonicParsing="false" onAction="#login" text="Login" />
-      <PasswordField fx:id="psw" layoutX="226.0" layoutY="187.0" />
-      <Label layoutX="163.0" layoutY="148.0" text="Username:" />
-      <Label layoutX="165.0" layoutY="191.0" text="Password:" />
-      <Label layoutX="156.0" layoutY="27.0" text="Login Amministratore">
-         <font>
-            <Font size="30.0" />
-         </font>
-      </Label>
-      <Hyperlink layoutX="217.0" layoutY="285.0" onAction="#signup" text="Non sei ancora registrato?" />
-      <TextField fx:id="adminUsername" layoutX="226.0" layoutY="144.0" />
-      <Text fx:id="errorMsg" fill="#f80c0c" layoutX="194.0" layoutY="107.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username o password errati, riprova!" visible="false" />
+      <Button fx:id="homeButton" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#goToHome" prefHeight="17.0" prefWidth="45.0">
+         <graphic>
+            <ImageView fitHeight="97.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@ButtonImages/home.png" />
+               </image>
+            </ImageView>
+         </graphic></Button>
+      <AnchorPane layoutX="158.0" layoutY="61.0" prefHeight="279.0" prefWidth="284.0" style="-fx-background-color: white;">
+         <children>
+            <Button fx:id="loginButton" layoutX="92.0" layoutY="182.0" mnemonicParsing="false" onAction="#login" prefHeight="35.0" prefWidth="87.0" text="Accedi" />
+            <PasswordField fx:id="psw" layoutX="68.0" layoutY="138.0" promptText="Password" />
+            <Label layoutX="106.0" layoutY="18.0" prefHeight="35.0" prefWidth="59.0" stylesheets="@Style_home.css" text="Login" textAlignment="CENTER">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+            <Hyperlink layoutX="68.0" layoutY="242.0" onAction="#signup" text="Non sei ancora registrato?" />
+            <TextField fx:id="adminUsername" layoutX="68.0" layoutY="100.0" promptText="Username" />
+            <Text fx:id="errorMsg" fill="#f80c0c" layoutX="38.0" layoutY="66.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username o password errati, riprova!" visible="false" />
+         </children>
+      </AnchorPane>
    </children>
 </AnchorPane>

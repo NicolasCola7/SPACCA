@@ -14,7 +14,7 @@
 
 <AnchorPane fx:id="backGround" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" prefHeight="627.0" prefWidth="601.0" stylesheets="@SceneStyle.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.ClassicGameController">
    <children>
-      <MenuButton fx:id="menu" layoutX="14.0" layoutY="14.0" maxHeight="30.0" maxWidth="40.0" minHeight="30.0" minWidth="40.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="40.0" stylesheets="@MenuStyle.css" text="Menu">
+      <MenuButton fx:id="menu" layoutX="14.0" layoutY="14.0" maxHeight="30.0" maxWidth="40.0" minHeight="30.0" minWidth="40.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="40.0" text="Menu">
         <items>
             <MenuItem mnemonicParsing="false" onAction="#save" text="Salva" />
           <MenuItem mnemonicParsing="false" onAction="#saveAndQuit" text="Salva ed Esci" />
@@ -22,7 +22,7 @@
           <MenuItem mnemonicParsing="false" onAction="#showLeaderboard" text="Leaderboard" />
         </items>
       </MenuButton>
-      <VBox fx:id="infoBox" layoutX="17.0" layoutY="185.0" prefHeight="200.0" prefWidth="74.0" styleClass="button-container" stylesheets="@GameButtonStyle.css">
+      <VBox fx:id="infoBox" layoutX="17.0" layoutY="185.0" prefHeight="200.0" prefWidth="74.0" styleClass="button-container">
          <children>
             <Button fx:id="characterInfosButton" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" onAction="#seeCharacterInfos" prefHeight="50.0" prefWidth="100.0" text="Personaggio" />
             <Button fx:id="equipedWeaponButton" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" onAction="#seeEquipedWeapon" prefHeight="50.0" prefWidth="100.0" text="Arma" />
@@ -31,7 +31,7 @@
             <Label fx:id="turnLabel" prefHeight="25.0" prefWidth="99.0" text="Turno:" />
          </children>
       </VBox>
-      <VBox fx:id="gameButtonsBox" layoutX="524.0" layoutY="166.0" prefHeight="200.0" prefWidth="74.0" styleClass="button-container" stylesheets="@GameButtonStyle.css">
+      <VBox fx:id="gameButtonsBox" layoutX="524.0" layoutY="166.0" prefHeight="200.0" prefWidth="74.0" styleClass="button-container">
          <children>
             <Button fx:id="submitCardButton" mnemonicParsing="false" onAction="#submitCard" prefHeight="50.0" prefWidth="104.0" text="Usa" />
             <Button fx:id="discardCardButton" mnemonicParsing="false" onAction="#discardCard" prefHeight="50.0" prefWidth="200.0" text="Scarta" />
@@ -51,6 +51,6 @@
       </HBox>
       <Pane fx:id="deckPane" layoutX="139.0" layoutY="135.0" prefHeight="200.0" prefWidth="200.0" />
       <Pane fx:id="latestPlayedCardPane" layoutX="317.0" layoutY="166.0" prefHeight="200.0" prefWidth="200.0" />
-      <ToggleButton fx:id="volumeButton" contentDisplay="GRAPHIC_ONLY" layoutX="61.0" layoutY="10.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="40.0" styleClass="volume-button" stylesheets="@VolumeButtonStyle.css" text="ToggleButton" />
+      <ToggleButton fx:id="volumeButton" contentDisplay="GRAPHIC_ONLY" layoutX="61.0" layoutY="10.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="40.0" styleClass="volume-button" text="ToggleButton" />
    </children>
 </AnchorPane>

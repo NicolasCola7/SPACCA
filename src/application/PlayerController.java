@@ -1,6 +1,7 @@
 package application;
 
 import java.io.File;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.ModuleLayer.Controller;
@@ -24,6 +25,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+
+
 public class PlayerController implements Initializable{
 	private Scene scene;
 	private Stage stage;
@@ -39,10 +44,6 @@ public class PlayerController implements Initializable{
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		playButton.disableProperty().bind(gameCode.textProperty().isEmpty());
 		
-		ImageView homeImg=new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Home2.png")));
-		homeImg.setFitWidth(homeButton.getPrefWidth());
-		homeImg.setFitHeight(homeButton.getPrefHeight());
-		homeButton.setGraphic(homeImg);
 	}
 	
 	public void goToHome(ActionEvent event) throws IOException {
@@ -53,49 +54,84 @@ public class PlayerController implements Initializable{
 		stage.show();
 	}
 	
-	public void play(ActionEvent event)  {
-		if(checkGameCode(gameCode.getText())==true) {
-			if(gameType.equals("classic")) {
-				FXMLLoader loader = new FXMLLoader(getClass().getResource("ClassicGame.fxml"));
-				
-				try {
-					Parent classicGameScene = loader.load();
-					Scene scene=new Scene(classicGameScene);
-					ClassicGameController classicGameController=loader.getController();
-		            classicGameController.setGameCode(gameCode.getText());
-		            classicGameController.setAdminUsername(adminUsername);
-		            stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-					stage.setScene(scene);
-					stage.show();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			else {
-				FXMLLoader loader = new FXMLLoader(getClass().getResource("Tournament.fxml"));
-				
-				try {
-					Parent tournamentScene = loader.load();
-					Scene scene=new Scene(tournamentScene);
-					TournamentController tournamentController=loader.getController();
-		            tournamentController.setGameCode(gameCode.getText());
-		            tournamentController.setAdminUsername(adminUsername);
-		            stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-					stage.setScene(scene);
-					stage.show();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		else {
-			alert = new Alert(Alert.AlertType.ERROR);
-			alert.setTitle("Errore");
-			alert.setHeaderText("Non esiste alcuna partita associata al seguente codice:");
-			alert.setContentText("Inserisci un nuovo codice partita!");
-			alert.showAndWait();
-			gameCode.clear();
-		}	
+	public void play(ActionEvent event) throws IOException {
+	    if (checkGameCode(gameCode.getText()) == true) {
+	        root = FXMLLoader.load(getClass().getResource("Loading.fxml"));
+	        stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+	        scene = new Scene(root);
+	        stage.setScene(scene);
+	        stage.show();
+
+	        // Utilizza un task asincrono per caricare la scena del gioco classico o del torneo
+	        Task<Void> task = new Task<Void>() {
+	            @Override
+	            protected Void call() {
+	                try {
+	                    Thread.sleep(3000); // attendi 3 secondi per mostrare la scena di loading
+	                } catch (InterruptedException e) {
+	                    e.printStackTrace();
+	                }
+
+	                Platform.runLater(new Runnable() {
+	                    @Override
+	                    public void run() {
+	                        if (gameType.equals("classic")) {
+	                            // Aggiungi un blocco try-catch per gestire l'eccezione IOException
+	                            try {
+	                                FXMLLoader loader = new FXMLLoader(getClass().getResource("ClassicGame.fxml"));
+	                                Parent classicGameScene = loader.load();
+	                                Scene scene = new Scene(classicGameScene);
+	                                ClassicGameController classicGameController = loader.getController();
+	                                classicGameController.setGameCode(gameCode.getText());
+	                                classicGameController.setAdminUsername(adminUsername);
+	                                stage.setScene(scene);
+	                                stage.show();
+	                            } catch (IOException e) {
+	                                e.printStackTrace();
+	                                // Mostra un messaggio di errore all'utente
+	                                Alert alert = new Alert(Alert.AlertType.ERROR);
+	                                alert.setTitle("Errore");
+	                                alert.setHeaderText("Impossibile caricare la scena del gioco classico.");
+	                                alert.setContentText("Riprova più tardi.");
+	                                alert.showAndWait();
+	                            }
+	                        } else {
+	                            // Aggiungi un blocco try-catch per gestire l'eccezione IOException
+	                            try {
+	                                FXMLLoader loader = new FXMLLoader(getClass().getResource("Tournament.fxml"));
+	                                Parent tournamentScene = loader.load();
+	                                Scene scene = new Scene(tournamentScene);
+	                                TournamentController tournamentController = loader.getController();
+	                                tournamentController.setGameCode(gameCode.getText());
+	                                tournamentController.setAdminUsername(adminUsername);
+	                                stage.setScene(scene);
+	                                stage.show();
+	                            } catch (IOException e) {
+	                                e.printStackTrace();
+	                                // Mostra un messaggio di errore all'utente
+	                                Alert alert = new Alert(Alert.AlertType.ERROR);
+	                                alert.setTitle("Errore");
+	                                alert.setHeaderText("Impossibile caricare la scena del torneo.");
+	                                alert.setContentText("Riprova più tardi.");
+	                                alert.showAndWait();
+	                            }
+	                        }
+	                    }
+	                });
+	                return null;
+	            }
+	        };
+
+	        // Esegui il task asincrono
+	        new Thread(task).start();
+	    } else {
+	        alert = new Alert(Alert.AlertType.ERROR);
+	        alert.setTitle("Errore");
+	        alert.setHeaderText("Non esiste alcuna partita associata al seguente codice:");
+	        alert.setContentText("Inserisci un nuovo codice partita!");
+	        alert.showAndWait();
+	        gameCode.clear();
+	    }
 	}
 	
 	private boolean checkGameCode(String code) {
@@ -116,6 +152,7 @@ public class PlayerController implements Initializable{
 				check=false;
 		}
 		} catch (FileNotFoundException e) {
+			System.out.println("File not found");
 			e.printStackTrace();
 		}
 		return check;

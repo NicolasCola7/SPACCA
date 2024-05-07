@@ -137,7 +137,20 @@ public class TournamentController implements Initializable{
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {// inizializza la partita 
-		
+		FXMLLoader loadingScreenLoader = new FXMLLoader(getClass().getResource("Loading.fxml"));
+		Parent loadingScreenParent = null;
+	    try {
+	        loadingScreenParent = loadingScreenLoader.load();
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
+	    Scene loadingScreenScene = new Scene(loadingScreenParent);
+	    Stage loadingScreenStage = new Stage();
+	    loadingScreenStage.setScene(loadingScreenScene);
+	    loadingScreenStage.initModality(Modality.APPLICATION_MODAL);
+	    loadingScreenStage.initOwner(primaryStage);
+	    loadingScreenStage.show();
+	    
 		Platform.runLater(() -> {//serve a ritardare le istruzioni al suo interno dato che quando si passano dati da un altro controller (PlayerController in questo caso)  il metodo initialize viene eseguito prima dei metodi utilizzati nel controller che passa i dati,in guesto caso setGameCode() e setAdminUsername()
 			tournamentBracketLoader =new FXMLLoader(getClass().getResource("TournamentBracket.fxml"));
 			
@@ -167,6 +180,7 @@ public class TournamentController implements Initializable{
 				tournament=new Tournament(gameCode,adminUsername);
 				currentPlayer=0;
 			}
+			
 			currentPlayerHand=new ArrayList<ToggleButton>();
 			actualGamePlayersNames=tournament.getActualGamePlayersNames();
 			
@@ -181,19 +195,23 @@ public class TournamentController implements Initializable{
 			 bracketStage.initOwner(primaryStage);
 			 bracketStage.setTitle("Avanzamento Torneo");
 			 bracketStage.setScene(bracketScene);
-			
-			initializeCardsBox(currentPlayer);
-			
+			 
+			loadingScreenStage.close();
+		
 			primaryStage=(Stage) drawCardButton.getScene().getWindow();
 			primaryStage.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::closeWindowEvent);				
 		    primaryStage.setMaximized(true);
+			primaryStage.show();
 		    
 			setMenuButtonStyle();
 		    setButtonImages();
 		    setSceneStyle();
 		    
 		    InformationAlert.display("Messaggio informativo",tournament.getCurrentGameMessage());
-	    });  
+		    initializeCardsBox(currentPlayer);
+		    
+	    }); 
+		
 	}
 	
 	private void initializeCardsBox(int currentPlayer) {// inizializza la UI del giocatore corrente
@@ -205,12 +223,18 @@ public class TournamentController implements Initializable{
 		if(areBothBot()) {
 			int looser=(int)(Math.random()*2);
 			tournament.eliminatePlayer(looser);
-			endCurrentGame(0);
+			
+			if(tournament.isTournamentGameOver()) 
+				endTournament(currentPlayer);
+			else if(tournament.isActualGameOver()) 
+				 endCurrentGame(currentPlayer);	
 		}
+		
 		else if(isBot(this.currentPlayer)) {
 			InformationAlert.display("Messaggio informativo", "Sta giocando "+tournament.getPlayer(this.currentPlayer).getUsername()+"...");
 	        useBotRoutine();
 		}
+		
 		else {
 			for(int i=0;i<tournament.getPlayer(currentPlayer).getHand().size();i++) {
 				Card card=tournament.getPlayer(currentPlayer).getHand().get(i);
@@ -994,6 +1018,7 @@ public class TournamentController implements Initializable{
      
          }
      });
+	   
 	   ImageView bracketImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/bracket.png")));
 	   nextPlayerImg.setFitWidth(50);
 	   nextPlayerImg.setFitHeight(50);

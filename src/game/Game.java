@@ -9,7 +9,8 @@ import leaderboard.Leaderboard;
 import javafx.beans.property.SimpleBooleanProperty;
 import cards.*;
 import decks.*;	
-	public abstract class Game implements Serializable{
+	
+public abstract class Game implements Serializable{
 
 		private static final long serialVersionUID = -1894678914308683663L;
 		protected Deck deck;
@@ -41,6 +42,7 @@ import decks.*;
 		turn=1;
 		currentPlayer=0;
 	}
+	
 	abstract public void insertPlayers();
 	abstract public void buildPlayersHands();
 	abstract public Player getPlayer(int player);

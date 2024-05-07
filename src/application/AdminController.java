@@ -1,11 +1,8 @@
 package application;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.Scanner;
 
 import game.GameType;
 import javafx.event.ActionEvent;
@@ -24,26 +21,13 @@ import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import leaderboard.Leaderboard;
 
-public class AdminController implements Initializable{
+public class AdminController{
 	private Scene scene;
 	private Stage stage;
 	private Parent root;
-	private String adminUsername;
 	@FXML private Button homeButton;
 	
-	@Override
-	public void initialize(URL arg0, ResourceBundle arg1) {
-		ImageView homeImg=new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Home2.png")));	
-		homeImg.setFitWidth(homeButton.getPrefWidth());
-		homeImg.setFitHeight(homeButton.getPrefHeight());
-		homeButton.setGraphic(homeImg);
-		
-		//creo i file leaderboard
-		Leaderboard classicGamesLeaderboard=new Leaderboard(adminUsername,GameType.CLASSIC);
-		Leaderboard tournamentsLeaderboard=new Leaderboard(adminUsername,GameType.TOURNAMENT);
-		
-	}
-	
+	// back to home page
 	public void goToHome(ActionEvent event) throws IOException {
 		Alert alert=new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Logout");
@@ -57,32 +41,50 @@ public class AdminController implements Initializable{
 			stage.show();
 		}
 	}
-	public void playersManagement(ActionEvent event)  throws IOException{
-		root = FXMLLoader.load(getClass().getResource("PlayersManagement.fxml"));
-		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-		scene=new Scene(root);
-		stage.setScene(scene);
-		stage.show();
-	}
-	public void matchesManagement(ActionEvent event)  throws IOException{
-		root = FXMLLoader.load(getClass().getResource("MatchesManagement.fxml"));
+	
+	//new player creation
+	public void newPlayer(ActionEvent event) throws IOException {
+		root = FXMLLoader.load(getClass().getResource("NewPlayer.fxml"));
 		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 		scene=new Scene(root);
 		stage.setScene(scene);
 		stage.show();
 	}
 	
-	private void getCurrentAdmin() {	
-		try {
-			Scanner scan = new Scanner(new File("./Files/ConfigurationFiles/AdminAttuale.csv"));
-			  while (scan.hasNextLine()) {
-		        	String line=scan.nextLine();
-		        	adminUsername=line;
-		        }
-			  scan.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+	//edit existing player
+	public void editExisting(ActionEvent event) throws IOException {
+		root = FXMLLoader.load(getClass().getResource("EditExisting.fxml"));
+		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+		scene=new Scene(root);
+		stage.setScene(scene);
+		stage.show();
+	}
+	
+	//classic game creation
+	public void standardMatch(ActionEvent event) throws IOException {
+		root = FXMLLoader.load(getClass().getResource("ClassicGameCreation.fxml"));
+		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+		scene=new Scene(root);
+		stage.setScene(scene);
+		stage.show();
+	}
+	
+	//tournamnet creation
+	public void tournament(ActionEvent event) throws IOException {
+		root = FXMLLoader.load(getClass().getResource("TournamentCreation.fxml"));
+		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+		scene=new Scene(root);
+		stage.setScene(scene);
+		stage.show();
+	}
+	
+	
+	public void suspendedGames(ActionEvent event) throws IOException {
+		root = FXMLLoader.load(getClass().getResource("SuspendedGames.fxml"));
+		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+		scene=new Scene(root);
+		stage.setScene(scene);
+		stage.show();
 	}
 
 }

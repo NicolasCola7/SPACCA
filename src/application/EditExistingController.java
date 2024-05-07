@@ -60,14 +60,6 @@ public class EditExistingController implements Initializable {
 		deleteButton.disableProperty().bind(selectedPlayer.valueProperty().isNull());
 		modifyButton.disableProperty().bind(selectedPlayer.valueProperty().isNull().or(newPlayerName.textProperty().isEmpty()));
 		
-		ImageView backImg=new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Back2.png")));
-		ImageView homeImg=new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Home2.png")));
-		backImg.setFitWidth(backButton.getPrefWidth());
-		homeImg.setFitWidth(homeButton.getPrefWidth());
-		backImg.setFitHeight(backButton.getPrefHeight());
-		homeImg.setFitHeight(homeButton.getPrefHeight());
-		homeButton.setGraphic(homeImg);
-		backButton.setGraphic(backImg);
 	}
 	public void goToHome(ActionEvent event) throws IOException {
 		alert=new Alert(AlertType.CONFIRMATION);
@@ -83,7 +75,7 @@ public class EditExistingController implements Initializable {
 		}
 	}
 	public void back(ActionEvent event) throws IOException {
-		root = FXMLLoader.load(getClass().getResource("PlayersManagement.fxml"));
+		root = FXMLLoader.load(getClass().getResource("Admin.fxml"));
 		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 		scene=new Scene(root);
 		stage.setScene(scene);

@@ -65,17 +65,7 @@ public class ClassicGameCreationController implements Initializable {
 				gameCode.textProperty().isEmpty().or(
 				numberOfPlayerSelection.valueProperty().isNull().or(
 				playersSelection.getSelectionModel().selectedItemProperty().isNull())));
-		
-		ImageView backImg=new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Back2.png")));
-		ImageView homeImg=new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Home2.png")));
-		backImg.setFitWidth(backButton.getPrefWidth());
-		homeImg.setFitWidth(homeButton.getPrefWidth());
-		backImg.setFitHeight(backButton.getPrefHeight());
-		homeImg.setFitHeight(homeButton.getPrefHeight());
-		homeButton.setGraphic(homeImg);
-		backButton.setGraphic(backImg);
-		//homeButton.setStyle("-fx-background-color:transparent;");
-		//backButton.setStyle("-fx-background-color:transparent;");
+	
 		
 	}
 	
@@ -93,7 +83,7 @@ public class ClassicGameCreationController implements Initializable {
 		}
 	}
 	public void back(ActionEvent event) throws IOException {
-		root = FXMLLoader.load(getClass().getResource("MatchesManagement.fxml"));
+		root = FXMLLoader.load(getClass().getResource("Admin.fxml"));
 		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 		scene=new Scene(root);
 		stage.setScene(scene);

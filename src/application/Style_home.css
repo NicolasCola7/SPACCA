@@ -1,0 +1,17 @@
+.root {
+    -fx-background-image: url('./BackgroundImage/background.png');
+    -fx-background-size: cover;
+    -fx-background-repeat: no-repeat;
+}
+
+.button{
+    -fx-background-color: linear-gradient(#B54DFA,#FF66C4);
+    -fx-background-radius: 30;
+    -fx-background-insets: 0;
+    -fx-text-fill: white;
+}
+
+.text-area{
+	-fx-font-size: 14px;
+	-fx-editable: false;
+}

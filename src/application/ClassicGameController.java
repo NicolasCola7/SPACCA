@@ -1,7 +1,10 @@
 /*TODO
- * fare in modo che nel primo turno non si possano usare carte evento o azione?
  * controllo errori/provare il gioco
- * avanzamento torneo(da considerare come componente aggiuntiva?)
+ * gestione eccezioni
+ * superclasse gameController
+ * regolamento
+ * presentazione
+ * commenti
  */
 package application;
 import cards.*;
@@ -138,18 +141,21 @@ public class ClassicGameController implements Initializable{
 	private ArrayList<String> players;
 	private Stage primaryStage;
 	
-	
-	public void setGameCode(String code) { // metodo che viene chiamato dal playerController per settare il gameCode
+	//setting game code to initialize classic game
+	public void setGameCode(String code) { 
 		gameCode=code;
 	}
 	
+	//setting admin username to initialize classic game
 	public void setAdminUsername(String name) { //metodo che viene chiamato dal playerController per settare l'adminUsername
 		adminUsername=name;
 	}
 	
+	//init or load game
 	@Override
-	public void initialize(URL arg0, ResourceBundle arg1) {// inizializza la partita 
-		Platform.runLater(() -> {//serve a ritardare le istruzioni al suo interno dato che quando si passano dati da un altro controller (PlayerController in questo caso)  il metodo initialize viene eseguito prima dei metodi utilizzati nel controller che passa i dati,in guesto caso setGameCode() e setAdminUsername()
+	public void initialize(URL arg0, ResourceBundle arg1) {
+		//delay the scene loading(waiting for setGameCode() and setAdminUsername()
+		Platform.runLater(() -> {
 			if(isSerialized("./Files/ConfigurationFiles/"+gameCode+".ser")){
 				game=deserialize("./Files/ConfigurationFiles/"+gameCode+".ser");
 				currentPlayer=game.getCurrentPlayer();
@@ -159,11 +165,14 @@ public class ClassicGameController implements Initializable{
 				game=new ClassicGame(gameCode,adminUsername);
 				currentPlayer=0;
 			}
+			// initializing hand
 			currentPlayerHand=new ArrayList<ToggleButton>();
 			group=new ToggleGroup();
 			initializeCardsBox(currentPlayer);
 			
+			//initializing stage
 			primaryStage= (Stage) drawCardButton.getScene().getWindow();
+			//managing window closing
 			primaryStage.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::closeWindowEvent);				
 		    primaryStage.setMaximized(true);
 		    
@@ -173,7 +182,8 @@ public class ClassicGameController implements Initializable{
 	    });  
 	}
 	
-	private void initializeCardsBox(int currentPlayer) {// inizializza la UI del giocatore corrente
+	//init current player hand GUI
+	private void initializeCardsBox(int currentPlayer) {
 		currentPlayerHand.clear();
 		players=game.getPlayersNames(); 
 		actualNumberOfPlayers=game.getNOfPlayers();
@@ -187,13 +197,17 @@ public class ClassicGameController implements Initializable{
 		}
 		setBindings();
 		initializePlayersBox();
-    
+		
+		//showing other players actions on current player
 		String toDisplay=game.getActionMessage(currentPlayer);
 		if(toDisplay.length()>0)
 			InformationAlert.display("Messaggio informativo",toDisplay );
 	}
+	
+	//init other players information
 	private void initializePlayersBox() {
 		actualNumberOfPlayers=game.getNOfPlayers();
+		
 		for (int i=0;i<actualNumberOfPlayers;i++) {
 			if(i!=currentPlayer) {
 				Player player=game.getPlayer(i);
@@ -230,41 +244,40 @@ public class ClassicGameController implements Initializable{
 			}
 		}
 	}
-	private void setBindings() { // serve a fare in modo che i bottoni vengano disattivati e attivati  in determinate situazioni
+	
+	//setting bindings to disable buttons
+	private void setBindings() { 
 		SimpleBooleanProperty hasDrawed=game.getHasDrawed();
 		SimpleBooleanProperty hasAttacked=game.getHasAttacked();
 		SimpleBooleanProperty hasDiscarded=game.getHasDiscarded();
+		
 		SimpleBooleanProperty isSelectedAttackCard=new SimpleBooleanProperty(false);
 		SimpleBooleanProperty isSelectedEventOrActionCard=new SimpleBooleanProperty(false);
 		SimpleBooleanProperty isFirstTurn=new SimpleBooleanProperty(game.getTurn()==1);
 		SimpleBooleanProperty isSelected=new SimpleBooleanProperty(false);
 		
-		isSelected.bind(group.selectedToggleProperty().isNull());// isSelected diventa true  è selezionata una carta
+		isSelected.bind(group.selectedToggleProperty().isNull());
 		
 		group.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
-            	isSelectedAttackCard.bind(((ToggleButton)group.getSelectedToggle()).textProperty().isEqualTo("Attacco"));// isSelectedAttackCard diventa true se è selezionata la carta attacco
+            	isSelectedAttackCard.bind(((ToggleButton)group.getSelectedToggle()).textProperty().isEqualTo("Attacco"));
             	 
             	ArrayList<Card> hand=game.getPlayer(currentPlayer).getHand();
             	ToggleButton btn=(ToggleButton) group.getSelectedToggle();
-            	Card c=hand.get(currentPlayerHand.indexOf(btn));
-            	SimpleBooleanProperty isActionOrEventCard= new SimpleBooleanProperty(false);
-            	isActionOrEventCard.set(c instanceof ActionCard || c instanceof EventCard);
+            	int cardIndex=currentPlayerHand.indexOf(btn);
+            	Card c=hand.get(cardIndex);
+            	SimpleBooleanProperty isActionOrEventCard=new SimpleBooleanProperty(c instanceof ActionCard || c instanceof EventCard);
             	isSelectedEventOrActionCard.bind(isActionOrEventCard);
             }	
-            else {
-            	isSelectedEventOrActionCard.unbind();
-            	isSelectedAttackCard.unbind();
-            }
-            
         });
 		
-    	drawCardButton.disableProperty().bind(hasDrawed); //disattiva il bottone per pescare se ha già pescato
-		discardCardButton.disableProperty().bind(hasDiscarded.or(isSelected)); //disattiva il bottone per scartare se il giocatore ha già scartato una carta o non ne ha selezionata alcuna
-		submitCardButton.disableProperty().bind(isSelected.or(hasAttacked.and(isSelectedAttackCard)).or(isFirstTurn.and(isSelectedEventOrActionCard)));//disattiva il bottone per giocare una carta se non c'è alcuna carta selezionata, oppure se il giocatore ha già attaccato e la carta selezionata è una carta attacco
+    	drawCardButton.disableProperty().bind(hasDrawed); 
+		discardCardButton.disableProperty().bind(hasDiscarded.or(isSelected)); 
+		submitCardButton.disableProperty().bind(isSelected.or(hasAttacked.and(isSelectedAttackCard)).or(isFirstTurn.and(isSelectedEventOrActionCard)));
 	}
 	
-	public void seeBoard(ActionEvent event)throws IOException{ // permette di visualizzare le carte presenti nella board del giocatore corrrente
+	//showing current player's  board
+	public void seeBoard(ActionEvent event)throws IOException{ 
 		StaticCard[] board=game.getPlayer(currentPlayer).getBoard();
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle("Board");
@@ -291,11 +304,11 @@ public class ClassicGameController implements Initializable{
         alert.getDialogPane().setContent(boardBox);
 		alert.showAndWait();	
 	}
-	
+	//showing current player character's info
 	public void seeCharacterInfos(ActionEvent event) throws IOException{//permette di vedere le informazioni relative al personaggio del giocatore corrente
 		getCharacterInfos(currentPlayer);
 	}
-	
+	//showing current player's equiped weapon
 	public void seeEquipedWeapon(ActionEvent event)throws IOException{
 		WeaponCard wc=game.getPlayer(currentPlayer).getEquipedWeapon();
 		String fileName=(wc==null?"Vuoto.png":wc.getName().replaceAll("\\s+", "")+".png");
@@ -317,30 +330,33 @@ public class ClassicGameController implements Initializable{
 		alert.showAndWait();
 	}
 	
-	public void drawCard(ActionEvent event) throws IOException { //per pescare una carta 
+	//drawing a card
+	public void drawCard(ActionEvent event) throws IOException {
 		Card drawedCard=game.drawCard(currentPlayer);
 		ToggleButton btn=new ToggleButton(drawedCard.getName());
-		addToCardsBox(btn); // aggiunge la carta pescata alla UI del giocatore corrente
+		addToCardsBox(btn); 
 	}
 	
-	public void discardCard(ActionEvent event)throws IOException{ //per scartare una carta
+	//discarding a card
+	public void discardCard(ActionEvent event)throws IOException{ 
 		ToggleButton btn=(ToggleButton) group.getSelectedToggle();
 		setLatestPlayedCard(game.getPlayersHand(currentPlayer).get(currentPlayerHand.indexOf(btn)));
 		game.discardCard(currentPlayer,currentPlayerHand.indexOf(btn));
-		removeFromCardsBox(btn);// rimuove la carta scartata dalla UI del giocatore corrente
+		removeFromCardsBox(btn);
 	}
-
-	public void submitCard(ActionEvent event)throws IOException{ // per giocare una carta
-		ToggleButton btn=(ToggleButton)group.getSelectedToggle(); //ottengo il bottone selezionato
-		Card submittedCard=game.getPlayersHand(currentPlayer).get(currentPlayerHand.indexOf(btn)); // ottengo la carta nella mano del giocatore corrispondente all'indice del bottone
-		int submittedCardIndex=currentPlayerHand.indexOf(btn); // ottengo l'indice della carta nella mano del giocatore 
-		ArrayList<String> toAttack=new ArrayList<String>(); // lista dei giocatori che possono essere attaccati
+	
+	//submittin a card
+	public void submitCard(ActionEvent event)throws IOException{ 
+		ToggleButton btn=(ToggleButton)group.getSelectedToggle(); //selected toggleButton (card)
+		Card submittedCard=game.getPlayersHand(currentPlayer).get(currentPlayerHand.indexOf(btn)); // selcted card
+		int submittedCardIndex=currentPlayerHand.indexOf(btn); 
+		ArrayList<String> toAttack=new ArrayList<String>(); //players to attack
 		toAttack.addAll(players);
 		toAttack.remove(currentPlayer);
 		int targetPlayer=0;
 		if(submittedCard instanceof ActionCard ) {
 			
-			if(submittedCard instanceof HealingPotionCard || submittedCard instanceof SauronEyeCard ) { // in questo caso nel metodo passo 2 volte currentPlayer perchè per queste 2 carte non serve passare il target Player
+			if(submittedCard instanceof HealingPotionCard || submittedCard instanceof SauronEyeCard ) { 
 				game.submitActionCard(submittedCardIndex, currentPlayer,0);
 				 removeFromCardsBox(btn);
 			}
@@ -354,7 +370,8 @@ public class ClassicGameController implements Initializable{
 		        dialog.setHeaderText("Seleziona un giocatore:");
 		        Optional<String> result = dialog.showAndWait();
 		        targetPlayer=players.indexOf(dialog.getSelectedItem());
-		        if(result.isPresent() || result.get()!=null ) { //il metodo submitActionCard viene chiamato solo se viene selezionato un giocatore da attaccare
+		       
+		        if(result.isPresent() || result.get()!=null ) { 
 		        	game.submitActionCard(submittedCardIndex, currentPlayer,targetPlayer);
 		        	 removeFromCardsBox(btn);
 		      
@@ -406,10 +423,11 @@ public class ClassicGameController implements Initializable{
 		checkElimination(targetPlayer);
 		checkCurrentPlayerElimination(targetPlayer);
 		
-		if(game.isGameOver()) //controlla se è rimasto solo un giocatore 
+		if(game.isGameOver()) 
 			endGame(currentPlayer);
 	}
 	
+	//showing latest played or discarded card
 	private void setLatestPlayedCard(Card c) {
 		latestPlayedCardPane.getChildren().clear();
 		ImageView latestPlayedCard=new ImageView(new Image(getClass().getResourceAsStream("./CardsImages/"+c.getName().replaceAll("\\s+", "")+".png")));
@@ -418,6 +436,7 @@ public class ClassicGameController implements Initializable{
 		latestPlayedCardPane.getChildren().add(latestPlayedCard);
 	}
 	
+	//submitting the turn the next player
 	public void submitPlayer(ActionEvent event)throws IOException{ //passa la giocata al prossimo giocatore
 		updateCurrentPlayer(currentPlayer);
 		game.setHasAttacked(false);
@@ -425,7 +444,7 @@ public class ClassicGameController implements Initializable{
 		game.setHasDrawed(false);
 	}
 	
-	//controllo che serve per quando viene eliminato un giocatore che in ordine di giocata è prima del giocatore corrente
+	//checks if previous players have been eliminated and update the currentPlayer
 	private void checkElimination(int targetPlayer) {
 		if(players.size()<actualNumberOfPlayers) {
 			playersBox.getChildren().clear();
@@ -441,7 +460,7 @@ public class ClassicGameController implements Initializable{
 		}
 	}
 	
-	 // caso in cui l'attaccate venga eliminato dal veleno di vedova nera,specchio o entrambi
+	 // check if currentPlayer has been eliminated due to a targetPlayer staticCard
 	private void checkCurrentPlayerElimination(int targetPlayer) {
 		if(game.getPlayer(currentPlayer).getCharacter().getCurrentLife()<=0) {
 			
@@ -468,10 +487,11 @@ public class ClassicGameController implements Initializable{
 		}
 	}
 	
-	//caso in cui entrambi i giocatori si eliminino a vicenda
+	//check if 2 players eliminate themselves concurrently
 	private void checkConcurrentElimination() {
 		if(currentPlayer==actualNumberOfPlayers-1 || players.size()<actualNumberOfPlayers) {
-			// gestisco l'eccezione del caso in cui gli ultimi 2 giocatori si eliminano a vicenda
+			
+			// if the 2 eliminated players were the latest 2 remaining the game end in a draw
 			if(players.size()==0) { 
 				try {
 					throw new NoWinnerException("Partita terminata in pareggio, non ci sono vincitori!");
@@ -489,6 +509,7 @@ public class ClassicGameController implements Initializable{
 			refreshCardsBox(currentPlayer);
 	}
 	
+	//check if the currentPlayer is a Bot
 	private boolean isBot(int current) {
 		if (game.getPlayer(current) instanceof Bot)
 			return true;
@@ -496,6 +517,7 @@ public class ClassicGameController implements Initializable{
 			return false;		
 	}
 	
+	//bot actions
 	private synchronized void useBotRoutine() {	    
 		Bot bot =(Bot) game.getPlayer(currentPlayer);
 		String botActionsMessage="Il bot ha eseguito le seguenti azioni:\n";

@@ -5,24 +5,58 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.TournamentCreationController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@Style_home.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.TournamentCreationController">
    <children>
-      <Button fx:id="homeButton" contentDisplay="GRAPHIC_ONLY" layoutX="14.0" layoutY="9.0" mnemonicParsing="false" onAction="#goToHome" prefHeight="39.0" prefWidth="49.0" text="Home" />
-      <Button fx:id="backButton" contentDisplay="GRAPHIC_ONLY" layoutX="534.0" layoutY="14.0" mnemonicParsing="false" onAction="#back" prefHeight="30.0" prefWidth="58.0" text="Indietro" />
-      <Label layoutX="272.0" layoutY="18.0" text="Torneo">
-         <font>
-            <Font size="20.0" />
-         </font>
-      </Label>
-      <ListView fx:id="playersSelection" layoutX="38.0" layoutY="100.0" prefHeight="200.0" prefWidth="200.0" />
-      <Button fx:id="confirmButton" layoutX="278.0" layoutY="331.0" mnemonicParsing="false" onAction="#confirm" text="Conferma" />
-      <TextField fx:id="gameCode" layoutX="365.0" layoutY="260.0" />
-      <Label layoutX="288.0" layoutY="264.0" text="Codice partita:" />
-      <CheckBox fx:id="botCheck" layoutX="391.0" layoutY="183.0" mnemonicParsing="false" />
-      <Label layoutX="287.0" layoutY="183.0" text="Completa con bot" />
-      <Label layoutX="38.0" layoutY="76.0" text="Scegli giocatori:" />
+      <Button fx:id="homeButton" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#goToHome" prefHeight="17.0" prefWidth="45.0">
+         <graphic>
+            <ImageView fitHeight="97.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@ButtonImages/home.png" />
+               </image>
+            </ImageView>
+         </graphic></Button>
+      <Button fx:id="backButton" layoutX="66.0" layoutY="14.0" mnemonicParsing="false" onAction="#back" prefHeight="17.0" prefWidth="45.0">
+         <graphic>
+            <ImageView fitHeight="97.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@ButtonImages/back.png" />
+               </image>
+            </ImageView>
+         </graphic></Button>
+      <AnchorPane layoutX="17.0" layoutY="56.0" prefHeight="330.0" prefWidth="567.0" style="-fx-background-color: white;">
+         <children>
+            <Label layoutX="246.0" layoutY="14.0" text="Torneo">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+            <ListView fx:id="playersSelection" layoutX="14.0" layoutY="94.0" prefHeight="220.0" prefWidth="176.0" style="-fx-background-color: #EBDEF0;" />
+			<Button fx:id="confirmButton" layoutX="310.0" layoutY="263.0" mnemonicParsing="false" onAction="#confirm" text="Conferma">
+               <font>
+                  <Font size="18.0" />
+               </font></Button>            
+			<TextField fx:id="gameCode" layoutX="273.0" layoutY="106.0" prefHeight="25.0" prefWidth="188.0" promptText="Codice partita">
+               <font>
+                  <Font size="15.0" />
+               </font></TextField>            
+			<CheckBox fx:id="botCheck" layoutX="402.0" layoutY="203.0" mnemonicParsing="false">
+               <font>
+                  <Font size="15.0" />
+               </font></CheckBox>           
+             <Label layoutX="272.0" layoutY="203.0" text="Completa con bot:">
+               <font>
+                  <Font size="15.0" />
+               </font></Label>
+            <Label layoutX="46.0" layoutY="73.0" text="Scegli i giocatori:">
+               <font>
+                  <Font size="15.0" />
+               </font></Label>
+         </children>
+      </AnchorPane>
    </children>
 </AnchorPane>

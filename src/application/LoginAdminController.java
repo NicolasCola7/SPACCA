@@ -37,11 +37,6 @@ public class LoginAdminController implements Initializable{
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		loginButton.disableProperty().bind(adminUsername.textProperty().isEmpty().or(psw.textProperty().isEmpty()));
-		
-		ImageView homeImg=new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Home2.png")));
-		homeImg.setFitWidth(homeButton.getPrefWidth());
-		homeImg.setFitHeight(homeButton.getPrefHeight());
-		homeButton.setGraphic(homeImg);
 	}
 	
 	public void goToHome(ActionEvent event) throws IOException {
