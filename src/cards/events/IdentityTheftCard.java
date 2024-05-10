@@ -2,7 +2,7 @@ package cards.events;
 import cards.Seed;
 import cards.characters.Character;
 import decks.Deck;
-import game.Player;
+import player.Player;
 
 public class IdentityTheftCard extends EventCard {
 	

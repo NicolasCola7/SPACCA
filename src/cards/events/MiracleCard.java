@@ -2,7 +2,7 @@ package cards.events;
 
 import cards.Seed;
 import decks.Deck;
-import game.Player;
+import player.Player;
 
 public class MiracleCard extends EventCard{
 

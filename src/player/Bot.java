@@ -1,4 +1,4 @@
-package game;
+package player;
 
 import cards.Card;
 import cards.actions.AttackCard;

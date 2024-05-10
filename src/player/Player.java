@@ -1,4 +1,4 @@
-package game;
+package player;
 import java.io.Serializable;
 import java.util.ArrayList;
 import cards.Card;
@@ -39,7 +39,7 @@ public class Player implements Serializable{
 		return equipedWeapon;
 	}
 	
-	public boolean addToBoard(StaticCard sc) { //si potrebbe fare che quando vine chiamato il metodo e ritorna false, si mostra un alert che chiede se si vuole sostituire la carta già posizionata con quella nuovo
+	public boolean addToBoard(StaticCard sc) { 
 		boolean check=true;
 		if(board[0]==null && board[1]==null) {
 			if(sc instanceof ShieldCard || sc instanceof HologramCard || sc instanceof EnchantedMirrorCard)
@@ -109,6 +109,7 @@ public class Player implements Serializable{
 		attackPower=character.getAttack(); //resetta la potenza d'attacco del personaggio
 		return removed;
 	}
+	
 	public ArrayList<Card> getHand(){
 		return hand;
 	}

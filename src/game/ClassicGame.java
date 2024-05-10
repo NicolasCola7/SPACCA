@@ -8,6 +8,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
 import leaderboard.Leaderboard;
+import player.Bot;
+import player.Player;
 import cards.*;
 import cards.actions.*;
 import cards.statics.*;
@@ -30,11 +32,13 @@ public class ClassicGame extends Game {
 		initializeProperties();
 	}
 	
+	@Override
 	public void buildPlayersHands() {
 		for(int i=0;i<nOfPlayers;i++) 
 			players.get(i).getHand().addAll(deck.drawHand());
 	}
 	
+	@Override
 	public void insertPlayers() {
 		actionMessages=new ArrayList<String>();
 		players=new LinkedList<Player>();
@@ -65,6 +69,7 @@ public class ClassicGame extends Game {
 		}
 	}
 	
+	@Override
 	public void eliminatePlayer(int i) {
 		players.remove(i);
 		playersNames.remove(i);
@@ -79,10 +84,12 @@ public class ClassicGame extends Game {
 			return false;
 	}
 	
+	@Override
 	public Player getPlayer(int player) {
 		return players.get(player);
 	}
-
+	
+	@Override
 	public void submitActionCard(int submittedCard, int currentPlayer, int target) { // per action cards
 		Player attackingPlayer=players.get(currentPlayer);
 		Player targetPlayer=players.get(target);
@@ -158,6 +165,7 @@ public class ClassicGame extends Game {
 		attackingPlayer.getHand().remove(submittedCard);	
 	}
 	
+	@Override
 	public boolean submitStaticCard(int submittedCard, int player) {// per static cards
 		Player currentPlayer=players.get(player);  
 		StaticCard submitted=(StaticCard)currentPlayer.getHand().get(submittedCard);
@@ -187,6 +195,7 @@ public class ClassicGame extends Game {
 		return check;
 	}
 	
+	@Override
 	public boolean submitWeaponCard(int submittedCard, int player) { // per weapon cards
 		Player currentPlayer=players.get(player);   
 		WeaponCard submittedWeapon=(WeaponCard)currentPlayer.getHand().get(submittedCard);
@@ -216,6 +225,8 @@ public class ClassicGame extends Game {
 		this.currentPlayer=player;
 		return check;
 	}
+	
+	@Override
 	public void submitEventCard(int submittedCard, int player, int target) { // per event cards
 		Player currentPlayer=players.get(player);
 		Player targetPlayer=players.get(target);
@@ -242,6 +253,8 @@ public class ClassicGame extends Game {
 		this.currentPlayer=player;
 		currentPlayer.getHand().remove(submittedCard);
 	}
+	
+	@Override
 	public Card drawCard(int currentPlayer) {//metodo per pescare la carta e aggiungerla alla mano 
 		Card c=deck.drawCard();
 		this.currentPlayer=currentPlayer;
@@ -250,6 +263,8 @@ public class ClassicGame extends Game {
 		hasDrawed.set(hasDrawedValue); // hasDrawed diventa true cosi che il giocatore non possa pescare più di una carta per turno in quanto viene disattivato il bottone per pescare
 		return c;
 	}
+	
+	@Override
 	public void discardCard(int currentPlayer,int selectedCard) { //scarta una carta
 		deck.addToStockPile(this.getPlayersHand(currentPlayer).remove(selectedCard));
 		this.currentPlayer=currentPlayer;

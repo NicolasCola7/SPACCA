@@ -2,7 +2,7 @@ package cards.actions;
 import java.util.List;
 import cards.Seed;
 import decks.Deck;
-import game.Player;
+import player.Player;
 
 public class SauronEyeCard extends ActionCard{
 	

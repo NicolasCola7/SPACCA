@@ -12,12 +12,14 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
 import leaderboard.Leaderboard;
+import player.Bot;
+import player.Player;
 import cards.*;
 import cards.actions.*;
 import cards.statics.*;
 import cards.events.*;
 import decks.*;	
-public class Tournament extends Game{
+public class Tournament extends Game  {
 
 	private static final long serialVersionUID = 8046043559234131541L;
 	private TournamentPhase tournamentPhase;
@@ -48,6 +50,8 @@ public class Tournament extends Game{
 	
 		currentGameMessage=tournamentPhase + ", " + gameNumber +"° partita: "+ actualGamePlayersNames.get(0) + " VS " + actualGamePlayersNames.get(1);;
 	}
+	
+	@Override
 	public void buildPlayersHands() {
 		actionMessages.clear();
 		actualGamePlayersNames.clear();
@@ -73,6 +77,8 @@ public class Tournament extends Game{
 			actionMessages.add("");
 		}
 	}
+	
+	@Override
 	public void insertPlayers() {
 		players=new LinkedList<Player>();
 		try {
@@ -101,6 +107,8 @@ public class Tournament extends Game{
 		}
 	}
 	
+	
+	@Override
 	public void eliminatePlayer(int player) {
 		eliminated.addLast(actualGamePlayers.remove(player));
 		actualGamePlayersNames.remove(player);
@@ -159,10 +167,14 @@ public class Tournament extends Game{
 		InformationAlert.display("Messaggio informativo",currentGameMessage);
 	}
 	
+	
+	@Override
 	public Player getPlayer(int player) {
 		return actualGamePlayers.get(player);
 	}
 	
+	
+	@Override
 	public void submitActionCard(int submittedCard, int currentPlayer, int target) { // per action cards
 		Player attackingPlayer=actualGamePlayers.get(currentPlayer);
 		Player targetPlayer=actualGamePlayers.get(target);
@@ -227,6 +239,8 @@ public class Tournament extends Game{
 		attackingPlayer.getHand().remove(submittedCard);	
 	}
 	
+	
+	@Override
 	public boolean submitStaticCard(int submittedCard, int player) {// per static cards
 		Player currentPlayer=actualGamePlayers.get(player);  
 		StaticCard submitted=(StaticCard)currentPlayer.getHand().get(submittedCard);
@@ -256,6 +270,8 @@ public class Tournament extends Game{
 		return check;
 	}
 	
+	
+	@Override
 	public boolean submitWeaponCard(int submittedCard, int player) { // per weapon cards
 		Player currentPlayer=actualGamePlayers.get(player);   
 		WeaponCard submittedWeapon=(WeaponCard)currentPlayer.getHand().get(submittedCard);
@@ -286,6 +302,7 @@ public class Tournament extends Game{
 		return check;
 	}
 	
+	@Override
 	public void submitEventCard(int submittedCard, int player, int target) { // per event cards
 		Player currentPlayer=actualGamePlayers.get(player);
 		Player targetPlayer=actualGamePlayers.get(target);
@@ -313,6 +330,8 @@ public class Tournament extends Game{
 		currentPlayer.getHand().remove(submittedCard);
 	}
 	
+	
+	@Override
 	public Card drawCard(int currentPlayer) {//metodo per pescare la carta e aggiungerla alla mano 
 		Card c=deck.drawCard();
 		this.currentPlayer=currentPlayer;
@@ -322,6 +341,8 @@ public class Tournament extends Game{
 		return c;
 	}
 	
+	
+	@Override
 	public void discardCard(int currentPlayer,int selectedCard) { //scarta una carta
 		deck.addToStockPile(actualGamePlayers.get(currentPlayer).getHand().remove(selectedCard));
 		this.currentPlayer=currentPlayer;
@@ -329,6 +350,7 @@ public class Tournament extends Game{
 		hasDiscarded.set(hasDiscardedValue); //HasDiscarded diventa true in modo che il giocatore corrente non possa scartare più di una carta
 	}
 	
+		
 	public ArrayList<Player> getActualGamePlayers() {
 		return actualGamePlayers;
 	}

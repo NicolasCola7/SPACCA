@@ -5,7 +5,7 @@ import java.util.Random;
 import cards.Card;
 import cards.Seed;
 import decks.Deck;
-import game.Player;
+import player.Player;
 public class GauntletCard extends ActionCard{
 
 	private static final long serialVersionUID = 559366357330063678L;

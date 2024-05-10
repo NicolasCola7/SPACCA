@@ -28,18 +28,18 @@
                   <Font size="24.0" />
                </font>
             </Label>
-            <TabPane layoutY="49.0" prefHeight="283.0" prefWidth="567.0" tabClosingPolicy="UNAVAILABLE">
+            <TabPane fx:id="tabPane" layoutY="49.0" prefHeight="283.0" prefWidth="567.0" tabClosingPolicy="UNAVAILABLE">
               <tabs>
                 <Tab text="Generale">
                   <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="300.0" prefWidth="401.0">
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="300.0" prefWidth="401.0"  >
                            <children>
-                              <TextArea editable="false" prefHeight="255.0" prefWidth="567.0" promptText="fthrthrjhrj" text="a&#10;a&#10;&#10;&#10;&#10;aaa&#10;aaa&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;aaa&#10;" wrapText="true" />
+                              <TextArea fx:id="TGenerale" editable="false" prefHeight="255.0" prefWidth="567.0" wrapText="true" />
                            </children>
-                        </AnchorPane>
+                     </AnchorPane>
                   </content>
                 </Tab>
-                <Tab text="Carte azione">
+                <Tab text="Carte azione" fx:id="tabAzione">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="254.0" prefWidth="513.0" id="a_back">
                            <children>
@@ -47,75 +47,50 @@
                                 <content>
                                   <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="552.0" style="-fx-background-color: white;" id="a_back">
                                        <children>
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CardsImages/Attacco.png" />
-                                             </image>
-                                          </ImageView>
-                                          <Label layoutX="323.0" layoutY="14.0" text="Attacco">
+                                          <ImageView fx:id="CAttacco" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true"> </ImageView>                                        <Label layoutX="323.0" layoutY="14.0" text="Attacco">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="52.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Carta che permette di compiere un'attacco &#10;semplice contro altri avversari. &#10;All'interno di un mazzo sono presenti 27 copie&#10;Non possiede alcun seme.&#10;">
+                                          <TextArea fx:id="TAttacco" editable="false" layoutX="214.0" layoutY="52.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" >
                                              <font>
                                                 <Font size="13.0" />
                                              </font></TextArea>
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="265.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CardsImages/GuantoDiThanos.png" />
-                                             </image>
-                                          </ImageView>
+                                          <ImageView fx:id="CThanos" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="265.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="265.0" layoutY="265.0" text="Guanto di Thanos">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="303.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Carta che permette di scartare una carta &#10;casuale nella mano dell'avversario.&#10;All'interno di un mazzo sono presenti 5 copie.&#10;Fa parte del seme Marvel (MV)&#10;" />
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="516.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CardsImages/PozioneCurativa.png" />
-                                             </image>
-                                          </ImageView>
+                                          <TextArea fx:id="TThanos" editable="false" layoutX="214.0" layoutY="303.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" />
+                                          <ImageView fx:id="CPozione" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="516.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="265.0" layoutY="516.0" text="Pozione curativa">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="554.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Carta che permette di rigenerare 15 punti vita &#10;persi.&#10;All'interno di un mazzo sono presenti 6 copie.&#10;Fa parte del seme Harry Potter (HP).&#10;" />
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="767.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CardsImages/OcchioDiSauron.png" />
-                                             </image>
-                                          </ImageView>
+                                          <TextArea fx:id="TPozione" editable="false" layoutX="214.0" layoutY="554.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" />
+                                          <ImageView fx:id="CSauron" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="767.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="265.0" layoutY="767.0" text="Occhio di Sauron">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="805.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Carta che permette di infliggere 20 danni a &#10;tutti i giocatori che non è possibile  evitare.&#10;All'interno di un mazzo sono presenti 5 copie.&#10;Fa parte del seme Signore degli Anelli (SA).&#10;" />
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="1018.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CardsImages/Arrembaggio.png" />
-                                             </image>
-                                          </ImageView>
+                                          <TextArea fx:id="TSauron" editable="false" layoutX="214.0" layoutY="805.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" />
+                                          <ImageView fx:id="CArrembaggio" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="1018.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="290.0" layoutY="1018.0" text="Arrembaggio">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="1056.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Carta che permette di rubare una carta casuale &#10;dalla mano dell'avversario.&#10;All'interno di un mazzo sono presenti 4 copie.&#10;Fa parte del seme Pirati dei Caraibi (PC).&#10;" />
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="1269.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CardsImages/PioggiaDiMeteore.png" />
-                                             </image>
-                                          </ImageView>
+                                          <TextArea fx:id="TArrembaggio" editable="false" layoutX="214.0" layoutY="1056.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" />
+                                          <ImageView fx:id="CPioggia" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="1269.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="265.0" layoutY="1269.0" text="Pioggia di Meteore">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="1307.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Carta che permette di distruggere tutte le &#10;carte statiche presenti nella board dell'&#10;avversario scelto.&#10;All'interno di un mazzo sono presenti 4 copie.&#10;Fa parte del seme Star Wars (SW).&#10;" />
+                                          <TextArea fx:id="TPioggia" editable="false" layoutX="214.0" layoutY="1307.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" />
                                        </children>
                                     </AnchorPane>
                                 </content>
@@ -123,7 +98,7 @@
                            </children></AnchorPane>
                   </content>
                 </Tab>
-                  <Tab text="Carte statiche">
+                  <Tab text="Carte statiche" fx:id="tabStatiche">
                      <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="254.0" prefWidth="513.0">
                            <children>
@@ -131,75 +106,51 @@
                                 <content>
                                   <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="552.0" style="-fx-background-color: white;">
                                        <children>
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CardsImages/Anello.png" />
-                                             </image>
-                                          </ImageView>
+                                          <ImageView fx:id="CAnello" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true"> </ImageView>
                                           <Label layoutX="323.0" layoutY="14.0" text="Anello">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="52.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Carta che permette di aumentare la precisione&#10;quando si attacca.&#10;All'interno di un mazzo sono presenti 5 copie&#10;Fa parte del seme Signore degli Anelli (SA).&#10;">
+                                          <TextArea fx:id="TAnello" editable="false" layoutX="214.0" layoutY="52.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" >
                                              <font>
                                                 <Font size="13.0" />
                                              </font></TextArea>
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="265.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CardsImages/SpecchioIncantato.png" />
-                                             </image>
-                                          </ImageView>
+                                          <ImageView fx:id="CSpecchio" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="265.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="265.0" layoutY="265.0" text="Specchio incantato">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="303.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Carta che permette se attaccati di far subire &#10;all'avversario i danni al posto nostro.&#10;All'interno di un mazzo sono presenti 5 copie.&#10;Fa parte del seme Harry Potter (HP)&#10;" />
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="516.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CardsImages/VelenoDiVedovaNera.png" />
-                                             </image>
-                                          </ImageView>
+                                          <TextArea fx:id="TSpecchio" editable="false" layoutX="214.0" layoutY="303.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;"></TextArea>
+                                          <ImageView fx:id="CVeleno" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="516.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="245.0" layoutY="516.0" text="Veleno Vedova Nera">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="554.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Carta che permette di far perdere all'&#10;avversario 5 punti vita se attaccato.&#10;All'interno di un mazzo sono presenti 5 copie.&#10;Fa parte del seme Marvel (MV)." />
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="767.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CardsImages/MaledizioneAzteca.png" />
-                                             </image>
-                                          </ImageView>
+                                          <TextArea fx:id="TVeleno" editable="false" layoutX="214.0" layoutY="554.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" ></TextArea>
+                                          <ImageView fx:id="CMaledizione" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="767.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="255.0" layoutY="767.0" text="Maledizione Azteca">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="805.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Carta che permette di ridurre la precisione &#10;dell'attaccante.&#10;All'interno di un mazzo sono presenti 5 copie.&#10;Fa parte del seme Pirati dei Caraibi (PC).&#10;" />
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="1018.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CardsImages/Scudo.png" />
-                                             </image>
-                                          </ImageView>
+                                          <TextArea fx:id="TMaledizione" editable="false" layoutX="214.0" layoutY="805.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" ></TextArea>
+                                          <ImageView fx:id="CScudo" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="1018.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="330.0" layoutY="1018.0" text="Scudo">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="1056.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Carta che permette di evitare il colpo di un &#10;avversario.&#10;All'interno di un mazzo sono presenti 12 copie&#10;Non possiede alcun seme.&#10;" />
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="1269.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CardsImages/Ologramma.png" />
-                                             </image>
-                                          </ImageView>
+                                          <TextArea fx:id="TScudo" editable="false" layoutX="214.0" layoutY="1056.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" ></TextArea>
+                                          <ImageView fx:id="COlogramma" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="1269.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="295.0" layoutY="1269.0" text="Ologramma">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="1307.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Carta che funge da scudo se la carta estratta &#10;è dello stesso seme del personaggio.&#10;All'interno di un mazzo sono presenti 5 copie.&#10;Fa parte del seme Star Wars (SW).&#10;" />
+                                          <TextArea fx:id="TOlogramma" editable="false" layoutX="214.0" layoutY="1307.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" />
                                        </children>
                                     </AnchorPane>
                                 </content>
@@ -207,7 +158,7 @@
                            </children></AnchorPane>
                   </content>
                   </Tab>
-                  <Tab text="Carte evento">
+                  <Tab text="Carte evento" fx:id="tabEvento">
                       <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="254.0" prefWidth="513.0">
                            <children>
@@ -215,7 +166,7 @@
                                 <content>
                                   <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="552.0" style="-fx-background-color: white;">
                                        <children>
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+                                          <ImageView fx:id="CFurto" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
                                                 <Image url="@CardsImages/FurtoDiIdentità.png" />
                                              </image>
@@ -225,11 +176,11 @@
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="52.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Carta che permette di scambiare il &#10;personaggio con quello di un altro giocatore.&#10;All'interno di un mazzo sono presenti 5 copie&#10;Non possiede alcun seme.&#10;">
+                                          <TextArea fx:id="TFurto" editable="false" layoutX="214.0" layoutY="52.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Carta che permette di scambiare il &#10;personaggio con quello di un altro giocatore.&#10;All'interno di un mazzo sono presenti 5 copie&#10;Non possiede alcun seme.&#10;">
                                              <font>
                                                 <Font size="13.0" />
                                              </font></TextArea>
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="265.0" pickOnBounds="true" preserveRatio="true">
+                                          <ImageView fx:id="CGiorno" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="265.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
                                                 <Image url="@CardsImages/GiornoDelGiudizio.png" />
                                              </image>
@@ -239,8 +190,8 @@
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="303.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Carta che permette di eliminare un giocatore &#10;a scelta.&#10;All'interno di un mazzo sono presenti 5 copie&#10;Non possiede alcun seme.&#10;" />
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="516.0" pickOnBounds="true" preserveRatio="true">
+                                          <TextArea fx:id="TGiorno" editable="false" layoutX="214.0" layoutY="303.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Carta che permette di eliminare un giocatore &#10;a scelta.&#10;All'interno di un mazzo sono presenti 5 copie&#10;Non possiede alcun seme.&#10;" />
+                                          <ImageView fx:id="CMiracolo" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="516.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
                                                 <Image url="@CardsImages/Miracolo.png" />
                                              </image>
@@ -250,7 +201,7 @@
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="554.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Carta che permette recupera tutti i punti vita&#10;persi.&#10;All'interno di un mazzo sono presenti 5 copie&#10;Non possiede alcun seme." />
+                                          <TextArea fx:id="TMiracolo" editable="false" layoutX="214.0" layoutY="554.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Carta che permette recupera tutti i punti vita&#10;persi.&#10;All'interno di un mazzo sono presenti 5 copie&#10;Non possiede alcun seme." />
                                           
                                        </children>
                                     </AnchorPane>
@@ -259,7 +210,7 @@
                            </children></AnchorPane>
                   </content>
                   </Tab>
-                  <Tab text="Armi">
+                  <Tab text="Armi" fx:id="tabArmi">
                      <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="254.0" prefWidth="513.0">
                            <children>
@@ -267,119 +218,76 @@
                                 <content>
                                   <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="552.0" style="-fx-background-color: white;">
                                        <children>
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CardsImages/BacchettaDiSambuco.png" />
-                                             </image>
-                                          </ImageView>
+                                          <ImageView fx:id="CBacchetta" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="240.0" layoutY="14.0" text="Bacchetta di Sambuco">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="52.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Arma che ha una potenza di 15 punti.&#10;All'interno di un mazzo sono presenti 5 copie&#10;Fa parte del seme Harry Potter (HP).&#10;">
-                                             <font>
-                                                <Font size="13.0" />
-                                             </font></TextArea>
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="265.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CardsImages/SpadaLaser.png" />
-                                             </image>
-                                          </ImageView>
+                                          <TextArea fx:id="TBacchetta" editable="false" layoutX="214.0" layoutY="52.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" /> 
+                                          <ImageView fx:id="CSpadaLaser" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="265.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="300.0" layoutY="265.0" text="Spada laser">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="303.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Arma che ha una potenza di 13 punti.&#10;All'interno di un mazzo sono presenti 2 copie&#10;Fa parte del seme Star Wars (SW).&#10;" />
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="516.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CardsImages/SpadaDelRe.png" />
-                                             </image>
-                                          </ImageView>
+                                          <TextArea fx:id="TSpadaLaser" editable="false" layoutX="214.0" layoutY="303.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" />
+                                          <ImageView fx:id="CSpadaRe" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="516.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="295.0" layoutY="516.0" text="Spada del Re">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="554.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Arma che ha una potenza di 12 punti.&#10;All'interno di un mazzo sono presenti 2 copie&#10;Fa parte del seme Signore degli Anelli (SA).&#10;" />
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="767.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CardsImages/SciabolaDelPirata.png" />
-                                             </image>
-                                          </ImageView>
+                                          <TextArea fx:id="TSpadaRe" editable="false" layoutX="214.0" layoutY="554.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" />
+                                          <ImageView fx:id="CSciabola" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="767.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="265.0" layoutY="767.0" text="Sciabola del Pirata">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="805.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Arma che ha una potenza di 10 punti.&#10;All'interno di un mazzo sono presenti 2 copie&#10;Fa parte del seme Pirati dei Caraibi (SA).&#10;" />
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="1018.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CardsImages/Pistola.png" />
-                                             </image>
-                                          </ImageView>
+                                          <TextArea fx:id="TSciabola" editable="false" layoutX="214.0" layoutY="805.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" />
+                                          <ImageView fx:id="CPistola" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="1018.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="330.0" layoutY="1018.0" text="Pistola">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="1056.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Arma che ha una potenza di 5 punti.&#10;All'interno di un mazzo sono presenti 2 copie&#10;Fa parte del seme Pirati dei Caraibi (PC).&#10;" />
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="1269.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CardsImages/Mjolnir.png" />
-                                             </image>
-                                          </ImageView>
+                                          <TextArea fx:id="TPistola" editable="false" layoutX="214.0" layoutY="1056.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" />
+                                          <ImageView fx:id="CMjolnir" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="1269.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="325.0" layoutY="1269.0" text="Mjolnir">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="1307.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Arma che ha una potenza di 14 punti.&#10;All'interno di un mazzo sono presenti 2 copie&#10;Fa parte del seme Marvel (MV).&#10;" />
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="1520.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CardsImages/SpadaComune.png" />
-                                             </image>
-                                          </ImageView>
+                                          <TextArea fx:id="TMjolnir" editable="false" layoutX="214.0" layoutY="1307.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" />
+                                          <ImageView fx:id="CSpadaSemplice" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="1520.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="275.0" layoutY="1520.0" text="Spada semplice">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="1558.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Arma che ha una potenza di 7 punti.&#10;All'interno di un mazzo sono presenti 2 copie&#10;Fa parte del seme Signore degli Anelli (SA).&#10;" />
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="1771.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CardsImages/BacchettaDelPrincipiante.png" />
-                                             </image>
-                                          </ImageView>
+                                          <TextArea fx:id="TSpadaSemplice" editable="false" layoutX="214.0" layoutY="1558.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" />
+                                          <ImageView fx:id="CBacchettaPrinc" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="1771.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="245.0" layoutY="1771.0" text="Bacchetta Principiante">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="1809.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Arma che ha una potenza di 9 punti.&#10;All'interno di un mazzo sono presenti 2 copie&#10;Fa parte del seme Harry Potter (HP).&#10;" />
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="2022.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CardsImages/SpadaLaserOscura.png" />
-                                             </image>
-                                          </ImageView>
+                                          <TextArea fx:id="TBacchettaPrinc" editable="false" layoutX="214.0" layoutY="1809.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" />
+                                          <ImageView fx:id="CSpadaOscura" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="2022.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="295.0" layoutY="2022.0" text="Spada oscura">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="2060.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Arma che ha una potenza di 10 punti.&#10;All'interno di un mazzo sono presenti 2 copie&#10;Fa parte del seme Star Wars (SW).&#10;" />
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="2273.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CardsImages/ScettroDiLoki.png" />
-                                             </image>
-                                          </ImageView>
+                                          <TextArea fx:id="TSpadaOscura" editable="false" layoutX="214.0" layoutY="2060.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" />
+                                          <ImageView fx:id="CScettro" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="2273.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="285.0" layoutY="2273.0" text="Scettro di Loki">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="2311.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Arma che ha una potenza di 8 punti.&#10;All'interno di un mazzo sono presenti 2 copie&#10;Fa parte del seme Marvel (MV).&#10;" />
+                                          <TextArea fx:id="TScettro" editable="false" layoutX="214.0" layoutY="2311.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" />
                                        </children>
                                     </AnchorPane>
                                 </content>
@@ -387,7 +295,7 @@
                            </children></AnchorPane>
                   </content>
                   </Tab>
-                  <Tab text="Personaggi">
+                  <Tab text="Personaggi" fx:id="tabPersonaggi">
                      <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="254.0" prefWidth="513.0">
                            <children>
@@ -395,119 +303,76 @@
                                 <content>
                                   <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="552.0" style="-fx-background-color: white;">
                                        <children>
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CharactersCardsImages/HarryPotterCh.png" />
-                                             </image>
-                                          </ImageView>
+                                          <ImageView fx:id="CHarry" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="300.0" layoutY="14.0" text="Harry Potter">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="52.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Personaggio di Harry Potter.&#10;Posiede 8 punti attacco, 85 punti vita, &#10;6 punti precisione.&#10;Fa parte del seme Harry Potter (HP).&#10;">
-                                             <font>
-                                                <Font size="13.0" />
-                                             </font></TextArea>
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="265.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CharactersCardsImages/VoldemortCh.png" />
-                                             </image>
-                                          </ImageView>
+                                          <TextArea fx:id="THarry" editable="false" layoutX="214.0" layoutY="52.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" />
+                                          <ImageView fx:id="CVoldemort" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="265.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="300.0" layoutY="265.0" text="Voldemort">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="303.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Personaggio di Voldemort.&#10;Posiede 9 punti attacco, 100 punti vita, &#10;7 punti precisione.&#10;Fa parte del seme Harry Potter (HP)." />
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="516.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CharactersCardsImages/DarthVaderCh.png" />
-                                             </image>
-                                          </ImageView>
+                                          <TextArea fx:id="TVoldemort" editable="false" layoutX="214.0" layoutY="303.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" />
+                                          <ImageView fx:id="CDarthVader" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="516.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="300.0" layoutY="516.0" text="Darth Vader">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="554.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Personaggio di Darth Vader.&#10;Posiede 8 punti attacco, 100 punti vita, &#10;8 punti precisione.&#10;Fa parte del seme Star Wars (SW).&#10;" />
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="767.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CharactersCardsImages/YodaCh.png" />
-                                             </image>
-                                          </ImageView>
+                                          <TextArea fx:id="TDarthVader" editable="false" layoutX="214.0" layoutY="554.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" />
+                                          <ImageView fx:id="CYoda" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="767.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="340.0" layoutY="767.0" text="Yoda">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="805.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Personaggio di Yoda.&#10;Posiede 9 punti attacco, 90 punti vita, &#10;8 punti precisione.&#10;Fa parte del seme Star Wars (SW).&#10;" />
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="1018.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CharactersCardsImages/FrodoCh.png" />
-                                             </image>
-                                          </ImageView>
+                                          <TextArea fx:id="TYoda" editable="false" layoutX="214.0" layoutY="805.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;"  />
+                                          <ImageView fx:id="CFrodo" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="1018.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="290.0" layoutY="1018.0" text="Frodo Baggins">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="1056.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Personaggio di Frodo Baggins.&#10;Posiede 5 punti attacco, 80 punti vita, &#10;4 punti precisione.&#10;Fa parte del seme Signori degli Anelli (SA).&#10;" />
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="1269.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CharactersCardsImages/SauronCh.png" />
-                                             </image>
-                                          </ImageView>
+                                          <TextArea fx:id="TFrodo" editable="false" layoutX="214.0" layoutY="1056.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;"  />
+                                          <ImageView fx:id="CSauronp" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="1269.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="330.0" layoutY="1269.0" text="Sauron">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="1307.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Personaggio di Sauron.&#10;Posiede 10 punti attacco, 110 punti vita, &#10;7 punti precisione.&#10;Fa parte del seme Signore degli Anelli (SA).&#10;" />
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="1520.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CharactersCardsImages/ThorCh.png" />
-                                             </image>
-                                          </ImageView>
+                                          <TextArea fx:id="TSauronp" editable="false" layoutX="214.0" layoutY="1307.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" />
+                                          <ImageView fx:id="CThor" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="1520.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="340.0" layoutY="1520.0" text="Thor">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="1558.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Personaggio di Thor.&#10;Posiede 8 punti attacco, 110 punti vita, &#10;7 punti precisione.&#10;Fa parte del seme Marvel (MV).&#10;" />
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="1771.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CharactersCardsImages/ThanosCh.png" />
-                                             </image>
-                                          </ImageView>
+                                          <TextArea fx:id="TThor" editable="false" layoutX="214.0" layoutY="1558.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;"  />
+                                          <ImageView fx:id="CThanos" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="1771.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="320.0" layoutY="1771.0" text="Thanos">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="1809.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Personaggio di Thanos.&#10;Posiede 10 punti attacco, 80 punti vita, &#10;6 punti precisione.&#10;Fa parte del seme Marvel (MV).&#10;" />
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="2022.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CharactersCardsImages/JackSparrowCh.png" />
-                                             </image>
-                                          </ImageView>
+                                          <TextArea fx:id="TThanos" editable="false" layoutX="214.0" layoutY="1809.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;"  />
+                                          <ImageView fx:id="CJack" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="2022.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="295.0" layoutY="2022.0" text="Jack Sparrow">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="2060.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Personaggio di Jack Sparrow.&#10;Posiede 6 punti attacco, 90 punti vita, &#10;9 punti precisione.&#10;Fa parte del seme Pirati dei Caraibi (PC).&#10;" />
-                                          <ImageView fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="2273.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@CharactersCardsImages/DavyJonesCh.png" />
-                                             </image>
-                                          </ImageView>
+                                          <TextArea fx:id="TJack" editable="false" layoutX="214.0" layoutY="2060.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" />
+                                          <ImageView fx:id="CDavy" fitHeight="234.0" fitWidth="168.0" layoutX="14.0" layoutY="2273.0" pickOnBounds="true" preserveRatio="true"></ImageView>
                                           <Label layoutX="300.0" layoutY="2273.0" text="Davy Jones">
                                              <font>
                                                 <Font size="26.0" />
                                              </font>
                                           </Label>
-                                          <TextArea editable="false" layoutX="214.0" layoutY="2311.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;" text="Personaggio di Davy Jones.&#10;Posiede 8 punti attacco, 90 punti vita, &#10;9 punti precisione.&#10;Fa parte del seme Pirati dei Caraibi (PC).&#10;" />
+                                          <TextArea fx:id="TDavy" editable="false" layoutX="214.0" layoutY="2311.0" prefHeight="196.0" prefWidth="305.0" style="-fx-border: none;"  />
                                        </children>
                                     </AnchorPane>
                                 </content>

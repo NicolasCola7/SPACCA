@@ -2,7 +2,7 @@ package cards.events;
 
 import cards.Seed;
 import decks.Deck;
-import game.Player;
+import player.Player;
 
 public class DoomsdayCard extends EventCard{ //elimina un giocatore a scelta
 	private static final long serialVersionUID = 889827892558517459L;

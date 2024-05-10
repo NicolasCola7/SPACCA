@@ -6,7 +6,7 @@ import java.util.Random;
 import cards.Card;
 import cards.Seed;
 import decks.Deck;
-import game.Player;
+import player.Player;
 
 public class BoardingCard extends ActionCard{ //permette di rubare una carta casuale dalla mano dell'avversario
 

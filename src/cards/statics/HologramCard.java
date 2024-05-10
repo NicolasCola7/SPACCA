@@ -2,7 +2,7 @@ package cards.statics;
 
 import cards.Seed;
 import decks.Deck;
-import game.Player;
+import player.Player;
 
 public class HologramCard extends StaticCard {
 	private static final long serialVersionUID = 3524309103914460998L;

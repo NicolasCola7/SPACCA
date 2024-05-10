@@ -1,7 +1,7 @@
 package cards.statics;
 
 import cards.Seed;
-import game.Player;
+import player.Player;
 
 public class BlackWidowsPoisonCard extends StaticCard { //se nella board, quando si viene attaccati l'attaccante subisce danni
 	

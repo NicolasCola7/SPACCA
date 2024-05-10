@@ -1,6 +1,6 @@
 package cards.statics;
 import cards.Seed;
-import game.Player;
+import player.Player;
 
 public class RingCard extends StaticCard{
 

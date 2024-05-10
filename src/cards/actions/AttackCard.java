@@ -5,9 +5,9 @@ import cards.statics.BlackWidowsPoisonCard;
 import cards.statics.EnchantedMirrorCard;
 import cards.statics.HologramCard;
 import decks.Deck;
-import game.Bot;
 import game.InformationAlert;
-import game.Player;
+import player.Bot;
+import player.Player;
 
 public class AttackCard extends ActionCard{
 	
