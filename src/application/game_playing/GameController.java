@@ -1,4 +1,4 @@
-package application;
+package application.game_playing;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,10 +19,14 @@ import cards.WeaponCard;
 import cards.statics.StaticCard;
 import game.ClassicGame;
 import game.Game;
+import game.InformationAlert;
+import game.Tournament;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -33,6 +37,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableView;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Alert.AlertType;
@@ -43,8 +48,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+import leaderboard.LeaderboardData;
+import player.Bot;
+import player.Player;
 
-public class GameController {
+public abstract class GameController implements GameControllerInterface{
 	protected String gameCode;
 	protected String  adminUsername;
 
@@ -57,6 +66,7 @@ public class GameController {
 	protected Clip cardSound;
 	
 	protected Stage primaryStage;
+	
 	
 	@FXML protected ScrollPane cardsScroller;
 	@FXML protected Label playerUsernameLabel;
@@ -71,12 +81,40 @@ public class GameController {
 	@FXML protected HBox cardsBox;
 	@FXML protected VBox infoBox;
 	@FXML protected VBox gameButtonsBox;
+	@FXML protected VBox nameTurnBox;
 	@FXML protected HBox playersBox;
 	@FXML protected MenuButton menu;
 	@FXML protected Pane deckPane;
 	@FXML protected Pane latestPlayedCardPane;
 	@FXML protected AnchorPane backGround;
 	@FXML protected ToggleButton volumeButton;
+	
+	
+	public abstract void initializeCardsBox(int currentPlayer);
+	public abstract void initializePlayersBox();
+	public abstract void setBindings();
+	public abstract void seeEquipedWeapon(ActionEvent event) throws IOException;
+	public abstract void seeCharacterInfos(ActionEvent event) throws IOException;
+	public abstract void seeBoard(ActionEvent event) throws IOException;
+	public abstract void drawCard(ActionEvent event) throws IOException;
+	public abstract  void discardCard(ActionEvent event)throws IOException;;
+	public abstract void submitCard(ActionEvent event)throws IOException;;
+	public abstract void submitPlayer(ActionEvent event)throws IOException;;
+	public abstract void useBotRoutine();
+	public  abstract void checkCurrentPlayerElimination(int targetPlayer);
+	public abstract void checkConcurrentElimination() ;
+	public abstract void updateCurrentPlayer(int currentPlayer);
+	public abstract void serialize(String filename);
+	public abstract void closeWindowEvent(WindowEvent event)throws IOException;;
+	public abstract TableView<LeaderboardData> getLeaderboard();
+	public abstract void save(ActionEvent event) throws IOException;
+	public abstract void quit(ActionEvent event)throws IOException;
+	public abstract void saveAndQuit(ActionEvent event)throws IOException;;
+	public abstract void showLeaderboard(ActionEvent event) throws IOException;
+	public abstract  ObservableList<LeaderboardData> getDataFromLeaderboardFile();
+	public abstract void getCharacterInfos(int player);
+	
+	
 	
 	//setting game code to initialize classic game
 	public void setGameCode(String code) { 
@@ -115,7 +153,7 @@ public class GameController {
 	private void setMenuButtonStyle() {
 	   menu.setLayoutX(primaryStage.getX());
        menu.setLayoutY(primaryStage.getY()+20);
-       ImageView menuImg=new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Menu1.png")));
+       ImageView menuImg=new ImageView(new Image(getClass().getResourceAsStream("./GameButtonsImages/Menu1.png")));
        menuImg.setFitWidth(menu.getPrefWidth()); 
        menuImg.setFitHeight(menu.getPrefHeight());
        menu.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -150,6 +188,7 @@ public class GameController {
 	}		
 	   
 	protected void setCardImage(ToggleButton btn) {
+		
        Image icon = new Image(getClass().getResourceAsStream("./CardsImages/"+btn.getText().replaceAll("\\s+", "")+".png"));
        ImageView iconView = new ImageView(icon);
        iconView.setFitWidth(btn.getPrefWidth()); 
@@ -203,7 +242,11 @@ public class GameController {
       
        AnchorPane.setTopAnchor(deckPane, (primaryStage.getHeight() - deckPane.getPrefHeight()) / 4);
        AnchorPane.setLeftAnchor(deckPane, (primaryStage.getWidth() - deckPane.getPrefWidth())/4);
-      
+       
+       nameTurnBox.setLayoutY(primaryStage.getY()+20);
+       nameTurnBox.setLayoutX(gameButtonsBox.getLayoutX()-150);
+      // nameTurnBox.setAlignment(Pos.TOP_RIGHT);
+       
        ImageView deckImg=new ImageView(new Image(getClass().getResourceAsStream("./CardsImages/Deck.png")));
        deckImg.setFitHeight(300);
        deckImg.setFitWidth(270);
@@ -238,47 +281,47 @@ public class GameController {
    }	
    
 	 private void setButtonImages() {
-		 ImageView chButtonImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Character.png")));
+		 ImageView chButtonImg= new ImageView(new Image(getClass().getResourceAsStream("./GameButtonsImages/Character.png")));
 		 chButtonImg.setFitWidth(50);
 		 chButtonImg.setFitHeight(50);
 		 characterInfosButton.setGraphic(chButtonImg);
 		 
-		 ImageView equipedWeaponImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Weapon3.png")));
+		 ImageView equipedWeaponImg= new ImageView(new Image(getClass().getResourceAsStream("./GameButtonsImages/Weapon3.png")));
 		 equipedWeaponImg.setFitWidth(50);
 		 equipedWeaponImg.setFitHeight(50);
 		 equipedWeaponButton.setGraphic(equipedWeaponImg);
 		 
-		 ImageView boardImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/Board.png")));
+		 ImageView boardImg= new ImageView(new Image(getClass().getResourceAsStream("./GameButtonsImages/Board.png")));
 		 boardImg.setFitWidth(50);
 		 boardImg.setFitHeight(50);
 		 boardInfosButton.setGraphic(boardImg);
 		
-		 ImageView discardImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/DiscardCard.png")));
+		 ImageView discardImg= new ImageView(new Image(getClass().getResourceAsStream("./GameButtonsImages/DiscardCard.png")));
 		 discardImg.setFitWidth(50);
 		 discardImg.setFitHeight(50);
 		 discardCardButton.setGraphic(discardImg);
 		 
-		 ImageView drawImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/DrawCard.png")));
+		 ImageView drawImg= new ImageView(new Image(getClass().getResourceAsStream("./GameButtonsImages/DrawCard.png")));
 		 drawImg.setFitWidth(50);
 		 drawImg.setFitHeight(50);
 		 drawCardButton.setGraphic(drawImg);
 		 
-		 ImageView submitImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/PlayCard.png")));
+		 ImageView submitImg= new ImageView(new Image(getClass().getResourceAsStream("./GameButtonsImages/PlayCard.png")));
 		 submitImg.setFitWidth(50);
 		 submitImg.setFitHeight(50);
 		 submitCardButton.setGraphic(submitImg);
 		 
-		 ImageView nextPlayerImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/NextPlayer.png")));
+		 ImageView nextPlayerImg= new ImageView(new Image(getClass().getResourceAsStream("./GameButtonsImages/NextPlayer.png")));
 		 nextPlayerImg.setFitWidth(50);
 		 nextPlayerImg.setFitHeight(50);
 		 submitPlayerButton.setGraphic(nextPlayerImg);
 		 
 		 volumeButton.setLayoutX(menu.getLayoutX()+60);
 		 volumeButton.setLayoutY(menu.getLayoutY()-10);
-		 ImageView volumeOnImage = new ImageView(new Image("./application/ButtonImages/VolumeOn.png"));
+		 ImageView volumeOnImage = new ImageView(new Image(getClass().getResourceAsStream("./GameButtonsImages/VolumeOn.png")));
 		 volumeOnImage.setFitWidth(35);
 		 volumeOnImage.setFitHeight(35);
-		 ImageView volumeOffImage = new ImageView(new Image("./application/ButtonImages/VolumeOff.png"));
+		 ImageView volumeOffImage = new ImageView(new Image(getClass().getResourceAsStream("./GameButtonsImages/VolumeOff.png")));
 		 volumeOffImage.setFitWidth(35);
 		 volumeOffImage.setFitHeight(35);
 		 volumeButton.setGraphic(volumeOnImage);
@@ -308,7 +351,7 @@ public class GameController {
 		alert.setHeaderText(null);
 		alert.setGraphic(null);
 		alert.getDialogPane().getStyleClass().add("game-alert");
-		alert.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
+		alert.getDialogPane().getScene().getStylesheets().add("./application/game_playing/GameAlertStyle.css");
 		alert.getButtonTypes().remove(ButtonType.OK);
 		alert.getButtonTypes().add(ButtonType.CLOSE);
 		
@@ -336,7 +379,7 @@ public class GameController {
 		alert.setHeaderText(null);
 		alert.setGraphic(null);
 		alert.getDialogPane().getStyleClass().add("game-alert");
-		alert.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
+		alert.getDialogPane().getScene().getStylesheets().add("./application/game_playing/GameAlertStyle.css");
 		alert.getButtonTypes().remove(ButtonType.OK);
 		alert.getButtonTypes().add(ButtonType.CLOSE);
 		

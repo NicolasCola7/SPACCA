@@ -46,11 +46,12 @@ public class LoginAdminController implements Initializable{
 		stage.setScene(scene);
 		stage.show();
 	}
+	
 	public void login(ActionEvent event) throws IOException {
 		try {
-			Scanner scf = new Scanner(new File("./Files/ConfigurationFiles/Login.csv"));
-	        while (scf.hasNextLine()) {
-	        	String[] line= scf.nextLine().split(",");
+			Scanner scan = new Scanner(new File("./Files/ConfigurationFiles/Login.csv"));
+	        while (scan.hasNextLine()) {
+	        	String[] line= scan.nextLine().split(",");
 	        	if(line[0].equals(adminUsername.getText()) && line[1].equals(psw.getText())) {
 	        		String username=adminUsername.getText();
 	        		PrintWriter actualAdmin=new PrintWriter("./Files/ConfigurationFiles/AdminAttuale.csv");
@@ -65,11 +66,14 @@ public class LoginAdminController implements Initializable{
 	        	else
 	        		errorMsg.setVisible(true);	
 	        }
+	    	scan.close();
 		}
+	
 		catch(FileNotFoundException e) {
-			System.out.println("File not found");
+			System.out.println("File 'Login.csv' not found");
 		}
 	}
+	
 	public void signup(ActionEvent event) throws IOException {
 		root = FXMLLoader.load(getClass().getResource("AdminSignup.fxml"));
 		stage=(Stage)((Node)event.getSource()).getScene().getWindow();

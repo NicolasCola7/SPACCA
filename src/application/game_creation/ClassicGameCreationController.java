@@ -1,5 +1,5 @@
 
-package application;
+package application.game_creation;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -37,22 +37,12 @@ import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import leaderboard.Leaderboard;
 
-public class ClassicGameCreationController implements Initializable {
-	private Scene scene;
-	private Stage stage;
-	private Parent root;
-	@FXML private ListView<String> playersSelection;
+public class ClassicGameCreationController extends GameCreationController implements Initializable {
+	
+	
 	@FXML private ChoiceBox<Integer> numberOfPlayerSelection;
-	@FXML private CheckBox botCheck;
-	@FXML private TextField gameCode;
-	@FXML private Button confirmButton;
-	@FXML private Button homeButton;
-	@FXML private Button backButton;
-	private ArrayList<String> players;
-	private String adminUsername;
-	private File playersList;
 	private int numberOfPlayers;
-	private ArrayList<String> gamePlayers;
+	
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
@@ -66,7 +56,6 @@ public class ClassicGameCreationController implements Initializable {
 				numberOfPlayerSelection.valueProperty().isNull().or(
 				playersSelection.getSelectionModel().selectedItemProperty().isNull())));
 	
-		
 	}
 	
 	public void goToHome(ActionEvent event) throws IOException {
@@ -75,15 +64,16 @@ public class ClassicGameCreationController implements Initializable {
 		alert.setHeaderText("Stai per effettuare il logout!");
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
-			root = FXMLLoader.load(getClass().getResource("home.fxml"));
+			root = FXMLLoader.load(new File("src/application/home.fxml").toURI().toURL());
 			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 			scene=new Scene(root);
 			stage.setScene(scene);
 			stage.show();
 		}
 	}
+	
 	public void back(ActionEvent event) throws IOException {
-		root = FXMLLoader.load(getClass().getResource("Admin.fxml"));
+		root = FXMLLoader.load((new File("src/application/Admin.fxml").toURI().toURL()));
 		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 		scene=new Scene(root);
 		stage.setScene(scene);
@@ -98,13 +88,12 @@ public class ClassicGameCreationController implements Initializable {
 			for(int i=gamePlayers.size();i< numberOfPlayers;i++)
 				gamePlayers.add(i,"bot"+i);
 				addToGamesDatasFile();
-				
 				Alert alert=new Alert(AlertType.CONFIRMATION);
 				alert.setTitle("Attenzione!");
 				alert.setHeaderText("Partita creata correttamente:");
 				alert.setContentText("Vuoi tornare alla home?");
 				if(alert.showAndWait().get()==ButtonType.OK) {
-					root = FXMLLoader.load(getClass().getResource("home.fxml"));
+					root = FXMLLoader.load(new File("src/application/home.fxml").toURI().toURL());
 					stage=(Stage)((Node)e.getSource()).getScene().getWindow();
 					scene=new Scene(root);
 					stage.setScene(scene);
@@ -128,60 +117,8 @@ public class ClassicGameCreationController implements Initializable {
 			gameCode.clear();
 		}
 	}
-	private void getCurrentAdmin() {	
-		try {
-			Scanner scan = new Scanner(new File("./Files/ConfigurationFiles/AdminAttuale.csv"));
-			  while (scan.hasNextLine()) {
-		        	String line=scan.nextLine();
-		        	adminUsername=line;
-		        }
-			  scan.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-	private void populatePlayersList() {
-		players=new ArrayList<String>();
-		playersList=new File("./Files/ConfigurationFiles/"+adminUsername+"ListaGiocatori.csv");
-	
-		try {
-			Scanner scan = new Scanner(playersList);
-			while(scan.hasNextLine()) {
-				players.add(scan.nextLine());
-			}
-			scan.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		
-		playersSelection.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-		playersSelection.getItems().addAll(players);
-	}
-	
-	private boolean gameCodeCheck(String code){
-		boolean check=true;
-		File file=new File("./Files/ConfigurationFiles/GamesDatas.csv");
-		
-		if(file.length()!=0) {
-			try {
-				Scanner scan=new Scanner(file);
-				while(scan.hasNextLine()) {
-					String[] gameInfos=scan.nextLine().split(",");
-					if(gameInfos[2].equals(code)) {
-						check=false;
-						break;
-					}
-					else
-						check=true;
-				}
-				scan.close();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
-		return check;
-	}
-	private void addToGamesDatasFile() {
+
+	public void addToGamesDatasFile() {
 		try {
 			FileWriter writer = new FileWriter(new File("./Files/ConfigurationFiles/GamesDatas.csv"),true);
 			PrintWriter pw=new PrintWriter(writer);

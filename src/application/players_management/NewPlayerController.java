@@ -1,4 +1,4 @@
-package application;
+package application.players_management;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -56,7 +56,7 @@ public class NewPlayerController implements Initializable {
 		alert.setHeaderText("Stai per effettuare il logout!");
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
-			root = FXMLLoader.load(getClass().getResource("home.fxml"));
+			root = FXMLLoader.load((new File("src/application/home.fxml").toURI().toURL()));
 			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 			scene=new Scene(root);
 			stage.setScene(scene);
@@ -64,7 +64,7 @@ public class NewPlayerController implements Initializable {
 		}
 	}
 	public void back(ActionEvent event) throws IOException {
-		root = FXMLLoader.load(getClass().getResource("Admin.fxml"));
+		root = FXMLLoader.load((new File("src/application/Admin.fxml").toURI().toURL()));
 		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 		scene=new Scene(root);
 		stage.setScene(scene);
@@ -96,6 +96,7 @@ public class NewPlayerController implements Initializable {
 				playerUsername.clear();
         	}
 	}
+	
 	private void addToPlayersList() {
 		try {
 			FileWriter fw = new FileWriter(playersList, true);
@@ -103,9 +104,10 @@ public class NewPlayerController implements Initializable {
 			pw.println(playerUsername.getText());
 			pw.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("File '" + adminUsername + "ListaGiocatori.csv" + "' not found");
 		}
 	}
+	
 	private void getCurrentAdmin() {	
 		try {
 			Scanner scan = new Scanner(new File("./Files/ConfigurationFiles/AdminAttuale.csv"));
@@ -114,9 +116,10 @@ public class NewPlayerController implements Initializable {
 		        	adminUsername=line;
 		        }
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			System.out.println("File 'AdminAttuale' not found");
 		}
 	}
+	
 	private void addToClassicGamesLeaderboard(String player) {
 		File leaderboard=new File("./Files/ConfigurationFiles/"+adminUsername+"ClassicGamesLeaderboard.csv");
 		try {
@@ -125,9 +128,10 @@ public class NewPlayerController implements Initializable {
 			pw.println(player+","+0);
 			pw.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("File '" + adminUsername + "ClassicGamesLeaderboard.csv" + "' not found");
 		}
 	}
+	
 	private void addToTournamentsLeaderboard(String player) {
 		File leaderboard=new File("./Files/ConfigurationFiles/"+adminUsername+"TournamentsLeaderboard.csv");
 		try {
@@ -136,7 +140,7 @@ public class NewPlayerController implements Initializable {
 			pw.println(player+","+0);
 			pw.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("File '" + adminUsername + "TournamentsLeaderboard.csv" + "' not found");
 		}
 	}
 }

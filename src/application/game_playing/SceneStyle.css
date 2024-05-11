@@ -1,5 +1,5 @@
 .root{
-    -fx-background-image: url("../application/BackgroundImage/BackGround.jpg");
+    -fx-background-image: url("BackGround.jpg");
     -fx-background-size:cover;
 }
 
@@ -46,7 +46,7 @@
     -fx-background-color: orange;
 }
 
-.button-container > .label{
+.name-turn-container > .label{
 	-fx-background-color:white;
 	-fx-border-color:black;
 }

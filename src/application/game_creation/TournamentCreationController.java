@@ -1,4 +1,4 @@
-package application;
+package application.game_creation;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -33,22 +33,9 @@ import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import leaderboard.Leaderboard;
 
-public class TournamentCreationController implements Initializable{
-	private Scene scene;
-	private Stage stage;
-	private Parent root;
-	@FXML private ListView<String> playersSelection;
-	@FXML private CheckBox botCheck;
-	@FXML private TextField gameCode;
-	@FXML private Button confirmButton;
-	@FXML private Button homeButton;
-	@FXML private Button backButton;
-	private ArrayList<String> players;
-	private String adminUsername;
-	private File playersList;
+public class TournamentCreationController extends GameCreationController implements Initializable  {
+
 	private final int numberOfPlayers=8;
-	private ArrayList<String> gamePlayers;
-	
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
@@ -69,7 +56,7 @@ public class TournamentCreationController implements Initializable{
 		alert.setHeaderText("Stai per effettuare il logout!");
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
-			root = FXMLLoader.load(getClass().getResource("home.fxml"));
+			root = FXMLLoader.load(new File("src/application/home.fxml").toURI().toURL());
 			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 			scene=new Scene(root);
 			stage.setScene(scene);
@@ -78,7 +65,7 @@ public class TournamentCreationController implements Initializable{
 	}
 	
 	public void back(ActionEvent event) throws IOException {
-		root = FXMLLoader.load(getClass().getResource("Admin.fxml"));
+		root = FXMLLoader.load(new File("src/application/Admin.fxml").toURI().toURL());
 		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 		scene=new Scene(root);
 		stage.setScene(scene);
@@ -86,7 +73,7 @@ public class TournamentCreationController implements Initializable{
 	}
 	
 	public void confirm(ActionEvent e) throws IOException  {
-		gamePlayers=new ArrayList<String>( numberOfPlayers);
+		gamePlayers=new ArrayList<String>(numberOfPlayers);
 		gamePlayers.addAll(playersSelection.getSelectionModel().getSelectedItems());
 		
 		if(((botCheck.isSelected() && gamePlayers.size()!= numberOfPlayers) || (!botCheck.isSelected() && gamePlayers.size()== numberOfPlayers)) && gameCodeCheck(gameCode.getText())) {
@@ -101,7 +88,7 @@ public class TournamentCreationController implements Initializable{
 			alert.setHeaderText("Torneo creato correttamente:");
 			alert.setContentText("Vuoi tornare alla home?");
 			if(alert.showAndWait().get()==ButtonType.OK) {
-				root = FXMLLoader.load(getClass().getResource("home.fxml"));
+				root = FXMLLoader.load(new File("src/application/home.fxml").toURI().toURL());
 				stage=(Stage)((Node)e.getSource()).getScene().getWindow();
 				scene=new Scene(root);
 				stage.setScene(scene);
@@ -126,59 +113,7 @@ public class TournamentCreationController implements Initializable{
 		}
 	}
 	
-	private void getCurrentAdmin() {	
-		try {
-			Scanner scan = new Scanner(new File("./Files/ConfigurationFiles/AdminAttuale.csv"));
-			  while (scan.hasNextLine()) {
-		        	String line=scan.nextLine();
-		        	adminUsername=line;
-		        }
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private void populatePlayersList() {
-		players=new ArrayList<String>();
-		playersList=new File("./Files/ConfigurationFiles/"+adminUsername+"ListaGiocatori.csv");
-	
-		try {
-			Scanner scan = new Scanner(playersList);
-			while(scan.hasNextLine()) {
-				players.add(scan.nextLine());
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		playersSelection.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-		playersSelection.getItems().addAll(players);
-	}
-	
-	private boolean gameCodeCheck(String code) {
-		boolean check=false;
-		File file=new File("./Files/ConfigurationFiles/GamesDatas.csv");
-		
-		if(file.length()!=0) {
-			try {
-				Scanner scan=new Scanner(file);
-				while(scan.hasNextLine()) {
-					String[] gameInfos=scan.nextLine().split(",");
-					if(gameInfos[2].equals(code)) {
-						check=false;
-						break;
-					}
-					else
-						check=true;
-				}
-				scan.close();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
-		return check;
-	}
-	
-	private void addToGamesDatasFile()  {
+	public void addToGamesDatasFile()  {
 		try {
 			FileWriter writer = new FileWriter(new File("./Files/ConfigurationFiles/GamesDatas.csv"),true);
 			PrintWriter pw=new PrintWriter(writer);

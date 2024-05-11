@@ -1,4 +1,4 @@
-package application;
+package application.players_management;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -67,7 +67,7 @@ public class EditExistingController implements Initializable {
 		alert.setHeaderText("Stai per effettuare il logout!");
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
-			root = FXMLLoader.load(getClass().getResource("home.fxml"));
+			root = FXMLLoader.load((new File("src/application/home.fxml").toURI().toURL()));
 			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 			scene=new Scene(root);
 			stage.setScene(scene);
@@ -75,7 +75,7 @@ public class EditExistingController implements Initializable {
 		}
 	}
 	public void back(ActionEvent event) throws IOException {
-		root = FXMLLoader.load(getClass().getResource("Admin.fxml"));
+		root = FXMLLoader.load((new File("src/application/Admin.fxml").toURI().toURL()));
 		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 		scene=new Scene(root);
 		stage.setScene(scene);
@@ -120,6 +120,7 @@ public class EditExistingController implements Initializable {
         	newPlayerName.clear();
         }
 	}
+	
 	 private void updatePlayersList() {
         try {
         	PrintWriter pw=new PrintWriter(playersList);
@@ -128,9 +129,10 @@ public class EditExistingController implements Initializable {
             }
         	pw.close();
         } catch (IOException e) {
-            e.printStackTrace();
+        	System.out.println("File '" + adminUsername + "ListaGiocatori.csv' not foud");
         }
     }
+	 
 	private void getCurrentAdmin() {	
 		try {
 			Scanner scan = new Scanner(new File("./Files/ConfigurationFiles/AdminAttuale.csv"));
@@ -139,9 +141,10 @@ public class EditExistingController implements Initializable {
 		        	adminUsername=line;
 		        }
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			System.out.println("File 'AdminAttuale.csv' not found");
 		}
 	}
+	
 	private void getPlayersNames() {
 		players=new ArrayList<String>();
 		playersList=new File("./Files/ConfigurationFiles/"+adminUsername+"ListaGiocatori.csv");
@@ -150,8 +153,9 @@ public class EditExistingController implements Initializable {
 			while(scan.hasNextLine()) {
 				players.add(scan.nextLine());
 			}
+			scan.close();
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			System.out.println("File '" + adminUsername + "ListaGiocatori.csv' not foud");
 		}
 	}
 	

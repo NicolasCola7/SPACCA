@@ -68,6 +68,7 @@ public class SuspendedGamesController implements Initializable{
 		stage.setScene(scene);
 		stage.show();
 	}
+	
 	public void deleteGame(ActionEvent event) throws IOException {
 		String deletedGame=gameSelection.getSelectionModel().getSelectedItem();
 		deleteGameFromGamesDatasFile( deletedGame);
@@ -75,6 +76,7 @@ public class SuspendedGamesController implements Initializable{
 		gameSelection.getItems().remove(deletedGame);
 		gameSelection.getSelectionModel().clearSelection();
 	}
+	
 	private void getCurrentAdmin() {	
 		try {
 			Scanner scan = new Scanner(new File("./Files/ConfigurationFiles/AdminAttuale.csv"));
@@ -86,6 +88,7 @@ public class SuspendedGamesController implements Initializable{
 			e.printStackTrace();
 		}
 	}
+	
 	private void populateAdminGamesList() {
 		gamesList=new File("./Files/ConfigurationFiles/GamesDatas.csv");
 		adminGamesList=new ArrayList<String>();
@@ -102,6 +105,7 @@ public class SuspendedGamesController implements Initializable{
 		}
 		gameSelection.getItems().addAll(adminGamesList);
 	}
+	
 	private void deleteGameFromGamesDatasFile(String game) {
 	   ArrayList<String> datas=new ArrayList<String>();
 	   try {
@@ -120,6 +124,7 @@ public class SuspendedGamesController implements Initializable{
 		   e.printStackTrace();
 	   }
 	}
+	
 	private void deleteSerializationFile(String game) {
 	   String[] splittedLine=game.split(",");
 	   String gameCode=splittedLine[2];

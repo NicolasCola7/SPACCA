@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane fx:id="backGround" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" prefHeight="627.0" prefWidth="601.0" stylesheets="@SceneStyle.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.TournamentController">
+<AnchorPane fx:id="backGround" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" prefHeight="627.0" prefWidth="601.0" stylesheets="@game_playing/SceneStyle.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.game_playing.TournamentController">
    <children>
       <MenuButton fx:id="menu" layoutX="14.0" layoutY="14.0" maxHeight="30.0" maxWidth="40.0" minHeight="30.0" minWidth="40.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="40.0" text="Menu">
          <items>
@@ -28,8 +28,6 @@
             <Button fx:id="characterInfosButton" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" onAction="#seeCharacterInfos" prefHeight="50.0" prefWidth="100.0" text="Personaggio" />
             <Button fx:id="equipedWeaponButton" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" onAction="#seeEquipedWeapon" prefHeight="50.0" prefWidth="100.0" text="Arma" />
             <Button fx:id="boardInfosButton" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" onAction="#seeBoard" prefHeight="50.0" prefWidth="100.0" text="Board" />
-            <Label fx:id="playerUsernameLabel" prefHeight="25.0" prefWidth="100.0" text="Username:" />
-            <Label fx:id="turnLabel" prefHeight="25.0" prefWidth="99.0" text="Turno:" />
          </children>
       </VBox>
       <VBox fx:id="gameButtonsBox" layoutX="524.0" layoutY="166.0" prefHeight="200.0" prefWidth="74.0" styleClass="button-container">
@@ -53,5 +51,11 @@
       <Pane fx:id="deckPane" layoutX="139.0" layoutY="135.0" prefHeight="200.0" prefWidth="200.0" />
       <Pane fx:id="latestPlayedCardPane" layoutX="317.0" layoutY="166.0" prefHeight="200.0" prefWidth="200.0" />
       <ToggleButton fx:id="volumeButton" contentDisplay="GRAPHIC_ONLY" layoutX="54.0" layoutY="7.0" mnemonicParsing="false" styleClass="volume-button" text="ToggleButton" />
+      <VBox fx:id="nameTurnBox" alignment="CENTER_RIGHT" layoutX="787.0" layoutY="21.0" prefHeight="50.0" prefWidth="200.0" styleClass="name-turn-container">
+         <children>
+            <Label fx:id="playerUsernameLabel" prefHeight="25.0" prefWidth="205.0" text="Username:" />
+            <Label fx:id="turnLabel" alignment="CENTER" prefHeight="25.0" prefWidth="85.0" text="Turno:" />
+         </children>
+      </VBox>
    </children>
 </AnchorPane>

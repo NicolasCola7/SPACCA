@@ -5,6 +5,7 @@ import java.io.IOException;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
@@ -24,23 +25,19 @@ public class HomeController {
 	private Scene scene;
 	private Stage stage;
 	private Parent root;
-	@FXML
-    private AnchorPane pane;
+	@FXML private AnchorPane pane;
 
-    @FXML
-    private ImageView logo;
+    @FXML  private ImageView logo;
 
-    @FXML
-    private Button playButton;
+    @FXML private Button playButton;
 
-    @FXML
-    private Button adminButton;
+    @FXML private Button adminButton;
 
-    @FXML
-    private Button rulesButton;
+    @FXML  private Button rulesButton;
     
     
     public void initialize() {
+  
         // Definisci le proprietà iniziali e finali per l'animazione del logo
         KeyValue logoInitialTranslateY = new KeyValue(logo.translateYProperty(), -100);
         KeyValue logoFinalTranslateY = new KeyValue(logo.translateYProperty(), 0);

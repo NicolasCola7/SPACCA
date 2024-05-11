@@ -1,4 +1,4 @@
-package application;
+package application.game_playing;
 import cards.*;
 import cards.actions.ActionCard;
 import cards.actions.AttackCard;
@@ -139,7 +139,7 @@ public class TournamentController extends GameController implements Initializabl
 		
 	}
 	
-	private void initializeCardsBox(int currentPlayer) {// inizializza la UI del giocatore corrente
+	public void initializeCardsBox(int currentPlayer) {// inizializza la UI del giocatore corrente
 		currentPlayerHand.clear();
 		turnLabel.setText(tournament.getTurn()+"° turno");
 		playerUsernameLabel.setText("Username:"+tournament.getPlayer(currentPlayer).getUsername());
@@ -174,14 +174,14 @@ public class TournamentController extends GameController implements Initializabl
 		}
 	}
 	
-	private void initializePlayersBox() {
+	public void initializePlayersBox() {
 		Player player=tournament.getPlayer(1-currentPlayer);
 		Character ch=player.getCharacter();
 		HBox playerBox=new HBox(1);
 		playerBox.setStyle("-fx-border-width:3;-fx-border-color:orange;");
 		playerBox.prefWidthProperty().bind(playersBox.prefWidthProperty());
 		
-		ImageView chImage=new ImageView(new Image(getClass().getResourceAsStream("./application/CharactersImages/"+ch.getName()+".png")));
+		ImageView chImage=new ImageView(new Image(getClass().getResourceAsStream("./CharactersImages/"+ch.getName()+".png")));
 		chImage.setFitHeight(playersBox.getPrefHeight());
 		chImage.setFitWidth(80);
 		
@@ -194,7 +194,7 @@ public class TournamentController extends GameController implements Initializabl
 		moreInfos.setPrefHeight(playersBox.getPrefHeight());
 		moreInfos.setPrefWidth(50);
 		
-		ImageView infoImg=new ImageView(new Image(getClass().getResourceAsStream("./application/ButtonImages/Info.png")));
+		ImageView infoImg=new ImageView(new Image(getClass().getResourceAsStream("./GameButtonsImages/Info.png")));
 		infoImg.setFitHeight(50);
 		infoImg.setFitWidth(50);
 		
@@ -207,7 +207,7 @@ public class TournamentController extends GameController implements Initializabl
 		playersBox.getChildren().add(playerBox);
 	}
 	
-	private void setBindings() { // serve a fare in modo che i bottoni vengano disattivati e attivati  in determinate situazioni
+	public void setBindings() { // serve a fare in modo che i bottoni vengano disattivati e attivati  in determinate situazioni
 		SimpleBooleanProperty hasDrawed=tournament.getHasDrawed();
 		SimpleBooleanProperty hasAttacked=tournament.getHasAttacked();
 		SimpleBooleanProperty hasDiscarded=tournament.getHasDiscarded();
@@ -343,7 +343,7 @@ public class TournamentController extends GameController implements Initializabl
 		return check;
 	}
 	
-	private void useBotRoutine() {
+	public void useBotRoutine() {
 		Bot bot =(Bot) tournament.getPlayer(currentPlayer);
 		String botActionsMessage="Il bot ha eseguito le seguenti azioni:\n";
 		//board del bot
@@ -488,7 +488,7 @@ public class TournamentController extends GameController implements Initializabl
 	}
 	
 	//controllo che serve per quando viene eliminato un giocatore che in ordine di giocata è prima del giocatore corrente
-	private void checkElimination() {
+	public void checkElimination() {
 		if(actualGamePlayersNames.size()==1 && currentPlayer==1) {
 			currentPlayer=0;
 			tournament.setCurrentPlayer(currentPlayer);
@@ -496,7 +496,7 @@ public class TournamentController extends GameController implements Initializabl
 	}
 		
 	 // caso in cui l'attaccate venga eliminato dal veleno di vedova nera o specchio o entrambi
-	private void checkCurrentPlayerElimination(int targetPlayer) {
+	public void checkCurrentPlayerElimination(int targetPlayer) {
 		if(tournament.getPlayer(currentPlayer).getCharacter().getCurrentLife()<=0) {
 			String message="";
 			Player target =tournament.getPlayer(targetPlayer);
@@ -524,7 +524,7 @@ public class TournamentController extends GameController implements Initializabl
 	}
 	
 	//caso in cui i due giocatori si eliminino a vicenda	
-	private void checkConcurrentElimination() {
+	public void checkConcurrentElimination() {
 		if(tournament.getActualGamePlayers().size()==0) { 
 			ArrayList<String> latestTwo=tournament.getLatestTwoEliminated();
 			InformationAlert.display("Messaggio informativo", "Vi siete eliminati a vicenda, verrà lanciata una moneta per decretare il vincitore: se esce testa vince "+latestTwo.get(0)+", se esce croce "+latestTwo.get(1));
@@ -543,7 +543,7 @@ public class TournamentController extends GameController implements Initializabl
 		}
 	}
 	
-	private void updateCurrentPlayer(int currentPlayer) {
+	public void updateCurrentPlayer(int currentPlayer) {
 		tournament.setHasAttacked(false);
 		tournament.setHasDiscarded(false);
 		tournament.setHasDrawed(false);
@@ -607,9 +607,15 @@ public class TournamentController extends GameController implements Initializabl
             out.writeObject(tournament);
             out.close();
             fileOut.close();
-            System.out.println("serialized successfully");
+            Alert saveAlert = new Alert(AlertType.INFORMATION);
+            saveAlert.setHeaderText(null);
+            saveAlert.setContentText("Progressi salvati correttamente!");
+            saveAlert.showAndWait();
         } catch (IOException e) {
-            e.printStackTrace();
+        	Alert error = new Alert(AlertType.ERROR);
+        	error.setHeaderText("Si è verificato un errore nel salvataggio:");
+       	 	error.setContentText("Riprova più tardi.");
+       	 	error.showAndWait();
         }
     }
     
@@ -622,10 +628,16 @@ public class TournamentController extends GameController implements Initializabl
             tournament = (Tournament) in.readObject();
             in.close();
             fileIn.close();
-            System.out.println("deserialized successfully");
+            Alert loadingProgressAlert = new Alert(AlertType.INFORMATION);
+            loadingProgressAlert.setHeaderText(null);
+            loadingProgressAlert.setContentText("Progressi caricati correttamente!");
+            loadingProgressAlert.showAndWait();
            
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+        	 Alert error = new Alert(AlertType.ERROR);
+        	 error.setHeaderText("Si è verificato un errore nel caricamento dei dati salvati:");
+        	 error.setContentText("Riprova più tardi.");
+        	 error.showAndWait();
         }
         return tournament;
     }
@@ -636,7 +648,7 @@ public class TournamentController extends GameController implements Initializabl
     }
     
    
-   private void closeWindowEvent(WindowEvent event) {
+   public void closeWindowEvent(WindowEvent event) {
 	   if(!tournament.isTournamentGameOver()) {
 		   Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		   alert.getButtonTypes().remove(ButtonType.OK);
@@ -651,7 +663,7 @@ public class TournamentController extends GameController implements Initializabl
 	   }
    }
    
-   private TableView<LeaderboardData>  getLeaderboard() {
+   public TableView<LeaderboardData> getLeaderboard() {
 	   TableView<LeaderboardData> leaderboard = new TableView<>();
        TableColumn<LeaderboardData,Integer> positionColumn = new TableColumn<>("POSIZIONE");
        TableColumn<LeaderboardData,String> nameColumn = new TableColumn<>("NOME");
@@ -683,7 +695,7 @@ public class TournamentController extends GameController implements Initializabl
 		if(alert.showAndWait().get()==ButtonType.OK) {
 			backgroundTrack.stop();
 			Stage stage = (Stage) ((MenuItem) event.getTarget()).getParentPopup().getOwnerWindow();
-		    Parent root = FXMLLoader.load(getClass().getResource("home.fxml"));
+		    Parent root = FXMLLoader.load(new File("src/application/home.fxml").toURI().toURL());
 		    Scene scene = new Scene(root);
 		    stage.setScene(scene);
 		    stage.show();
@@ -701,7 +713,7 @@ public class TournamentController extends GameController implements Initializabl
 		if(alert.showAndWait().get()==ButtonType.OK) {
 			backgroundTrack.stop();
 			Stage stage = (Stage) ((MenuItem) event.getTarget()).getParentPopup().getOwnerWindow();
-	        Parent root = FXMLLoader.load(getClass().getResource("home.fxml"));
+	        Parent root = FXMLLoader.load(new File("src/application/home.fxml").toURI().toURL());
 	        Scene scene = new Scene(root);
 	        stage.setScene(scene);
 	        stage.show();
@@ -711,7 +723,7 @@ public class TournamentController extends GameController implements Initializabl
    public void showLeaderboard(ActionEvent event)throws IOException{
 	   VBox vbox = new VBox(getLeaderboard());
        Scene scene = new Scene(vbox, 300, 200);
-       scene.getStylesheets().add("./application/LeaderboardStyle.css");
+       scene.getStylesheets().add("./application/game_playing/LeaderboardStyle.css");
        Stage popupLeaderboard = new Stage();
        popupLeaderboard.setResizable(false);
        popupLeaderboard.initModality(Modality.APPLICATION_MODAL);
@@ -723,7 +735,7 @@ public class TournamentController extends GameController implements Initializabl
    public void showLeaderboard() {
 	   VBox vbox = new VBox(getLeaderboard());
        Scene scene = new Scene(vbox, 300, 200);
-       scene.getStylesheets().add("./application/LeaderboardStyle.css");
+       scene.getStylesheets().add("./application/game_playing/LeaderboardStyle.css");
        Stage popupLeaderboard = new Stage();
        popupLeaderboard.setResizable(false);
        popupLeaderboard.initModality(Modality.APPLICATION_MODAL);
@@ -732,7 +744,7 @@ public class TournamentController extends GameController implements Initializabl
        popupLeaderboard.show();
    }
    
-   private  ObservableList<LeaderboardData> getDataFromLeaderboardFile() {
+   public  ObservableList<LeaderboardData> getDataFromLeaderboardFile() {
 	   ObservableList<LeaderboardData> data = FXCollections.observableArrayList();
 	   try {
 		   File leaderboardFile=new File("./Files/ConfigurationFiles/"+adminUsername+"TournamentsLeaderboard.csv");
@@ -752,7 +764,7 @@ public class TournamentController extends GameController implements Initializabl
 	   return data;
    }
    
-   private void getCharacterInfos(int player) {
+   public void getCharacterInfos(int player) {
 	   Character character=tournament.getPlayer(player).getCharacter();
 	   ImageView chImage = new ImageView(new Image(getClass().getResourceAsStream("./CharactersCardsImages/"+character.getName()+".png")));
 	   chImage.setFitWidth(300);
@@ -808,7 +820,7 @@ public class TournamentController extends GameController implements Initializabl
 	   alert.setHeaderText(null);
 	   alert.setGraphic(null);
 	   alert.getDialogPane().getStyleClass().add("game-alert");
-	   alert.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
+	   alert.getDialogPane().getScene().getStylesheets().add("./application/game_playing/GameAlertStyle.css");
 	   alert.setTitle("Personaggio");
 	   alert.getButtonTypes().remove(ButtonType.OK);
 	   alert.getButtonTypes().add(ButtonType.CLOSE);
@@ -817,7 +829,7 @@ public class TournamentController extends GameController implements Initializabl
    }
    
    private void initTournamentBracketScene() {
-		tournamentBracketLoader =new FXMLLoader(getClass().getResource("TournamentBracket.fxml"));
+		tournamentBracketLoader = new FXMLLoader(getClass().getResource("TournamentBracket.fxml"));
 		
 		try {
 			tournamentBracketScene=tournamentBracketLoader.load();
@@ -856,7 +868,7 @@ public class TournamentController extends GameController implements Initializabl
 	}
 	
 	private void setBracketButtonImage() {
-		 ImageView bracketImg= new ImageView(new Image(getClass().getResourceAsStream("./ButtonImages/bracket.png")));
+		 ImageView bracketImg= new ImageView(new Image(getClass().getResourceAsStream("./GameButtonsImages/bracket.png")));
 		 bracketImg.setFitWidth(50);
 		 bracketImg.setFitHeight(50);
 		 tournamentBracketButton.setGraphic(bracketImg);	

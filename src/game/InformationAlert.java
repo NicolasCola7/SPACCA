@@ -52,7 +52,7 @@ public class InformationAlert {
 		layout.setPadding(new Insets(8,12,0,8));
         
 		Scene scene=new Scene(layout);
-		scene.getStylesheets().add("./application/SceneStyle.css");
+		scene.getStylesheets().add("./application/game_playing/SceneStyle.css");
 		window.setScene(scene);
 		window.showAndWait();
 	}

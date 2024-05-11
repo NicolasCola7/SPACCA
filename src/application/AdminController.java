@@ -78,7 +78,6 @@ public class AdminController{
 		stage.show();
 	}
 	
-	
 	public void suspendedGames(ActionEvent event) throws IOException {
 		root = FXMLLoader.load(getClass().getResource("SuspendedGames.fxml"));
 		stage=(Stage)((Node)event.getSource()).getScene().getWindow();

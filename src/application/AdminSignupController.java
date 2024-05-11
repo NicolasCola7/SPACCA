@@ -52,6 +52,7 @@ public class AdminSignupController implements Initializable {
 		stage.setScene(scene);
 		stage.show();
 	}
+	
 	public void signup(ActionEvent event)throws IOException {
 		boolean checkUser=true;
 		boolean checkPsw=true;
@@ -66,7 +67,7 @@ public class AdminSignupController implements Initializable {
 	        }
 		}
 		catch(FileNotFoundException e) {
-			System.out.println("File not found");
+			System.out.println("File 'Login.csv' not found");
 		}
 		
 		if(!psw.getText().equals(confirmPsw.getText())) {
@@ -91,22 +92,24 @@ public class AdminSignupController implements Initializable {
 			errorMsg.setVisible(true);
 			
 	}
+	
 	private void createPlayersList() {
 		try {
 			PrintWriter playersList=new PrintWriter("./Files/ConfigurationFiles/"+adminUsername.getText()+"ListaGiocatori.csv");
 			playersList.close();
-		} catch (FileNotFoundException e) {// 
-			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			System.out.println("File '"+adminUsername.getText()+"ListaGiocatori.csv' not found");
 		}
 	}
+	
 	private void updateCurrentAdmin() {
-		PrintWriter actualAdmin;
+		
 		try {
-			actualAdmin = new PrintWriter("./Files/ConfigurationFiles/AdminAttuale.csv");
+			PrintWriter actualAdmin= new PrintWriter("./Files/ConfigurationFiles/AdminAttuale.csv");
 			actualAdmin.println(adminUsername.getText());
 			actualAdmin.close();
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			System.out.println("File 'AdminAttuale.csv' not found");
 		}
 	}
 	private void addNewAdmin() {
@@ -117,7 +120,7 @@ public class AdminSignupController implements Initializable {
 			pw.println();
 			pw.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("File 'AdminAttuale.csv' not found");
 		}
 	}
 	

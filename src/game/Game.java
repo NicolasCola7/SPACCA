@@ -11,7 +11,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import cards.*;
 import decks.*;	
 	
-public abstract class Game implements Serializable, GameInterface, PlayerActionsInterface{
+public abstract class Game implements Serializable, GameInterface{
 
 		private static final long serialVersionUID = -1894678914308683663L;
 		protected Deck deck;

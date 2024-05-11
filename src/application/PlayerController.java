@@ -9,6 +9,8 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 
+import application.game_playing.ClassicGameController;
+import application.game_playing.TournamentController;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
@@ -76,7 +78,7 @@ public class PlayerController implements Initializable{
 	                    @Override
 	                    public void run() {
 	                        if (gameType.equals("classic")) {
-	                            // Aggiungi un blocco try-catch per gestire l'eccezione IOException
+	                           
 	                            try {
 	                                FXMLLoader loader = new FXMLLoader(getClass().getResource("ClassicGame.fxml"));
 	                                Parent classicGameScene = loader.load();
@@ -96,7 +98,7 @@ public class PlayerController implements Initializable{
 	                                alert.showAndWait();
 	                            }
 	                        } else {
-	                            // Aggiungi un blocco try-catch per gestire l'eccezione IOException
+	                          
 	                            try {
 	                                FXMLLoader loader = new FXMLLoader(getClass().getResource("Tournament.fxml"));
 	                                Parent tournamentScene = loader.load();
