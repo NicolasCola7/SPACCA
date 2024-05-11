@@ -107,9 +107,9 @@ public class RulesController implements Initializable{
 	}
 	
 	public void setEvento() {
-		TFurto.setText("Furto d'identità:\nCarta che permette di scambiare il\npersonaggio con quello di un altro giocatore.\nAll'interno di un mazzo sono presenti 5 copie\nNon possiede alcun seme.\n");
-		TGiorno.setText("Giorno del giudizio:\nCarta che permette di eliminare un giocatore\na scelta.\nAll'interno di un mazzo sono presenti 5 copie\nNon possiede alcun seme.\n");
-		TMiracolo.setText("Miracolo:\nCarta che permette recupera tutti i punti vita\npersi.\nAll'interno di un mazzo sono presenti 5 copie\nNon possiede alcun seme.\n");
+		TFurto.setText("Furto d'identità:\nCarta che permette di scambiare il\npersonaggio con quello di un altro giocatore.\nAll'interno di un mazzo ne è presente 1 copia\nNon possiede alcun seme.\n");
+		TGiorno.setText("Giorno del giudizio:\nCarta che permette di eliminare un giocatore\na scelta.\nAll'interno di un mazzo ne è presente 1 copia\nNon possiede alcun seme.\n");
+		TMiracolo.setText("Miracolo:\nCarta che permette recupera tutti i punti vita\npersi.\nAll'interno di un mazzo ne è presente 1 copia\nNon possiede alcun seme.\n");
 		CFurto.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/FurtoDiIdentità.png")));
 		CGiorno.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/GiornoDelGiudizio.png")));
 		CMiracolo.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/Miracolo.png")));

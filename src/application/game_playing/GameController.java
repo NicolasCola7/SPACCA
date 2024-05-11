@@ -188,7 +188,7 @@ public abstract class GameController implements GameControllerInterface{
 	}		
 	   
 	protected void setCardImage(ToggleButton btn) {
-		
+	
        Image icon = new Image(getClass().getResourceAsStream("./CardsImages/"+btn.getText().replaceAll("\\s+", "")+".png"));
        ImageView iconView = new ImageView(icon);
        iconView.setFitWidth(btn.getPrefWidth()); 
