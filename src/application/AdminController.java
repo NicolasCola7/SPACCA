@@ -28,62 +28,114 @@ public class AdminController{
 	@FXML private Button homeButton;
 	
 	// back to home page
-	public void goToHome(ActionEvent event) throws IOException {
+	public void goToHome(ActionEvent event)  {
 		Alert alert=new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Logout");
 		alert.setHeaderText("Stai per effettuare il logout!");
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
-			root = FXMLLoader.load(getClass().getResource("home.fxml"));
-			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-			scene=new Scene(root);
-			stage.setScene(scene);
-			stage.show();
+			try {
+				root = FXMLLoader.load(getClass().getResource("home.fxml"));
+				stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+				scene=new Scene(root);
+				stage.setScene(scene);
+				stage.show();
+			} catch (IOException e) {
+				Alert errorAlert=new Alert(AlertType.ERROR);
+				errorAlert.setHeaderText("Si è verificato un errore:");
+				errorAlert.setContentText("Riprova più tardi!");
+				errorAlert.showAndWait();
+				e.printStackTrace();
+			}
+			
 		}
 	}
 	
 	//new player creation
-	public void newPlayer(ActionEvent event) throws IOException {
-		root = FXMLLoader.load(getClass().getResource("NewPlayer.fxml"));
-		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-		scene=new Scene(root);
-		stage.setScene(scene);
-		stage.show();
+	public void newPlayer(ActionEvent event)  {
+		try {
+			root = FXMLLoader.load(getClass().getResource("NewPlayer.fxml"));
+			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+			scene=new Scene(root);
+			stage.setScene(scene);
+			stage.show();
+		} catch (IOException e) {
+			Alert errorAlert=new Alert(AlertType.ERROR);
+			errorAlert.setHeaderText("Si è verificato un errore:");
+			errorAlert.setContentText("Riprova più tardi!");
+			errorAlert.showAndWait();
+			e.printStackTrace();
+		}
+		
 	}
 	
 	//edit existing player
-	public void editExisting(ActionEvent event) throws IOException {
-		root = FXMLLoader.load(getClass().getResource("EditExisting.fxml"));
-		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-		scene=new Scene(root);
-		stage.setScene(scene);
-		stage.show();
+	public void editExisting(ActionEvent event)  {
+		try {
+			root = FXMLLoader.load(getClass().getResource("EditExisting.fxml"));
+			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+			scene=new Scene(root);
+			stage.setScene(scene);
+			stage.show();
+		} catch (IOException e) {
+			Alert errorAlert=new Alert(AlertType.ERROR);
+			errorAlert.setHeaderText("Si è verificato un errore:");
+			errorAlert.setContentText("Riprova più tardi!");
+			errorAlert.showAndWait();
+			e.printStackTrace();
+		}
+		
 	}
 	
 	//classic game creation
-	public void standardMatch(ActionEvent event) throws IOException {
-		root = FXMLLoader.load(getClass().getResource("ClassicGameCreation.fxml"));
-		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-		scene=new Scene(root);
-		stage.setScene(scene);
-		stage.show();
+	public void standardMatch(ActionEvent event)  {
+		try {
+			root = FXMLLoader.load(getClass().getResource("ClassicGameCreation.fxml"));
+			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+			scene=new Scene(root);
+			stage.setScene(scene);
+			stage.show();
+		} catch (IOException e) {
+			Alert errorAlert=new Alert(AlertType.ERROR);
+			errorAlert.setHeaderText("Si è verificato un errore:");
+			errorAlert.setContentText("Riprova più tardi!");
+			errorAlert.showAndWait();
+			e.printStackTrace();
+		}
 	}
 	
 	//tournamnet creation
-	public void tournament(ActionEvent event) throws IOException {
-		root = FXMLLoader.load(getClass().getResource("TournamentCreation.fxml"));
-		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-		scene=new Scene(root);
-		stage.setScene(scene);
-		stage.show();
+	public void tournament(ActionEvent event)  {
+		try {
+			root = FXMLLoader.load(getClass().getResource("TournamentCreation.fxml"));
+			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+			scene=new Scene(root);
+			stage.setScene(scene);
+			stage.show();
+		} catch (IOException e) {
+			Alert errorAlert=new Alert(AlertType.ERROR);
+			errorAlert.setHeaderText("Si è verificato un errore:");
+			errorAlert.setContentText("Riprova più tardi!");
+			errorAlert.showAndWait();
+			e.printStackTrace();
+		}
 	}
 	
-	public void suspendedGames(ActionEvent event) throws IOException {
-		root = FXMLLoader.load(getClass().getResource("SuspendedGames.fxml"));
-		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-		scene=new Scene(root);
-		stage.setScene(scene);
-		stage.show();
+	public void suspendedGames(ActionEvent event)  {
+		try {
+			root = FXMLLoader.load(getClass().getResource("SuspendedGames.fxml"));
+			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+			scene=new Scene(root);
+			stage.setScene(scene);
+			stage.show();
+		} catch (IOException e) {
+			Alert errorAlert=new Alert(AlertType.ERROR);
+			errorAlert.setHeaderText("Si è verificato un errore:");
+			errorAlert.setContentText("Riprova più tardi!");
+			errorAlert.showAndWait();
+			e.printStackTrace();
+		}
+		
 	}
 
 }

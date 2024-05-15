@@ -42,8 +42,8 @@ public class ClassicGame extends Game {
 	public void insertPlayers() {
 		actionMessages=new ArrayList<String>();
 		players=new LinkedList<Player>();
-		try {
-			Scanner scan=new Scanner(datas);
+		try (Scanner scan=new Scanner(datas)){
+			
 			while(scan.hasNextLine()) {
 				String[] line=scan.nextLine().split(",");
 				if(line[2].equals(gameCode)) {
@@ -63,9 +63,11 @@ public class ClassicGame extends Game {
 				else
 					continue;
 			}
-			scan.close();
 		}catch(FileNotFoundException e) {
-			e.printStackTrace();
+			 Alert alert=new Alert(AlertType.ERROR);
+			 alert.setHeaderText("Si è verificato un errore:");
+			 alert.setContentText("Riprova più tardi!");
+			 alert.showAndWait();
 		}
 	}
 	

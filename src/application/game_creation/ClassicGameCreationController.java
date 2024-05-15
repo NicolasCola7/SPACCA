@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Array;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,13 +59,27 @@ public class ClassicGameCreationController extends GameCreationController implem
 	
 	}
 	
-	public void goToHome(ActionEvent event) throws IOException {
+	public void goToHome(ActionEvent event){
 		Alert alert=new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Logout");
 		alert.setHeaderText("Stai per effettuare il logout!");
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
-			root = FXMLLoader.load(new File("src/application/home.fxml").toURI().toURL());
+			try {
+				root = FXMLLoader.load(new File("src/application/home.fxml").toURI().toURL());
+			} catch (MalformedURLException e) {
+				Alert errorAlert=new Alert(AlertType.ERROR);
+				errorAlert.setHeaderText("Si è verificato un errore:");
+				errorAlert.setContentText("Riprova più tardi!");
+				errorAlert.showAndWait();
+				e.printStackTrace();
+			} catch (IOException e) {
+				Alert errorAlert=new Alert(AlertType.ERROR);
+				errorAlert.setHeaderText("Si è verificato un errore:");
+				errorAlert.setContentText("Riprova più tardi!");
+				errorAlert.showAndWait();
+				e.printStackTrace();
+			}
 			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 			scene=new Scene(root);
 			stage.setScene(scene);
@@ -72,15 +87,29 @@ public class ClassicGameCreationController extends GameCreationController implem
 		}
 	}
 	
-	public void back(ActionEvent event) throws IOException {
-		root = FXMLLoader.load((new File("src/application/Admin.fxml").toURI().toURL()));
+	public void back(ActionEvent event){
+		try {
+			root = FXMLLoader.load((new File("src/application/Admin.fxml").toURI().toURL()));
+		} catch (MalformedURLException e) {
+			Alert errorAlert=new Alert(AlertType.ERROR);
+			errorAlert.setHeaderText("Si è verificato un errore:");
+			errorAlert.setContentText("Riprova più tardi!");
+			errorAlert.showAndWait();
+			e.printStackTrace();
+		} catch (IOException e) {
+			Alert errorAlert=new Alert(AlertType.ERROR);
+			errorAlert.setHeaderText("Si è verificato un errore:");
+			errorAlert.setContentText("Riprova più tardi!");
+			errorAlert.showAndWait();
+			e.printStackTrace();
+		}
 		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 		scene=new Scene(root);
 		stage.setScene(scene);
 		stage.show();
 	}
 	
-	public void confirm(ActionEvent e) throws IOException {
+	public void confirm(ActionEvent e) {
 		numberOfPlayers=numberOfPlayerSelection.getSelectionModel().getSelectedItem();
 		gamePlayers=new ArrayList<String>( numberOfPlayers);
 		gamePlayers.addAll(playersSelection.getSelectionModel().getSelectedItems());
@@ -93,7 +122,21 @@ public class ClassicGameCreationController extends GameCreationController implem
 				alert.setHeaderText("Partita creata correttamente:");
 				alert.setContentText("Vuoi tornare alla home?");
 				if(alert.showAndWait().get()==ButtonType.OK) {
-					root = FXMLLoader.load(new File("src/application/home.fxml").toURI().toURL());
+					try {
+						root = FXMLLoader.load(new File("src/application/home.fxml").toURI().toURL());
+					} catch (MalformedURLException e1) {
+						Alert errorAlert=new Alert(AlertType.ERROR);
+						errorAlert.setHeaderText("Si è verificato un errore:");
+						errorAlert.setContentText("Riprova più tardi!");
+						errorAlert.showAndWait();
+						e1.printStackTrace();
+					} catch (IOException e1) {
+						Alert errorAlert=new Alert(AlertType.ERROR);
+						errorAlert.setHeaderText("Si è verificato un errore:");
+						errorAlert.setContentText("Riprova più tardi!");
+						errorAlert.showAndWait();
+						e1.printStackTrace();
+					}
 					stage=(Stage)((Node)e.getSource()).getScene().getWindow();
 					scene=new Scene(root);
 					stage.setScene(scene);
@@ -119,20 +162,22 @@ public class ClassicGameCreationController extends GameCreationController implem
 	}
 
 	public void addToGamesDatasFile() {
-		try {
-			FileWriter writer = new FileWriter(new File("./Files/ConfigurationFiles/GamesDatas.csv"),true);
-			PrintWriter pw=new PrintWriter(writer);
+		try(FileWriter writer = new FileWriter(new File("./Files/ConfigurationFiles/GamesDatas.csv"),true);
+			PrintWriter pw=new PrintWriter(writer)) {
+			
 			String datas=adminUsername+",classic,"+gameCode.getText()+","+numberOfPlayers+","+gamePlayers.get(0);
 			for(int i=1;i< numberOfPlayers;i++)
 				datas+=","+gamePlayers.get(i);
 			pw.println(datas);
-			pw.close();
 			gameCode.clear();
 			botCheck.setSelected(false);
 			playersSelection.getSelectionModel().clearSelection();
 			numberOfPlayerSelection.getSelectionModel().clearSelection();
 		} catch (IOException e) {
-			e.printStackTrace();
+			Alert alert=new Alert(AlertType.ERROR);
+			alert.setHeaderText("Si è verificato un errore:");
+			alert.setContentText("Riprova più tardi!");
+			alert.showAndWait();
 		}
 	}
 }

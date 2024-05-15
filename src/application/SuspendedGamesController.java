@@ -47,81 +47,111 @@ public class SuspendedGamesController implements Initializable{
 		 
 	}
 	
-	public void goToHome(ActionEvent event) throws IOException {
+	public void goToHome(ActionEvent event)  {
 		Alert alert=new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Logout");
 		alert.setHeaderText("Stai per effettuare il logout!");
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
-			root = FXMLLoader.load(getClass().getResource("home.fxml"));
+			try {
+				root = FXMLLoader.load(getClass().getResource("home.fxml"));
+				stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+				scene=new Scene(root);
+				stage.setScene(scene);
+				stage.show();
+			} catch (IOException e) {
+				Alert errorAlert=new Alert(AlertType.ERROR);
+				errorAlert.setHeaderText("Si è verificato un errore:");
+				errorAlert.setContentText("Riprova più tardi!");
+				errorAlert.showAndWait();
+				e.printStackTrace();
+			}
+			
+		}
+	}
+	
+	public void back(ActionEvent event)  {
+		try {
+			root = FXMLLoader.load(getClass().getResource("Admin.fxml"));
 			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 			scene=new Scene(root);
 			stage.setScene(scene);
 			stage.show();
+		} catch (IOException e) {
+			Alert errorAlert=new Alert(AlertType.ERROR);
+			errorAlert.setHeaderText("Si è verificato un errore:");
+			errorAlert.setContentText("Riprova più tardi!");
+			errorAlert.showAndWait();
+			e.printStackTrace();
 		}
+		
 	}
 	
-	public void back(ActionEvent event) throws IOException {
-		root = FXMLLoader.load(getClass().getResource("Admin.fxml"));
-		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-		scene=new Scene(root);
-		stage.setScene(scene);
-		stage.show();
-	}
-	
-	public void deleteGame(ActionEvent event) throws IOException {
+	public void deleteGame(ActionEvent event)  {
 		String deletedGame=gameSelection.getSelectionModel().getSelectedItem();
-		deleteGameFromGamesDatasFile( deletedGame);
+		deleteGameFromGamesDatasFile(deletedGame);
 		deleteSerializationFile(deletedGame);
-		gameSelection.getItems().remove(deletedGame);
 		gameSelection.getSelectionModel().clearSelection();
+		gameSelection.getItems().remove(deletedGame);
 	}
 	
 	private void getCurrentAdmin() {	
-		try {
-			Scanner scan = new Scanner(new File("./Files/ConfigurationFiles/AdminAttuale.csv"));
+		try (Scanner scan = new Scanner(new File("./Files/ConfigurationFiles/AdminAttuale.csv"))){
+			
 			  while (scan.hasNextLine()) {
 		        	String line=scan.nextLine();
 		        	adminUsername=line;
 		        }
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			Alert alert=new Alert(AlertType.ERROR);
+			alert.setHeaderText("Si è verificato un errore:");
+			alert.setContentText("Riprova più tardi!");
+			alert.showAndWait();
 		}
 	}
 	
 	private void populateAdminGamesList() {
 		gamesList=new File("./Files/ConfigurationFiles/GamesDatas.csv");
 		adminGamesList=new ArrayList<String>();
-		try {
-			Scanner scan = new Scanner(gamesList);
+		try (Scanner scan = new Scanner(gamesList)){
+			
 			while(scan.hasNextLine()) {
 				String line=scan.nextLine();
 				String[] splittedLine=line.split(",");
 				if(splittedLine[0].equals(adminUsername))
 					adminGamesList.add(line);
 			}
+			gameSelection.getItems().addAll(adminGamesList);
+			
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			Alert alert=new Alert(AlertType.ERROR);
+			alert.setHeaderText("Si è verificato un errore:");
+			alert.setContentText("Riprova più tardi!");
+			alert.showAndWait();
 		}
-		gameSelection.getItems().addAll(adminGamesList);
+		
 	}
 	
 	private void deleteGameFromGamesDatasFile(String game) {
 	   ArrayList<String> datas=new ArrayList<String>();
-	   try {
-		   Scanner scan=new Scanner(gamesList);
+	   try ( Scanner scan=new Scanner(gamesList);
+			   PrintWriter pw=new PrintWriter(gamesList)){
+		  
 		   while(scan.hasNextLine()) {
 			   String line=scan.nextLine();
 			   if(!line.equals(game)) 
 				   datas.add(line);
 		   }
-		   PrintWriter pw=new PrintWriter(gamesList);
+		  
 		   for(String line:datas)
 			   pw.println(line);
-		   pw.close();
+		 
 	   }
 	   catch(IOException e) {
-		   e.printStackTrace();
+		   Alert alert=new Alert(AlertType.ERROR);
+		   alert.setHeaderText("Si è verificato un errore:");
+		   alert.setContentText("Riprova più tardi!");
+		   alert.showAndWait();
 	   }
 	}
 	

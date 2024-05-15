@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Scanner;
 import game.GameType;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 
 public class Leaderboard implements Serializable{
 	
@@ -31,17 +33,18 @@ public class Leaderboard implements Serializable{
 	
 	public void getData() {
 		int score=0;
-		try {
-			Scanner scan=new Scanner(leaderboardFile);
+		try(Scanner scan=new Scanner(leaderboardFile)) {
 			while(scan.hasNextLine()) {
 				String[] line=scan.nextLine().split(",");
 				names.addLast(line[0]);
 				score=Integer.parseInt(line[1]);
 				scores.addLast(score);
 			}
-			scan.close();
 		}catch(IOException e) {
-			e.printStackTrace();
+			 Alert alert=new Alert(AlertType.ERROR);
+			 alert.setHeaderText("Si è verificato un errore:");
+			 alert.setContentText("Riprova più tardi!");
+			 alert.showAndWait();
 		}
 	}
 	
@@ -64,14 +67,15 @@ public class Leaderboard implements Serializable{
 	}
 	
 	private void updateLeaderboard() {
-		try {
-			PrintWriter pw=new PrintWriter(leaderboardFile);
+		try(PrintWriter pw=new PrintWriter(leaderboardFile)) {
 			for(int i=0;i<names.size();i++) {
 				pw.println(names.get(i)+","+scores.get(i));
 			}
-			pw.close();
 		}catch(IOException e) {
-			e.printStackTrace();
+			 Alert alert=new Alert(AlertType.ERROR);
+			 alert.setHeaderText("Si è verificato un errore:");
+			 alert.setContentText("Riprova più tardi!");
+			 alert.showAndWait();
 		}
 	}
 	
@@ -111,20 +115,24 @@ public class Leaderboard implements Serializable{
 			}
 			scan.close();
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			 Alert alert=new Alert(AlertType.ERROR);
+			 alert.setHeaderText("Si è verificato un errore:");
+			 alert.setContentText("Riprova più tardi!");
+			 alert.showAndWait();
 		}
 	}
 	
 	public void initializeLeaderboardFile() {
 		getPlayersNames();
-		try {
-			PrintWriter pw=new PrintWriter(leaderboardFile);
+		try (PrintWriter pw=new PrintWriter(leaderboardFile)){
 			for(String name:playersNames) {
 				pw.println(name+","+0);
 			}
-			pw.close();
 		}catch(IOException e) {
-			e.printStackTrace();
-		}
+			 Alert alert=new Alert(AlertType.ERROR);
+			 alert.setHeaderText("Si è verificato un errore:");
+			 alert.setContentText("Riprova più tardi!");
+			 alert.showAndWait();	
+		 }
 	}
 }

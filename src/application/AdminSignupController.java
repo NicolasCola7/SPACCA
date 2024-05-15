@@ -18,9 +18,11 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
@@ -45,19 +47,28 @@ public class AdminSignupController implements Initializable {
 				confirmPsw.textProperty().isEmpty())));
 	}
 	
-	public void goToHome(ActionEvent event) throws IOException {
-		root = FXMLLoader.load(getClass().getResource("home.fxml"));
-		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-		scene=new Scene(root);
-		stage.setScene(scene);
-		stage.show();
+	public void goToHome(ActionEvent event)  {
+		try {
+			root = FXMLLoader.load(getClass().getResource("home.fxml"));
+			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+			scene=new Scene(root);
+			stage.setScene(scene);
+			stage.show();
+		} catch (IOException e) {
+			Alert errorAlert=new Alert(AlertType.ERROR);
+			errorAlert.setHeaderText("Si è verificato un errore:");
+			errorAlert.setContentText("Riprova più tardi!");
+			errorAlert.showAndWait();
+			e.printStackTrace();
+		}
+		
 	}
 	
-	public void signup(ActionEvent event)throws IOException {
+	public void signup(ActionEvent event) {
 		boolean checkUser=true;
 		boolean checkPsw=true;
-		try {
-			Scanner scan = new Scanner(new File("./Files/ConfigurationFiles/Login.csv"));
+		try (Scanner scan = new Scanner(new File("./Files/ConfigurationFiles/Login.csv"))){
+			
 	        while (scan.hasNextLine()) {
 	        	String[] line= scan.nextLine().split(",");
 	        	if(line[0].equals(adminUsername.getText())) {
@@ -67,7 +78,10 @@ public class AdminSignupController implements Initializable {
 	        }
 		}
 		catch(FileNotFoundException e) {
-			System.out.println("File 'Login.csv' not found");
+			Alert alert=new Alert(AlertType.ERROR);
+			alert.setHeaderText("Si è verificato un errore:");
+			alert.setContentText("Riprova più tardi!");
+			alert.showAndWait();	
 		}
 		
 		if(!psw.getText().equals(confirmPsw.getText())) {
@@ -81,12 +95,21 @@ public class AdminSignupController implements Initializable {
     		Leaderboard classicGamesLeaderboard=new Leaderboard(adminUsername.getText(),GameType.CLASSIC);
     		Leaderboard tournamentsLeaderboard=new Leaderboard(adminUsername.getText(),GameType.TOURNAMENT);
     		
-			root = FXMLLoader.load(getClass().getResource("Admin.fxml"));
-			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-			scene=new Scene(root);
-			stage.setScene(scene);
-			stage.show();
-			errorMsg.setVisible(false);
+			try {
+				root = FXMLLoader.load(getClass().getResource("Admin.fxml"));
+				stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+				scene=new Scene(root);
+				stage.setScene(scene);
+				stage.show();
+				errorMsg.setVisible(false);
+			} catch (IOException e) {
+				Alert errorAlert=new Alert(AlertType.ERROR);
+				errorAlert.setHeaderText("Si è verificato un errore:");
+				errorAlert.setContentText("Riprova più tardi!");
+				errorAlert.showAndWait();
+				e.printStackTrace();
+			}
+			
 		}
 		else
 			errorMsg.setVisible(true);
@@ -98,29 +121,40 @@ public class AdminSignupController implements Initializable {
 			PrintWriter playersList=new PrintWriter("./Files/ConfigurationFiles/"+adminUsername.getText()+"ListaGiocatori.csv");
 			playersList.close();
 		} catch (FileNotFoundException e) {
-			System.out.println("File '"+adminUsername.getText()+"ListaGiocatori.csv' not found");
+			Alert alert=new Alert(AlertType.ERROR);
+			alert.setHeaderText("Si è verificato un errore:");
+			alert.setContentText("Riprova più tardi!");
+			alert.showAndWait();	
 		}
 	}
 	
 	private void updateCurrentAdmin() {
-		
-		try {
-			PrintWriter actualAdmin= new PrintWriter("./Files/ConfigurationFiles/AdminAttuale.csv");
+		try (PrintWriter actualAdmin= new PrintWriter("./Files/ConfigurationFiles/AdminAttuale.csv")){
 			actualAdmin.println(adminUsername.getText());
-			actualAdmin.close();
 		} catch (FileNotFoundException e) {
-			System.out.println("File 'AdminAttuale.csv' not found");
+			Alert alert=new Alert(AlertType.ERROR);
+			alert.setHeaderText("Si è verificato un errore:");
+			alert.setContentText("Riprova più tardi!");
+			alert.showAndWait();	
 		}
 	}
 	private void addNewAdmin() {
-		try {
-			FileWriter fw = new FileWriter("./Files/ConfigurationFiles/Login.csv", true);
-			PrintWriter pw = new PrintWriter(fw);
+		try (FileWriter fw = new FileWriter("./Files/ConfigurationFiles/Login.csv", true);
+				PrintWriter pw = new PrintWriter(fw)){
+			
 			pw.print(adminUsername.getText()+","+psw.getText());
 			pw.println();
-			pw.close();
-		} catch (IOException e) {
-			System.out.println("File 'AdminAttuale.csv' not found");
+			
+		} catch (FileNotFoundException e) {
+			Alert alert=new Alert(AlertType.ERROR);
+			alert.setHeaderText("Si è verificato un errore:");
+			alert.setContentText("Riprova più tardi!");
+			alert.showAndWait();	
+		}catch (IOException e) {
+			Alert alert=new Alert(AlertType.ERROR);
+			alert.setHeaderText("Si è verificato un errore:");
+			alert.setContentText("Riprova più tardi!");
+			alert.showAndWait();	
 		}
 	}
 	

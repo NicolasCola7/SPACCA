@@ -26,6 +26,8 @@ import cards.statics.EnchantedMirrorCard;
 import cards.statics.HologramCard;
 import cards.statics.RingCard;
 import cards.statics.ShieldCard;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 
 public class Deck implements Serializable {
 	
@@ -45,9 +47,9 @@ public class Deck implements Serializable {
 
 	// build static cards
 	private void buildStaticCards() {
-		try {
-			File staticCards = new File("./Files/CardsFiles/StaticCards.csv");
-			Scanner scan = new Scanner(staticCards);
+		File staticCards = new File("./Files/CardsFiles/StaticCards.csv");
+		try (Scanner scan = new Scanner(staticCards)){
+
 			while (scan.hasNextLine()) {
 				String[] line = scan.nextLine().split(",");
 				String name = line[0];
@@ -80,17 +82,20 @@ public class Deck implements Serializable {
 					break;
 				}
 			}
-			scan.close();
+		
 		} catch (FileNotFoundException e) {
-			System.out.println("File not found");
+			 Alert alert=new Alert(AlertType.ERROR);
+			 alert.setHeaderText("Si è verificato un errore:");
+			 alert.setContentText("Riprova più tardi!");
+			 alert.showAndWait();
 		}
 	}
 
 	// build action cards
 	private void buildActionCards() {
-		try {
-			File actionCards = new File("./Files/CardsFiles/ActionCards.csv");
-			Scanner scan = new Scanner(actionCards);
+		File actionCards = new File("./Files/CardsFiles/ActionCards.csv");
+		try (Scanner scan = new Scanner(actionCards)){
+
 			while (scan.hasNextLine()) {
 				String[] line = scan.nextLine().split(",");
 				String name = line[0];
@@ -128,17 +133,20 @@ public class Deck implements Serializable {
 				}
 
 			}
-			scan.close();
+
 		} catch (FileNotFoundException e) {
-			System.out.println("File not found");
-		}
+			 Alert alert=new Alert(AlertType.ERROR);
+			 alert.setHeaderText("Si è verificato un errore:");
+			 alert.setContentText("Riprova più tardi!");
+			 alert.showAndWait();
+		  }
 	}
 
 	// build weapon cards
 	private void buildWeaponCards() {
-		try {
-			File weaponCards = new File("./Files/CardsFiles/WeaponCards.csv");
-			Scanner scan = new Scanner(weaponCards);
+		File weaponCards = new File("./Files/CardsFiles/WeaponCards.csv");
+		try (Scanner scan = new Scanner(weaponCards)){
+	
 			while (scan.hasNextLine()) {
 				String[] line = scan.nextLine().split(",");
 				String name = line[0];
@@ -172,10 +180,13 @@ public class Deck implements Serializable {
 				for (int i = 0; i < copy; i++)
 					deck.add(new WeaponCard(name, s, damage));
 			}
-			scan.close();
+		
 		} catch (FileNotFoundException e) {
-			System.out.println("File not found");
-		}
+			 Alert alert=new Alert(AlertType.ERROR);
+			 alert.setHeaderText("Si è verificato un errore:");
+			 alert.setContentText("Riprova più tardi!");
+			 alert.showAndWait();
+		  }
 	}
 
 	private void buildEventCards() {
@@ -237,6 +248,6 @@ public class Deck implements Serializable {
 
 	public void reset() {
 		deck.addAll(stockpile);
-	this.shuffle();
+		this.shuffle();
 	}
 }

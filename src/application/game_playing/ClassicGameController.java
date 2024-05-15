@@ -141,7 +141,7 @@ public class ClassicGameController extends GameController implements Initializab
 		    Card latest=(game.getDeck().getStockpile().size()==0?null:game.getDeck().getStockpile().getLast());
 		    String latestName=(latest==null?"Vuoto":latest.getName().replaceAll("\\s+", ""));
 	     
-		    ImageView latestPlayedCard=new ImageView(new Image(getClass().getResourceAsStream("./CardsImages/"+latestName+".png")));
+		    ImageView latestPlayedCard=new ImageView(new Image(getClass().getResourceAsStream("CardsImages/"+latestName+".png")));
 		    latestPlayedCard.setFitHeight(200);
 		    latestPlayedCard.setFitWidth(140);
 		    latestPlayedCardPane.getChildren().add(latestPlayedCard);
@@ -185,7 +185,7 @@ public class ClassicGameController extends GameController implements Initializab
 				playerBox.setStyle("-fx-border-width:3;-fx-border-color:orange;");
 				playerBox.prefWidthProperty().bind(playersBox.prefWidthProperty());
 				
-				ImageView chImage=new ImageView(new Image(getClass().getResourceAsStream("./CharactersImages/"+ch.getName()+".png")));
+				ImageView chImage=new ImageView(new Image(getClass().getResourceAsStream("CharactersImages/"+ch.getName()+".png")));
 				chImage.setFitHeight(playersBox.getPrefHeight());
 				chImage.setFitWidth(80);
 				
@@ -198,7 +198,7 @@ public class ClassicGameController extends GameController implements Initializab
 				moreInfos.setPrefHeight(playersBox.getPrefHeight());
 				moreInfos.setPrefWidth(50);
 				
-				ImageView infoImg=new ImageView(new Image(getClass().getResourceAsStream("./GameButtonsImages/Info.png")));
+				ImageView infoImg=new ImageView(new Image(getClass().getResourceAsStream("GameButtonsImages/Info.png")));
 				infoImg.setFitHeight(50);
 				infoImg.setFitWidth(50);
 				
@@ -245,31 +245,31 @@ public class ClassicGameController extends GameController implements Initializab
 	}
 	
 	//showing current player's  board
-	public void seeBoard(ActionEvent event)throws IOException{ 
+	public void seeBoard(ActionEvent event){ 
 		StaticCard[] board=game.getPlayer(currentPlayer).getBoard();
 		showBoard(board);
 	}
 	
 	//showing current player character's info
-	public void seeCharacterInfos(ActionEvent event) throws IOException{//permette di vedere le informazioni relative al personaggio del giocatore corrente
+	public void seeCharacterInfos(ActionEvent event){//permette di vedere le informazioni relative al personaggio del giocatore corrente
 		getCharacterInfos(currentPlayer);
 	}
 	
 	//showing current player's equiped weapon
-	public void seeEquipedWeapon(ActionEvent event)throws IOException{
+	public void seeEquipedWeapon(ActionEvent event){
 		WeaponCard wc=game.getPlayer(currentPlayer).getEquipedWeapon();
 		showEquipedWeapon(wc);
 	}
 	
 	//drawing a card
-	public void drawCard(ActionEvent event) throws IOException {
+	public void drawCard(ActionEvent event) {
 		Card drawedCard=game.drawCard(currentPlayer);
 		ToggleButton btn=new ToggleButton(drawedCard.getName());
 		addToCardsBox(btn); 
 	}
 	
 	//discarding a card
-	public void discardCard(ActionEvent event)throws IOException{ 
+	public void discardCard(ActionEvent event){ 
 		ToggleButton btn=(ToggleButton) group.getSelectedToggle();
 		setLatestPlayedCard(game.getPlayersHand(currentPlayer).get(currentPlayerHand.indexOf(btn)));
 		game.discardCard(currentPlayer,currentPlayerHand.indexOf(btn));
@@ -277,7 +277,7 @@ public class ClassicGameController extends GameController implements Initializab
 	}
 	
 	//submittin a card
-	public void submitCard(ActionEvent event)throws IOException{ 
+	public void submitCard(ActionEvent event){ 
 		ToggleButton btn=(ToggleButton)group.getSelectedToggle(); //selected toggleButton (card)
 		Card submittedCard=game.getPlayersHand(currentPlayer).get(currentPlayerHand.indexOf(btn)); // selcted card
 		int submittedCardIndex=currentPlayerHand.indexOf(btn); 
@@ -297,7 +297,7 @@ public class ClassicGameController extends GameController implements Initializab
 				dialog.setTitle("Selezione");
 				dialog.setGraphic(null);
 				dialog.getDialogPane().getStyleClass().add("game-alert");
-				dialog.getDialogPane().getScene().getStylesheets().add("./application/game_playing/GameAlertStyle.css");
+				dialog.getDialogPane().getScene().getStylesheets().add("application/game_playing/GameAlertStyle.css");
 		        dialog.setHeaderText("Seleziona un giocatore:");
 		        Optional<String> result = dialog.showAndWait();
 		        targetPlayer=players.indexOf(dialog.getSelectedItem());
@@ -325,7 +325,7 @@ public class ClassicGameController extends GameController implements Initializab
 				dialog.setTitle("Selezione");
 				dialog.setGraphic(null);
 				dialog.getDialogPane().getStyleClass().add("game-alert");
-				dialog.getDialogPane().getScene().getStylesheets().add("./application/game_playing/GameAlertStyle.css");
+				dialog.getDialogPane().getScene().getStylesheets().add("application/game_playing/GameAlertStyle.css");
 		        dialog.setHeaderText("Seleziona un giocatore:");
 		        Optional<String> result = dialog.showAndWait();
 		        targetPlayer=players.indexOf(dialog.getSelectedItem());
@@ -359,7 +359,7 @@ public class ClassicGameController extends GameController implements Initializab
 	}
 	
 	//submitting the turn the next player
-	public void submitPlayer(ActionEvent event)throws IOException{ //passa la giocata al prossimo giocatore
+	public void submitPlayer(ActionEvent event){ //passa la giocata al prossimo giocatore
 		updateCurrentPlayer(currentPlayer);
 		game.setHasAttacked(false);
 		game.setHasDiscarded(false);
@@ -622,12 +622,10 @@ public class ClassicGameController extends GameController implements Initializab
 	}
 	
 	public void serialize(String filename) {
-        try {
-            FileOutputStream fileOut = new FileOutputStream(filename);
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+        try (FileOutputStream fileOut = new FileOutputStream(filename);
+                ObjectOutputStream out = new ObjectOutputStream(fileOut)){
+            
             out.writeObject(game);
-            out.close();
-            fileOut.close();
             Alert saveAlert = new Alert(AlertType.INFORMATION);
             saveAlert.setHeaderText(null);
             saveAlert.setContentText("Progressi salvati correttamente!");
@@ -643,12 +641,10 @@ public class ClassicGameController extends GameController implements Initializab
     // Static method to deserialize the GameController
     public  ClassicGame deserialize(String filename) {
     	ClassicGame game = null;
-        try {
-            FileInputStream fileIn = new FileInputStream(filename);
-            ObjectInputStream in = new ObjectInputStream(fileIn);
+        try ( FileInputStream fileIn = new FileInputStream(filename);
+                ObjectInputStream in = new ObjectInputStream(fileIn)){
+    
             game = (ClassicGame) in.readObject();
-            in.close();
-            fileIn.close();
             Alert loadingProgressAlert = new Alert(AlertType.INFORMATION);
             loadingProgressAlert.setHeaderText(null);
             loadingProgressAlert.setContentText("Progressi caricati correttamente!");
@@ -703,10 +699,10 @@ public class ClassicGameController extends GameController implements Initializab
        return leaderboard;
    }
    
-   public void showLeaderboard(ActionEvent event)throws IOException{
+   public void showLeaderboard(ActionEvent event){
        VBox vbox = new VBox(getLeaderboard());
        Scene scene = new Scene(vbox, 300, 200);
-       scene.getStylesheets().add("./application/game_playing/LeaderboardStyle.css");
+       scene.getStylesheets().add("application/game_playing/LeaderboardStyle.css");
        Stage popupLeaderboard = new Stage();
        popupLeaderboard.setResizable(false);
        popupLeaderboard.initModality(Modality.APPLICATION_MODAL);
@@ -718,7 +714,7 @@ public class ClassicGameController extends GameController implements Initializab
    public void showLeaderboard() {
 	   VBox vbox = new VBox(getLeaderboard());
        Scene scene = new Scene(vbox, 300, 200);
-       scene.getStylesheets().add("./application/game_playing/LeaderboardStyle.css");
+       scene.getStylesheets().add("application/game_playing/LeaderboardStyle.css");
        Stage popupLeaderboard = new Stage();
        popupLeaderboard.setResizable(false);
        popupLeaderboard.initModality(Modality.APPLICATION_MODAL);
@@ -729,9 +725,7 @@ public class ClassicGameController extends GameController implements Initializab
    
    public  ObservableList<LeaderboardData> getDataFromLeaderboardFile() {
 	   ObservableList<LeaderboardData> data = FXCollections.observableArrayList();
-	   try {
-		   File leaderboardFile=new File("./Files/ConfigurationFiles/"+adminUsername+game.getGameType().toString()+"sLeaderboard.csv");
-		   Scanner scan=new Scanner(leaderboardFile);
+	   try (Scanner scan=new Scanner(new File("./Files/ConfigurationFiles/"+adminUsername+game.getGameType().toString()+"sLeaderboard.csv"))){
 		   int position=1;
 		   while(scan.hasNextLine()){
 			   String[] line=scan.nextLine().split(",");
@@ -742,16 +736,19 @@ public class ClassicGameController extends GameController implements Initializab
 		   }
  
        } catch (FileNotFoundException e) {
-           e.printStackTrace(); 
+    	   Alert alert=new Alert(AlertType.ERROR);
+    	   alert.setHeaderText("Si è verificato un errore:");
+    	   alert.setContentText("Riprova più tardi!");
+    	   alert.showAndWait();
        }
 	   return data;
    }
    
-   public void save(ActionEvent event) throws IOException{
+   public void save(ActionEvent event) {
 	   	serialize("./Files/ConfigurationFiles/"+gameCode+".ser");
    }		
    
-   public void quit(ActionEvent event) throws IOException{
+   public void quit(ActionEvent event) {
 		Alert alert=new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Logout");
 		alert.setGraphic(null);
@@ -760,14 +757,23 @@ public class ClassicGameController extends GameController implements Initializab
 		if(alert.showAndWait().get()==ButtonType.OK) {
 			backgroundTrack.stop();
 			Stage stage = (Stage) ((MenuItem) event.getTarget()).getParentPopup().getOwnerWindow();
-		    Parent root = FXMLLoader.load(new File("src/application/home.fxml").toURI().toURL());
-		    Scene scene = new Scene(root);
-		    stage.setScene(scene);
-		    stage.show();
+		    Parent root;
+			try {
+				root = FXMLLoader.load(new File("src/application/home.fxml").toURI().toURL());
+				Scene scene = new Scene(root);
+			    stage.setScene(scene);
+			    stage.show();
+			} catch (IOException e) {
+				Alert errorAlert=new Alert(AlertType.ERROR);
+				errorAlert.setHeaderText("Si è verificato un errore:");
+				errorAlert.setContentText("Riprova più tardi!");
+				errorAlert.showAndWait();
+				e.printStackTrace();
+			}
 		}	
    }	
    
-   public void saveAndQuit(ActionEvent event) throws IOException{
+   public void saveAndQuit(ActionEvent event) {
 		String serializationFile="./Files/ConfigurationFiles/"+gameCode+".ser";
 		serialize(serializationFile);
 		Alert alert=new Alert(AlertType.CONFIRMATION);
@@ -778,16 +784,26 @@ public class ClassicGameController extends GameController implements Initializab
 		if(alert.showAndWait().get()==ButtonType.OK) {
 			backgroundTrack.stop();
 			Stage stage = (Stage) ((MenuItem) event.getTarget()).getParentPopup().getOwnerWindow();
-	        Parent root = FXMLLoader.load(new File("src/application/home.fxml").toURI().toURL());
-	        Scene scene = new Scene(root);
-	        stage.setScene(scene);
-	        stage.show();
+	        Parent root;
+			try {
+				root = FXMLLoader.load(new File("src/application/home.fxml").toURI().toURL());
+				Scene scene = new Scene(root);
+		        stage.setScene(scene);
+		        stage.show();
+			} catch (IOException e) {
+				Alert errorAlert=new Alert(AlertType.ERROR);
+				errorAlert.setHeaderText("Si è verificato un errore:");
+				errorAlert.setContentText("Riprova più tardi!");
+				errorAlert.showAndWait();
+				e.printStackTrace();
+			}
+	       
 		}
    }
    
    public void getCharacterInfos(int player) {
 	   Character character=game.getPlayer(player).getCharacter();
-	   ImageView chImage = new ImageView(new Image(getClass().getResourceAsStream("./CharactersCardsImages/"+character.getName()+".png")));
+	   ImageView chImage = new ImageView(new Image(getClass().getResourceAsStream("CharactersCardsImages/"+character.getName()+".png")));
 	   chImage.setFitWidth(300);
 	   chImage.setFitHeight(350);
 	  
@@ -844,7 +860,7 @@ public class ClassicGameController extends GameController implements Initializab
 	   alert.setHeaderText(null);
 	   alert.setGraphic(null);
 	   alert.getDialogPane().getStyleClass().add("game-alert");
-	   alert.getDialogPane().getScene().getStylesheets().add("./application/game_playing/GameAlertStyle.css");
+	   alert.getDialogPane().getScene().getStylesheets().add("application/game_playing/GameAlertStyle.css");
 	   alert.getButtonTypes().remove(ButtonType.OK);
 	   alert.getButtonTypes().add(ButtonType.CLOSE);
 	   alert.getDialogPane().setContent(box);

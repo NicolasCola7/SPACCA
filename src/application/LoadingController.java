@@ -6,6 +6,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -32,11 +34,20 @@ public class LoadingController {
         rotateAnimation.play();
     }
     
-    public void goToPlay(ActionEvent event) throws IOException {
-		root = FXMLLoader.load(getClass().getResource("Player.fxml"));
-		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-		scene=new Scene(root);
-		stage.setScene(scene);
-		stage.show();
+    public void goToPlay(ActionEvent event)  {
+		try {
+			root = FXMLLoader.load(getClass().getResource("Player.fxml"));
+			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+			scene=new Scene(root);
+			stage.setScene(scene);
+			stage.show();
+		} catch (IOException e) {
+			Alert errorAlert=new Alert(AlertType.ERROR);
+			errorAlert.setHeaderText("Si è verificato un errore:");
+			errorAlert.setContentText("Riprova più tardi!");
+			errorAlert.showAndWait();
+			e.printStackTrace();
+		}
+		
 	}
 }

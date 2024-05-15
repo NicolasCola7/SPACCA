@@ -12,6 +12,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import javafx.scene.control.TextArea;
@@ -82,12 +84,12 @@ public class RulesController implements Initializable{
 		TSauron.setText("Carta che permette di infliggere 20 danni a\ntutti i giocatori che non è possibile  evitare.\nAll'interno di un mazzo sono presenti 5 copie.\nFa parte del seme Signore degli Anelli (SA).\n");
 		TArrembaggio.setText("Carta che permette di rubare una carta casuale\ndalla mano dell'avversario.\nAll'interno di un mazzo sono presenti 4 copie.\nFa parte del seme Pirati dei Caraibi (PC).\n");
 		TPioggia.setText("Carta che permette di distruggere tutte le\ncarte statiche presenti nella board dell'\navversario scelto.\nAll'interno di un mazzo sono presenti 4 copie.\nFa parte del seme Star Wars (SW).\n");
-		CAttacco.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/Attacco.png")));
-		CThanos.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/GuantoDiThanos.png")));
-		CPozione.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/PozioneCurativa.png")));
-		CSauron.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/OcchioDiSauron.png")));
-		CArrembaggio.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/Arrembaggio.png")));
-		CPioggia.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/PioggiaDiMeteore.png")));
+		CAttacco.setImage(new Image(getClass().getResourceAsStream("game_playing/CardsImages/Attacco.png")));
+		CThanos.setImage(new Image(getClass().getResourceAsStream("game_playing/CardsImages/GuantoDiThanos.png")));
+		CPozione.setImage(new Image(getClass().getResourceAsStream("game_playing/CardsImages/PozioneCurativa.png")));
+		CSauron.setImage(new Image(getClass().getResourceAsStream("game_playing/CardsImages/OcchioDiSauron.png")));
+		CArrembaggio.setImage(new Image(getClass().getResourceAsStream("game_playing/CardsImages/Arrembaggio.png")));
+		CPioggia.setImage(new Image(getClass().getResourceAsStream("game_playing/CardsImages/PioggiaDiMeteore.png")));
 
 	}
 	
@@ -98,21 +100,21 @@ public class RulesController implements Initializable{
 		TMaledizione.setText("Carta che permette di ridurre la precisione \ndell'attaccante.\nAll'interno di un mazzo sono presenti 5 copie.\nFa parte del seme Pirati dei Caraibi (PC).\n");
 		TScudo.setText("Carta che permette di evitare il colpo di un\navversario.\nAll'interno di un mazzo sono presenti 12 copie\nNon possiede alcun seme.\n");
 		TOlogramma.setText("Carta che funge da scudo se la carta estratta\nè dello stesso seme del personaggio.\nAll'interno di un mazzo sono presenti 5 copie.\nFa parte del seme Star Wars (SW).\n");
-		CAnello.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/Anello.png")));
-		CSpecchio.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/SpecchioIncantato.png")));
-		CVeleno.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/VelenoDiVedovaNera.png")));
-		CMaledizione.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/MaledizioneAzteca.png")));
-		CScudo.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/Scudo.png")));
-		COlogramma.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/Ologramma.png")));
+		CAnello.setImage(new Image(getClass().getResourceAsStream("game_playing/CardsImages/Anello.png")));
+		CSpecchio.setImage(new Image(getClass().getResourceAsStream("game_playing/CardsImages/SpecchioIncantato.png")));
+		CVeleno.setImage(new Image(getClass().getResourceAsStream("game_playing/CardsImages/VelenoDiVedovaNera.png")));
+		CMaledizione.setImage(new Image(getClass().getResourceAsStream("game_playing/CardsImages/MaledizioneAzteca.png")));
+		CScudo.setImage(new Image(getClass().getResourceAsStream("game_playing/CardsImages/Scudo.png")));
+		COlogramma.setImage(new Image(getClass().getResourceAsStream("game_playing/CardsImages/Ologramma.png")));
 	}
 	
 	public void setEvento() {
 		TFurto.setText("Furto d'identità:\nCarta che permette di scambiare il\npersonaggio con quello di un altro giocatore.\nAll'interno di un mazzo ne è presente 1 copia\nNon possiede alcun seme.\n");
 		TGiorno.setText("Giorno del giudizio:\nCarta che permette di eliminare un giocatore\na scelta.\nAll'interno di un mazzo ne è presente 1 copia\nNon possiede alcun seme.\n");
 		TMiracolo.setText("Miracolo:\nCarta che permette recupera tutti i punti vita\npersi.\nAll'interno di un mazzo ne è presente 1 copia\nNon possiede alcun seme.\n");
-		CFurto.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/FurtoDiIdentità.png")));
-		CGiorno.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/GiornoDelGiudizio.png")));
-		CMiracolo.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/Miracolo.png")));
+		CFurto.setImage(new Image(getClass().getResourceAsStream("game_playing/CardsImages/FurtoDiIdentità.png")));
+		CGiorno.setImage(new Image(getClass().getResourceAsStream("game_playing/CardsImages/GiornoDelGiudizio.png")));
+		CMiracolo.setImage(new Image(getClass().getResourceAsStream("game_playing/CardsImages/Miracolo.png")));
 	}
 	
 	public void setWeapons() {
@@ -126,16 +128,16 @@ public class RulesController implements Initializable{
 		TBacchettaPrinc.setText("Arma che ha una potenza di 9 punti.\nAll'interno di un mazzo sono presenti 2 copie\nFa parte del seme Harry Potter (HP).\n");
 		TSpadaOscura.setText("Arma che ha una potenza di 10 punti.\nAll'interno di un mazzo sono presenti 2 copie\nFa parte del seme Star Wars (SW).\n");
 		TScettro.setText("Arma che ha una potenza di 8 punti.\nAll'interno di un mazzo sono presenti 2 copie\nFa parte del seme Marvel (MV).\n");
-		CBacchetta.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/BacchettaDiSambuco.png")));
-		CSpadaLaser.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/SpadaLaser.png")));
-		CSpadaRe.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/SpadaDelRe.png")));
-		CSciabola.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/SciabolaDelPirata.png")));
-		CPistola.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/Pistola.png")));
-		CMjolnir.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/Mjolnir.png")));
-		CSpadaSemplice.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/SpadaComune.png")));
-		CBacchettaPrinc.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/BacchettaDelPrincipiante.png")));
-		CSpadaOscura.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/SpadaLaserOscura.png")));
-		CScettro.setImage(new Image(getClass().getResourceAsStream("./game_playing/CardsImages/ScettroDiLoki.png")));
+		CBacchetta.setImage(new Image(getClass().getResourceAsStream("game_playing/CardsImages/BacchettaDiSambuco.png")));
+		CSpadaLaser.setImage(new Image(getClass().getResourceAsStream("game_playing/CardsImages/SpadaLaser.png")));
+		CSpadaRe.setImage(new Image(getClass().getResourceAsStream("game_playing/CardsImages/SpadaDelRe.png")));
+		CSciabola.setImage(new Image(getClass().getResourceAsStream("game_playing/CardsImages/SciabolaDelPirata.png")));
+		CPistola.setImage(new Image(getClass().getResourceAsStream("game_playing/CardsImages/Pistola.png")));
+		CMjolnir.setImage(new Image(getClass().getResourceAsStream("game_playing/CardsImages/Mjolnir.png")));
+		CSpadaSemplice.setImage(new Image(getClass().getResourceAsStream("game_playing/CardsImages/SpadaComune.png")));
+		CBacchettaPrinc.setImage(new Image(getClass().getResourceAsStream("game_playing/CardsImages/BacchettaDelPrincipiante.png")));
+		CSpadaOscura.setImage(new Image(getClass().getResourceAsStream("game_playing/CardsImages/SpadaLaserOscura.png")));
+		CScettro.setImage(new Image(getClass().getResourceAsStream("game_playing/CardsImages/ScettroDiLoki.png")));
 
 	}
 	
@@ -150,25 +152,34 @@ public class RulesController implements Initializable{
 		TThanos.setText("Personaggio di Thanos.\nPosiede 10 punti attacco, 80 punti vita, \n6 punti precisione.\nFa parte del seme Marvel (MV).\n");
 		TJack.setText("Personaggio di Jack Sparrow.\nPosiede 6 punti attacco, 90 punti vita, \n9 punti precisione.\nFa parte del seme Pirati dei Caraibi (PC).\n");
 		TDavy.setText("Personaggio di Davy Jones.\nPosiede 8 punti attacco, 90 punti vita, \n9 punti precisione.\nFa parte del seme Pirati dei Caraibi (PC).\n");
-		CHarry.setImage(new Image(getClass().getResourceAsStream("./game_playing/CharactersCardsImages/HarryPotterCh.png")));
-		CVoldemort.setImage(new Image(getClass().getResourceAsStream("./game_playing/CharactersCardsImages/VoldemortCh.png")));
-		CDarthVader.setImage(new Image(getClass().getResourceAsStream("./game_playing/CharactersCardsImages/DarthVaderCh.png")));
-		CYoda.setImage(new Image(getClass().getResourceAsStream("./game_playing/CharactersCardsImages/YodaCh.png")));
-		CFrodo.setImage(new Image(getClass().getResourceAsStream("./game_playing/CharactersCardsImages/FrodoCh.png")));
-		CSauronp.setImage(new Image(getClass().getResourceAsStream("./game_playing/CharactersCardsImages/SauronCh.png")));
-		CThor.setImage(new Image(getClass().getResourceAsStream("./game_playing/CharactersCardsImages/ThorCh.png")));
-		CThanos.setImage(new Image(getClass().getResourceAsStream("./game_playing/CharactersCardsImages/ThanosCh.png")));
-		CJack.setImage(new Image(getClass().getResourceAsStream("./game_playing/CharactersCardsImages/JackSparrowCh.png")));
-		CDavy.setImage(new Image(getClass().getResourceAsStream("./game_playing/CharactersCardsImages/DavyJonesCh.png")));
+		CHarry.setImage(new Image(getClass().getResourceAsStream("game_playing/CharactersCardsImages/HarryPotterCh.png")));
+		CVoldemort.setImage(new Image(getClass().getResourceAsStream("game_playing/CharactersCardsImages/VoldemortCh.png")));
+		CDarthVader.setImage(new Image(getClass().getResourceAsStream("game_playing/CharactersCardsImages/DarthVaderCh.png")));
+		CYoda.setImage(new Image(getClass().getResourceAsStream("game_playing/CharactersCardsImages/YodaCh.png")));
+		CFrodo.setImage(new Image(getClass().getResourceAsStream("game_playing/CharactersCardsImages/FrodoCh.png")));
+		CSauronp.setImage(new Image(getClass().getResourceAsStream("game_playing/CharactersCardsImages/SauronCh.png")));
+		CThor.setImage(new Image(getClass().getResourceAsStream("game_playing/CharactersCardsImages/ThorCh.png")));
+		CThanos.setImage(new Image(getClass().getResourceAsStream("game_playing/CharactersCardsImages/ThanosCh.png")));
+		CJack.setImage(new Image(getClass().getResourceAsStream("game_playing/CharactersCardsImages/JackSparrowCh.png")));
+		CDavy.setImage(new Image(getClass().getResourceAsStream("game_playing/CharactersCardsImages/DavyJonesCh.png")));
 		
 	}
 	
-	public void goToHome(ActionEvent event) throws IOException {
-		root = FXMLLoader.load(getClass().getResource("home.fxml"));
-		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-		scene=new Scene(root);
-		stage.setScene(scene);
-		stage.show();
+	public void goToHome(ActionEvent event)  {
+		try {
+			root = FXMLLoader.load(getClass().getResource("home.fxml"));
+			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+			scene=new Scene(root);
+			stage.setScene(scene);
+			stage.show();
+		} catch (IOException e) {
+			Alert errorAlert=new Alert(AlertType.ERROR);
+			errorAlert.setHeaderText("Si è verificato un errore:");
+			errorAlert.setContentText("Riprova più tardi!");
+			errorAlert.showAndWait();
+			e.printStackTrace();
+		}
+		
 	}
 	
 	

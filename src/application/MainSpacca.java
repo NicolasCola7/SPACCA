@@ -6,6 +6,8 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 
@@ -13,7 +15,8 @@ import javafx.geometry.Rectangle2D;
 public class MainSpacca extends Application {
 	@Override
 	public void start(Stage primaryStage) {
-		try {			
+		try {	
+			
 			Parent root =FXMLLoader.load(getClass().getResource("home.fxml"));
 		    
 			Scene scene = new Scene(root);
@@ -24,9 +27,11 @@ public class MainSpacca extends Application {
 			primaryStage.initStyle(StageStyle.UTILITY);
 			
 			primaryStage.show();
-			
 		} catch(Exception e) {
-			e.printStackTrace();
+			Alert alert=new Alert(AlertType.ERROR);
+			alert.setHeaderText("Si è verificato un errore:");
+			alert.setContentText("Riprova più tardi!");
+			alert.showAndWait();	
 		}
 	}
 	

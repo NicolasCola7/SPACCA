@@ -81,8 +81,8 @@ public class Tournament extends Game  {
 	@Override
 	public void insertPlayers() {
 		players=new LinkedList<Player>();
-		try {
-			Scanner scan=new Scanner(datas);
+		try (Scanner scan=new Scanner(datas)){
+
 			while(scan.hasNextLine()) {
 				String[] line=scan.nextLine().split(",");
 				if(line[2].equals(gameCode)) {
@@ -101,10 +101,12 @@ public class Tournament extends Game  {
 				else
 					continue;
 			}
-			scan.close();
 		}catch(FileNotFoundException e) {
-			System.out.println("File not found");
-		}
+			 Alert alert=new Alert(AlertType.ERROR);
+			 alert.setHeaderText("Si è verificato un errore:");
+			 alert.setContentText("Riprova più tardi!");
+			 alert.showAndWait();
+		}	
 	}
 	
 	

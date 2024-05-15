@@ -50,37 +50,59 @@ public class NewPlayerController implements Initializable {
 		addButton.disableProperty().bind(playerUsername.textProperty().isEmpty());
 	}
 	
-	public void goToHome(ActionEvent event) throws IOException {
+	public void goToHome(ActionEvent event)  {
 		Alert alert=new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Logout");
 		alert.setHeaderText("Stai per effettuare il logout!");
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
-			root = FXMLLoader.load((new File("src/application/home.fxml").toURI().toURL()));
+			try {
+				root = FXMLLoader.load((new File("src/application/home.fxml").toURI().toURL()));
+				stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+				scene=new Scene(root);
+				stage.setScene(scene);
+				stage.show();
+			} catch (IOException e) {
+				Alert errorAlert=new Alert(AlertType.ERROR);
+				errorAlert.setHeaderText("Si è verificato un errore:");
+				errorAlert.setContentText("Riprova più tardi!");
+				errorAlert.showAndWait();
+				e.printStackTrace();
+			}
+			
+		}
+	}
+	public void back(ActionEvent event)  {
+		try {
+			root = FXMLLoader.load((new File("src/application/Admin.fxml").toURI().toURL()));
 			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 			scene=new Scene(root);
 			stage.setScene(scene);
 			stage.show();
+		} catch (IOException e) {
+			Alert errorAlert=new Alert(AlertType.ERROR);
+			errorAlert.setHeaderText("Si è verificato un errore:");
+			errorAlert.setContentText("Riprova più tardi!");
+			errorAlert.showAndWait();
+			e.printStackTrace();
+			e.printStackTrace();
 		}
-	}
-	public void back(ActionEvent event) throws IOException {
-		root = FXMLLoader.load((new File("src/application/Admin.fxml").toURI().toURL()));
-		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-		scene=new Scene(root);
-		stage.setScene(scene);
-		stage.show();
+		
 	}
 
-	public void addPlayer(ActionEvent event) throws IOException {
+	public void addPlayer(ActionEvent event)  {
 		String name=playerUsername.getText().trim();
         playersList=new File("./Files/ConfigurationFiles/"+adminUsername+"ListaGiocatori.csv");
-		Scanner scan = new Scanner(playersList);
-		players=new ArrayList<String>();
-		while(scan.hasNextLine()) {
-			String player=scan.nextLine();
-			players.add(player);	
-		}
-        	if(!players.contains(name)  && (name.length()<3 || !name.substring(0, 3).equalsIgnoreCase("bot"))) {
+		
+		try (Scanner scan=new Scanner(playersList)){
+			players=new ArrayList<String>();
+			
+			while(scan.hasNextLine()) {
+				String player=scan.nextLine();
+				players.add(player);	
+			}
+			
+			if(!players.contains(name)  && (name.length()<3 || !name.substring(0, 3).equalsIgnoreCase("bot"))) {
         		addToPlayersList();
         		addToClassicGamesLeaderboard(name);
         		addToTournamentsLeaderboard(name);
@@ -95,52 +117,92 @@ public class NewPlayerController implements Initializable {
 				msg.setTextFill(Color.RED);
 				playerUsername.clear();
         	}
+		} catch (FileNotFoundException e) {
+			Alert errorAlert=new Alert(AlertType.ERROR);
+			errorAlert.setHeaderText("Si è verificato un errore:");
+			errorAlert.setContentText("Riprova più tardi!");
+			errorAlert.showAndWait();
+			e.printStackTrace();
+			e.printStackTrace();
+		}    	
 	}
 	
-	private void addToPlayersList() {
-		try {
-			FileWriter fw = new FileWriter(playersList, true);
-			PrintWriter pw = new PrintWriter(fw);
+	private void addToPlayersList()  {
+		try (FileWriter fw = new FileWriter(playersList, true);
+				PrintWriter pw = new PrintWriter(fw)){
+			
 			pw.println(playerUsername.getText());
-			pw.close();
-		} catch (IOException e) {
-			System.out.println("File '" + adminUsername + "ListaGiocatori.csv" + "' not found");
+	
+		} catch (FileNotFoundException e) {
+			Alert errorAlert=new Alert(AlertType.ERROR);
+			errorAlert.setHeaderText("Si è verificato un errore:");
+			errorAlert.setContentText("Riprova più tardi!");
+			errorAlert.showAndWait();
+			e.printStackTrace();
+		} catch (IOException e1) {
+			Alert errorAlert=new Alert(AlertType.ERROR);
+			errorAlert.setHeaderText("Si è verificato un errore:");
+			errorAlert.setContentText("Riprova più tardi!");
+			errorAlert.showAndWait();
+			e1.printStackTrace();
 		}
 	}
 	
 	private void getCurrentAdmin() {	
-		try {
-			Scanner scan = new Scanner(new File("./Files/ConfigurationFiles/AdminAttuale.csv"));
+		try (Scanner scan = new Scanner(new File("./Files/ConfigurationFiles/AdminAttuale.csv"))){
+			
 			  while (scan.hasNextLine()) {
 		        	String line=scan.nextLine();
 		        	adminUsername=line;
 		        }
 		} catch (FileNotFoundException e) {
-			System.out.println("File 'AdminAttuale' not found");
+			Alert alert=new Alert(AlertType.ERROR);
+			alert.setHeaderText("Si è verificato un errore:");
+			alert.setContentText("Riprova più tardi!");
+			alert.showAndWait();	
 		}
 	}
 	
 	private void addToClassicGamesLeaderboard(String player) {
 		File leaderboard=new File("./Files/ConfigurationFiles/"+adminUsername+"ClassicGamesLeaderboard.csv");
-		try {
-			FileWriter fw = new FileWriter(leaderboard, true);
-			PrintWriter pw = new PrintWriter(fw);
+		try (FileWriter fw = new FileWriter(leaderboard, true);
+				PrintWriter pw = new PrintWriter(fw)){
+			
 			pw.println(player+","+0);
-			pw.close();
+		
+		} catch (FileNotFoundException e) {
+			Alert errorAlert=new Alert(AlertType.ERROR);
+			errorAlert.setHeaderText("Si è verificato un errore:");
+			errorAlert.setContentText("Riprova più tardi!");
+			errorAlert.showAndWait();
+			e.printStackTrace();
 		} catch (IOException e) {
-			System.out.println("File '" + adminUsername + "ClassicGamesLeaderboard.csv" + "' not found");
+			Alert alert=new Alert(AlertType.ERROR);
+			alert.setHeaderText("Si è verificato un errore:");
+			alert.setContentText("Riprova più tardi!");
+			alert.showAndWait();		
 		}
 	}
 	
 	private void addToTournamentsLeaderboard(String player) {
 		File leaderboard=new File("./Files/ConfigurationFiles/"+adminUsername+"TournamentsLeaderboard.csv");
-		try {
-			FileWriter fw = new FileWriter(leaderboard, true);
-			PrintWriter pw = new PrintWriter(fw);
+		try (FileWriter fw = new FileWriter(leaderboard, true);
+				PrintWriter pw = new PrintWriter(fw)){
+			
 			pw.println(player+","+0);
-			pw.close();
+		
+		} catch (FileNotFoundException e) {
+			Alert errorAlert=new Alert(AlertType.ERROR);
+			errorAlert.setHeaderText("Si è verificato un errore:");
+			errorAlert.setContentText("Riprova più tardi!");
+			errorAlert.showAndWait();
+			e.printStackTrace();
 		} catch (IOException e) {
-			System.out.println("File '" + adminUsername + "TournamentsLeaderboard.csv" + "' not found");
+			Alert alert=new Alert(AlertType.ERROR);
+			alert.setHeaderText("Si è verificato un errore:");
+			alert.setContentText("Riprova più tardi!");
+			alert.showAndWait();	
+			e.printStackTrace();
 		}
 	}
 }

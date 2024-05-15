@@ -23,6 +23,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
@@ -48,21 +49,38 @@ public class PlayerController implements Initializable{
 		
 	}
 	
-	public void goToHome(ActionEvent event) throws IOException {
-		root = FXMLLoader.load(getClass().getResource("home.fxml"));
-		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-		scene=new Scene(root);
-		stage.setScene(scene);
-		stage.show();
+	public void goToHome(ActionEvent event)  {
+		try {
+			root = FXMLLoader.load(getClass().getResource("home.fxml"));
+			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+			scene=new Scene(root);
+			stage.setScene(scene);
+			stage.show();
+		} catch (IOException e) {
+			Alert errorAlert=new Alert(AlertType.ERROR);
+			errorAlert.setHeaderText("Si è verificato un errore:");
+			errorAlert.setContentText("Riprova più tardi!");
+			errorAlert.showAndWait();
+			e.printStackTrace();
+		}
 	}
 	
-	public void play(ActionEvent event) throws IOException {
+	public void play(ActionEvent event)  {
 	    if (checkGameCode(gameCode.getText()) == true) {
-	        root = FXMLLoader.load(getClass().getResource("Loading.fxml"));
-	        stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-	        scene = new Scene(root);
-	        stage.setScene(scene);
-	        stage.show();
+	        try {
+				root = FXMLLoader.load(getClass().getResource("Loading.fxml"));
+				 stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+				 scene = new Scene(root);
+				 stage.setScene(scene);
+				 stage.show();
+			} catch (IOException e) {
+				Alert errorAlert=new Alert(AlertType.ERROR);
+				errorAlert.setHeaderText("Si è verificato un errore:");
+				errorAlert.setContentText("Riprova più tardi!");
+				errorAlert.showAndWait();
+				e.printStackTrace();
+			}
+	       
 
 	        // Utilizza un task asincrono per caricare la scena del gioco classico o del torneo
 	        Task<Void> task = new Task<Void>() {
@@ -71,7 +89,10 @@ public class PlayerController implements Initializable{
 	                try {
 	                    Thread.sleep(3000); // attendi 3 secondi per mostrare la scena di loading
 	                } catch (InterruptedException e) {
-	                    e.printStackTrace();
+	                	Alert alert=new Alert(AlertType.ERROR);
+	        			alert.setHeaderText("Si è verificato un errore:");
+	        			alert.setContentText("Riprova più tardi!");
+	        			alert.showAndWait();
 	                }
 
 	                Platform.runLater(new Runnable() {
@@ -89,13 +110,10 @@ public class PlayerController implements Initializable{
 	                                stage.setScene(scene);
 	                                stage.show();
 	                            } catch (IOException e) {
-	                                e.printStackTrace();
-	                                // Mostra un messaggio di errore all'utente
-	                                Alert alert = new Alert(Alert.AlertType.ERROR);
-	                                alert.setTitle("Errore");
-	                                alert.setHeaderText("Impossibile caricare la scena del gioco classico.");
-	                                alert.setContentText("Riprova più tardi.");
-	                                alert.showAndWait();
+	                                Alert alert=new Alert(AlertType.ERROR);
+	                    			alert.setHeaderText("Si è verificato un errore:");
+	                    			alert.setContentText("Riprova più tardi!");
+	                    			alert.showAndWait();
 	                            }
 	                        } else {
 	                          
@@ -109,13 +127,10 @@ public class PlayerController implements Initializable{
 	                                stage.setScene(scene);
 	                                stage.show();
 	                            } catch (IOException e) {
-	                                e.printStackTrace();
-	                                // Mostra un messaggio di errore all'utente
-	                                Alert alert = new Alert(Alert.AlertType.ERROR);
-	                                alert.setTitle("Errore");
-	                                alert.setHeaderText("Impossibile caricare la scena del torneo.");
-	                                alert.setContentText("Riprova più tardi.");
-	                                alert.showAndWait();
+	                            	Alert alert=new Alert(AlertType.ERROR);
+	                    			alert.setHeaderText("Si è verificato un errore:");
+	                    			alert.setContentText("Riprova più tardi!");
+	                    			alert.showAndWait();
 	                            }
 	                        }
 	                    }
@@ -139,9 +154,9 @@ public class PlayerController implements Initializable{
 	private boolean checkGameCode(String code) {
 		boolean check=true;
 		File datas=new File("./Files/ConfigurationFiles/GamesDatas.csv");
-		Scanner scan;
-		try {
-			scan = new Scanner(datas);
+		
+		try (Scanner scan = new Scanner(datas)){
+			
 		while(scan.hasNextLine()) {
 			String[] line=scan.nextLine().split(",");
 			if(gameCode.getText().equals(line[2])) {
@@ -154,8 +169,10 @@ public class PlayerController implements Initializable{
 				check=false;
 		}
 		} catch (FileNotFoundException e) {
-			System.out.println("File not found");
-			e.printStackTrace();
+			Alert alert=new Alert(AlertType.ERROR);
+			alert.setHeaderText("Si è verificato un errore:");
+			alert.setContentText("Riprova più tardi!");
+			alert.showAndWait();	
 		}
 		return check;
 	}

@@ -8,6 +8,8 @@ import java.util.Scanner;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListView;
@@ -36,29 +38,31 @@ public abstract class GameCreationController{
 		players=new ArrayList<String>();
 		playersList=new File("./Files/ConfigurationFiles/"+adminUsername+"ListaGiocatori.csv");
 	
-		try {
-			Scanner scan = new Scanner(playersList);
+		try (Scanner scan = new Scanner(playersList)){
 			while(scan.hasNextLine()) {
 				players.add(scan.nextLine());
 			}
-			scan.close();
+			playersSelection.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+			playersSelection.getItems().addAll(players);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			Alert alert=new Alert(AlertType.ERROR);
+			alert.setHeaderText("Si è verificato un errore:");
+			alert.setContentText("Riprova più tardi!");
+			alert.showAndWait();
 		}
-		
-		playersSelection.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-		playersSelection.getItems().addAll(players);
 	}
 	
 	protected void getCurrentAdmin() {	
-		try {
-			Scanner scan = new Scanner(new File("./Files/ConfigurationFiles/AdminAttuale.csv"));
+		try (Scanner scan = new Scanner(new File("./Files/ConfigurationFiles/AdminAttuale.csv"))){
 			  while (scan.hasNextLine()) {
 		        	String line=scan.nextLine();
 		        	adminUsername=line;
 		        }
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			Alert alert=new Alert(AlertType.ERROR);
+			alert.setHeaderText("Si è verificato un errore:");
+			alert.setContentText("Riprova più tardi!");
+			alert.showAndWait();
 		}
 	}
 	
@@ -67,8 +71,7 @@ public abstract class GameCreationController{
 		File file=new File("./Files/ConfigurationFiles/GamesDatas.csv");
 		
 		if(file.length()!=0) {
-			try {
-				Scanner scan=new Scanner(file);
+			try(Scanner scan=new Scanner(file)) {
 				while(scan.hasNextLine()) {
 					String[] gameInfos=scan.nextLine().split(",");
 					if(gameInfos[2].equals(code)) {
@@ -78,9 +81,11 @@ public abstract class GameCreationController{
 					else
 						check=true;
 				}
-				scan.close();
 			} catch (FileNotFoundException e) {
-				e.printStackTrace();
+				Alert alert=new Alert(AlertType.ERROR);
+				alert.setHeaderText("Si è verificato un errore:");
+				alert.setContentText("Riprova più tardi!");
+				alert.showAndWait();
 			}
 		}
 		return check;

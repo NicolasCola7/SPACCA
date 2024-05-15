@@ -93,24 +93,24 @@ public abstract class GameController implements GameControllerInterface{
 	public abstract void initializeCardsBox(int currentPlayer);
 	public abstract void initializePlayersBox();
 	public abstract void setBindings();
-	public abstract void seeEquipedWeapon(ActionEvent event) throws IOException;
-	public abstract void seeCharacterInfos(ActionEvent event) throws IOException;
-	public abstract void seeBoard(ActionEvent event) throws IOException;
-	public abstract void drawCard(ActionEvent event) throws IOException;
-	public abstract  void discardCard(ActionEvent event)throws IOException;;
-	public abstract void submitCard(ActionEvent event)throws IOException;;
-	public abstract void submitPlayer(ActionEvent event)throws IOException;;
+	public abstract void seeEquipedWeapon(ActionEvent event) ;
+	public abstract void seeCharacterInfos(ActionEvent event) ;
+	public abstract void seeBoard(ActionEvent event) ;
+	public abstract void drawCard(ActionEvent event) ;
+	public abstract  void discardCard(ActionEvent event);;
+	public abstract void submitCard(ActionEvent event);;
+	public abstract void submitPlayer(ActionEvent event);;
 	public abstract void useBotRoutine();
-	public  abstract void checkCurrentPlayerElimination(int targetPlayer);
+	public abstract void checkCurrentPlayerElimination(int targetPlayer);
 	public abstract void checkConcurrentElimination() ;
 	public abstract void updateCurrentPlayer(int currentPlayer);
 	public abstract void serialize(String filename);
-	public abstract void closeWindowEvent(WindowEvent event)throws IOException;;
+	public abstract void closeWindowEvent(WindowEvent event);;
 	public abstract TableView<LeaderboardData> getLeaderboard();
-	public abstract void save(ActionEvent event) throws IOException;
-	public abstract void quit(ActionEvent event)throws IOException;
-	public abstract void saveAndQuit(ActionEvent event)throws IOException;;
-	public abstract void showLeaderboard(ActionEvent event) throws IOException;
+	public abstract void save(ActionEvent event) ;
+	public abstract void quit(ActionEvent event);
+	public abstract void saveAndQuit(ActionEvent event);;
+	public abstract void showLeaderboard(ActionEvent event) ;
 	public abstract  ObservableList<LeaderboardData> getDataFromLeaderboardFile();
 	public abstract void getCharacterInfos(int player);
 	
@@ -144,7 +144,7 @@ public abstract class GameController implements GameControllerInterface{
 	//showing latest played or discarded card
 	protected void setLatestPlayedCard(Card c) {
 		latestPlayedCardPane.getChildren().clear();
-		ImageView latestPlayedCard=new ImageView(new Image(getClass().getResourceAsStream("./CardsImages/"+c.getName().replaceAll("\\s+", "")+".png")));
+		ImageView latestPlayedCard=new ImageView(new Image(getClass().getResourceAsStream("CardsImages/"+c.getName().replaceAll("\\s+", "")+".png")));
 		latestPlayedCard.setFitHeight(200);
 		latestPlayedCard.setFitWidth(140);
 		latestPlayedCardPane.getChildren().add(latestPlayedCard);
@@ -153,7 +153,7 @@ public abstract class GameController implements GameControllerInterface{
 	private void setMenuButtonStyle() {
 	   menu.setLayoutX(primaryStage.getX());
        menu.setLayoutY(primaryStage.getY()+20);
-       ImageView menuImg=new ImageView(new Image(getClass().getResourceAsStream("./GameButtonsImages/Menu1.png")));
+       ImageView menuImg=new ImageView(new Image(getClass().getResourceAsStream("GameButtonsImages/Menu1.png")));
        menuImg.setFitWidth(menu.getPrefWidth()); 
        menuImg.setFitHeight(menu.getPrefHeight());
        menu.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -163,21 +163,24 @@ public abstract class GameController implements GameControllerInterface{
 	protected void deleteGameFromGamesDatasFile() {
 	   File file=new File("./Files/ConfigurationFiles/GamesDatas.csv");
 	   ArrayList<String> datas=new ArrayList<String>();
-	   try {
-		   Scanner scan=new Scanner(file);
+	   try ( Scanner scan=new Scanner(file);
+			 PrintWriter pw=new PrintWriter(file)){
+		  
 		   while(scan.hasNextLine()) {
 			   String line=scan.nextLine();
 			   String[] splittedLine=line.split(",");
 			   if(!splittedLine[2].equals(gameCode)) 
 				   datas.add(line);
 		   }
-		   PrintWriter pw=new PrintWriter(file);
+		   
 		   for(String line:datas)
 			   pw.println(line);
-		   pw.close();
 	   }
 	   catch(IOException e) {
-		   e.printStackTrace();
+		   Alert alert=new Alert(AlertType.ERROR);
+    	   alert.setHeaderText("Si è verificato un errore:");
+    	   alert.setContentText("Riprova più tardi!");
+    	   alert.showAndWait();
 	   }
    }
 	   
@@ -189,7 +192,7 @@ public abstract class GameController implements GameControllerInterface{
 	   
 	protected void setCardImage(ToggleButton btn) {
 	
-       Image icon = new Image(getClass().getResourceAsStream("./CardsImages/"+btn.getText().replaceAll("\\s+", "")+".png"));
+       Image icon = new Image(getClass().getResourceAsStream("CardsImages/"+btn.getText().replaceAll("\\s+", "")+".png"));
        ImageView iconView = new ImageView(icon);
        iconView.setFitWidth(btn.getPrefWidth()); 
        iconView.setFitHeight(btn.getPrefHeight());
@@ -247,7 +250,7 @@ public abstract class GameController implements GameControllerInterface{
        nameTurnBox.setLayoutX(gameButtonsBox.getLayoutX()-150);
       // nameTurnBox.setAlignment(Pos.TOP_RIGHT);
        
-       ImageView deckImg=new ImageView(new Image(getClass().getResourceAsStream("./CardsImages/Deck.png")));
+       ImageView deckImg=new ImageView(new Image(getClass().getResourceAsStream("CardsImages/Deck.png")));
        deckImg.setFitHeight(300);
        deckImg.setFitWidth(270);
        deckPane.getChildren().add(deckImg);
@@ -269,11 +272,20 @@ public abstract class GameController implements GameControllerInterface{
     	   cardSound=AudioSystem.getClip();
     	   cardSound.open(cardsAudioStream);
        } catch (UnsupportedAudioFileException e) {
-    	   e.printStackTrace();
+    	   Alert alert=new Alert(AlertType.ERROR);
+    	   alert.setHeaderText("File audio non supportato:");
+    	   alert.setContentText("Riprova più tardi!");
+    	   alert.showAndWait();
        } catch (IOException e) {
-    	   e.printStackTrace();
+    	   Alert alert=new Alert(AlertType.ERROR);
+    	   alert.setHeaderText("Si è verificato un errore:");
+    	   alert.setContentText("Riprova più tardi!");
+    	   alert.showAndWait();
        }catch(LineUnavailableException e) {
-    	   e.printStackTrace();
+    	   Alert alert=new Alert(AlertType.ERROR);
+    	   alert.setHeaderText("Si è verificato un errore:");
+    	   alert.setContentText("Riprova più tardi!");
+    	   alert.showAndWait();
        }
        
        setMenuButtonStyle();
@@ -281,47 +293,47 @@ public abstract class GameController implements GameControllerInterface{
    }	
    
 	 private void setButtonImages() {
-		 ImageView chButtonImg= new ImageView(new Image(getClass().getResourceAsStream("./GameButtonsImages/Character.png")));
+		 ImageView chButtonImg= new ImageView(new Image(getClass().getResourceAsStream("GameButtonsImages/Character.png")));
 		 chButtonImg.setFitWidth(50);
 		 chButtonImg.setFitHeight(50);
 		 characterInfosButton.setGraphic(chButtonImg);
 		 
-		 ImageView equipedWeaponImg= new ImageView(new Image(getClass().getResourceAsStream("./GameButtonsImages/Weapon3.png")));
+		 ImageView equipedWeaponImg= new ImageView(new Image(getClass().getResourceAsStream("GameButtonsImages/Weapon3.png")));
 		 equipedWeaponImg.setFitWidth(50);
 		 equipedWeaponImg.setFitHeight(50);
 		 equipedWeaponButton.setGraphic(equipedWeaponImg);
 		 
-		 ImageView boardImg= new ImageView(new Image(getClass().getResourceAsStream("./GameButtonsImages/Board.png")));
+		 ImageView boardImg= new ImageView(new Image(getClass().getResourceAsStream("GameButtonsImages/Board.png")));
 		 boardImg.setFitWidth(50);
 		 boardImg.setFitHeight(50);
 		 boardInfosButton.setGraphic(boardImg);
 		
-		 ImageView discardImg= new ImageView(new Image(getClass().getResourceAsStream("./GameButtonsImages/DiscardCard.png")));
+		 ImageView discardImg= new ImageView(new Image(getClass().getResourceAsStream("GameButtonsImages/DiscardCard.png")));
 		 discardImg.setFitWidth(50);
 		 discardImg.setFitHeight(50);
 		 discardCardButton.setGraphic(discardImg);
 		 
-		 ImageView drawImg= new ImageView(new Image(getClass().getResourceAsStream("./GameButtonsImages/DrawCard.png")));
+		 ImageView drawImg= new ImageView(new Image(getClass().getResourceAsStream("GameButtonsImages/DrawCard.png")));
 		 drawImg.setFitWidth(50);
 		 drawImg.setFitHeight(50);
 		 drawCardButton.setGraphic(drawImg);
 		 
-		 ImageView submitImg= new ImageView(new Image(getClass().getResourceAsStream("./GameButtonsImages/PlayCard.png")));
+		 ImageView submitImg= new ImageView(new Image(getClass().getResourceAsStream("GameButtonsImages/PlayCard.png")));
 		 submitImg.setFitWidth(50);
 		 submitImg.setFitHeight(50);
 		 submitCardButton.setGraphic(submitImg);
 		 
-		 ImageView nextPlayerImg= new ImageView(new Image(getClass().getResourceAsStream("./GameButtonsImages/NextPlayer.png")));
+		 ImageView nextPlayerImg= new ImageView(new Image(getClass().getResourceAsStream("GameButtonsImages/NextPlayer.png")));
 		 nextPlayerImg.setFitWidth(50);
 		 nextPlayerImg.setFitHeight(50);
 		 submitPlayerButton.setGraphic(nextPlayerImg);
 		 
 		 volumeButton.setLayoutX(menu.getLayoutX()+60);
 		 volumeButton.setLayoutY(menu.getLayoutY()-10);
-		 ImageView volumeOnImage = new ImageView(new Image(getClass().getResourceAsStream("./GameButtonsImages/VolumeOn.png")));
+		 ImageView volumeOnImage = new ImageView(new Image(getClass().getResourceAsStream("GameButtonsImages/VolumeOn.png")));
 		 volumeOnImage.setFitWidth(35);
 		 volumeOnImage.setFitHeight(35);
-		 ImageView volumeOffImage = new ImageView(new Image(getClass().getResourceAsStream("./GameButtonsImages/VolumeOff.png")));
+		 ImageView volumeOffImage = new ImageView(new Image(getClass().getResourceAsStream("GameButtonsImages/VolumeOff.png")));
 		 volumeOffImage.setFitWidth(35);
 		 volumeOffImage.setFitHeight(35);
 		 volumeButton.setGraphic(volumeOnImage);
@@ -351,14 +363,14 @@ public abstract class GameController implements GameControllerInterface{
 		alert.setHeaderText(null);
 		alert.setGraphic(null);
 		alert.getDialogPane().getStyleClass().add("game-alert");
-		alert.getDialogPane().getScene().getStylesheets().add("./application/game_playing/GameAlertStyle.css");
+		alert.getDialogPane().getScene().getStylesheets().add("application/game_playing/GameAlertStyle.css");
 		alert.getButtonTypes().remove(ButtonType.OK);
 		alert.getButtonTypes().add(ButtonType.CLOSE);
 		
 		String staticCard1=(board[0]==null?"Vuoto":board[0].getName().replaceAll("\\s+", ""));
 		String staticCard2=(board[1]==null?"Vuoto":board[1].getName().replaceAll("\\s+", ""));
-		ImageView imageView1 = new ImageView(new Image(getClass().getResourceAsStream("./CardsImages/"+staticCard1+".png")));
-	    ImageView imageView2 = new ImageView(new Image(getClass().getResourceAsStream("./CardsImages/"+staticCard2+".png")));
+		ImageView imageView1 = new ImageView(new Image(getClass().getResourceAsStream("CardsImages/"+staticCard1+".png")));
+	    ImageView imageView2 = new ImageView(new Image(getClass().getResourceAsStream("CardsImages/"+staticCard2+".png")));
 	    
 	    imageView1.setFitWidth(280);
         imageView1.setFitHeight(350);
@@ -379,11 +391,11 @@ public abstract class GameController implements GameControllerInterface{
 		alert.setHeaderText(null);
 		alert.setGraphic(null);
 		alert.getDialogPane().getStyleClass().add("game-alert");
-		alert.getDialogPane().getScene().getStylesheets().add("./application/game_playing/GameAlertStyle.css");
+		alert.getDialogPane().getScene().getStylesheets().add("application/game_playing/GameAlertStyle.css");
 		alert.getButtonTypes().remove(ButtonType.OK);
 		alert.getButtonTypes().add(ButtonType.CLOSE);
 		
-		ImageView weaponImage = new ImageView(new Image(getClass().getResourceAsStream("./CardsImages/"+fileName)));
+		ImageView weaponImage = new ImageView(new Image(getClass().getResourceAsStream("CardsImages/"+fileName)));
 		weaponImage.setFitWidth(280);
 		weaponImage.setFitHeight(350);	
 		

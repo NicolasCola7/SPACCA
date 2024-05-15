@@ -61,28 +61,45 @@ public class EditExistingController implements Initializable {
 		modifyButton.disableProperty().bind(selectedPlayer.valueProperty().isNull().or(newPlayerName.textProperty().isEmpty()));
 		
 	}
-	public void goToHome(ActionEvent event) throws IOException {
+	public void goToHome(ActionEvent event)  {
 		alert=new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Logout");
 		alert.setHeaderText("Stai per effettuare il logout!");
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
-			root = FXMLLoader.load((new File("src/application/home.fxml").toURI().toURL()));
+			try {
+				root = FXMLLoader.load((new File("src/application/home.fxml").toURI().toURL()));
+				stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+				scene=new Scene(root);
+				stage.setScene(scene);
+				stage.show();
+			} catch (IOException e) {
+				Alert errorAlert=new Alert(AlertType.ERROR);
+				errorAlert.setHeaderText("Si è verificato un errore:");
+				errorAlert.setContentText("Riprova più tardi!");
+				errorAlert.showAndWait();
+				e.printStackTrace();
+			}
+			
+		}
+	}
+	public void back(ActionEvent event)  {
+		try {
+			root = FXMLLoader.load((new File("src/application/Admin.fxml").toURI().toURL()));
 			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 			scene=new Scene(root);
 			stage.setScene(scene);
 			stage.show();
+		} catch (IOException e) {
+			Alert errorAlert=new Alert(AlertType.ERROR);
+			errorAlert.setHeaderText("Si è verificato un errore:");
+			errorAlert.setContentText("Riprova più tardi!");
+			errorAlert.showAndWait();
+			e.printStackTrace();
 		}
 	}
-	public void back(ActionEvent event) throws IOException {
-		root = FXMLLoader.load((new File("src/application/Admin.fxml").toURI().toURL()));
-		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-		scene=new Scene(root);
-		stage.setScene(scene);
-		stage.show();
-	}
 	
-	public void deletePlayer(ActionEvent event) throws FileNotFoundException {
+	public void deletePlayer(ActionEvent event) {
 		String selectedName = selectedPlayer.getSelectionModel().getSelectedItem();
 		alert = new Alert(Alert.AlertType.CONFIRMATION);
 		alert.setTitle("Eliminazione giocatore");
@@ -122,40 +139,49 @@ public class EditExistingController implements Initializable {
 	}
 	
 	 private void updatePlayersList() {
-        try {
-        	PrintWriter pw=new PrintWriter(playersList);
+        try (PrintWriter pw=new PrintWriter(playersList)){
+        	
             for (String name : players) {
                 pw.println(name);
             }
-        	pw.close();
+        	
         } catch (IOException e) {
-        	System.out.println("File '" + adminUsername + "ListaGiocatori.csv' not foud");
-        }
+        	Alert alert=new Alert(AlertType.ERROR);
+        	alert.setHeaderText("Si è verificato un errore:");
+     	   	alert.setContentText("Riprova più tardi!");
+     	   	alert.showAndWait();        }
     }
 	 
 	private void getCurrentAdmin() {	
-		try {
-			Scanner scan = new Scanner(new File("./Files/ConfigurationFiles/AdminAttuale.csv"));
+		try (Scanner scan = new Scanner(new File("./Files/ConfigurationFiles/AdminAttuale.csv"))){
+			
 			  while (scan.hasNextLine()) {
 		        	String line=scan.nextLine();
 		        	adminUsername=line;
 		        }
+		
 		} catch (FileNotFoundException e) {
-			System.out.println("File 'AdminAttuale.csv' not found");
+			Alert alert=new Alert(AlertType.ERROR);
+			alert.setHeaderText("Si è verificato un errore:");
+    	   	alert.setContentText("Riprova più tardi!");
+    	   	alert.showAndWait();
 		}
 	}
 	
 	private void getPlayersNames() {
 		players=new ArrayList<String>();
 		playersList=new File("./Files/ConfigurationFiles/"+adminUsername+"ListaGiocatori.csv");
-		try {
-			Scanner scan = new Scanner(playersList);
+		try (Scanner scan = new Scanner(playersList)){
+			
 			while(scan.hasNextLine()) {
 				players.add(scan.nextLine());
 			}
-			scan.close();
+		
 		} catch (FileNotFoundException e) {
-			System.out.println("File '" + adminUsername + "ListaGiocatori.csv' not foud");
+			Alert alert=new Alert(AlertType.ERROR);
+			alert.setHeaderText("Si è verificato un errore:");
+			alert.setContentText("Riprova più tardi!");
+			alert.showAndWait();
 		}
 	}
 	
