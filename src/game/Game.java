@@ -75,12 +75,12 @@ public abstract class Game implements Serializable, GameInterface{
 	abstract public void discardCard(int currentPlayer,int cardIndex);
 	
 	@Override
-	public void changeTurn() {//cambio turno
+	public void changeTurn() {
 		turn++;
 	}
 	
 	@Override
-	public ArrayList<Card> getPlayersHand(int currentPlayer){// ritorna la mano del gicatore corrente
+	public ArrayList<Card> getPlayersHand(int currentPlayer){// return current player hand
 		return players.get(currentPlayer).getHand();
 	}
 	

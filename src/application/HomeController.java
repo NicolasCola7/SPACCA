@@ -39,56 +39,54 @@ public class HomeController {
     
     
     public void initialize() {
+    	
+    	//create drop-down animation
+    	
+    	// define init and final proprieties for every component
   
-        // Definisci le proprietà iniziali e finali per l'animazione del logo
         KeyValue logoInitialTranslateY = new KeyValue(logo.translateYProperty(), -100);
         KeyValue logoFinalTranslateY = new KeyValue(logo.translateYProperty(), 0);
         KeyValue logoInitialOpacity = new KeyValue(logo.opacityProperty(), 0);
         KeyValue logoFinalOpacity = new KeyValue(logo.opacityProperty(), 1);
 
-        // Definisci le proprietà iniziali e finali per l'animazione del pulsante "Gioca Ora"
         KeyValue playButtonInitialTranslateY = new KeyValue(playButton.translateYProperty(), -100);
         KeyValue playButtonFinalTranslateY = new KeyValue(playButton.translateYProperty(), 0);
         KeyValue playButtonInitialOpacity = new KeyValue(playButton.opacityProperty(), 0);
         KeyValue playButtonFinalOpacity = new KeyValue(playButton.opacityProperty(), 1);
 
-        // Definisci le proprietà iniziali e finali per l'animazione del pulsante "Login Admin"
         KeyValue adminButtonInitialTranslateY = new KeyValue(adminButton.translateYProperty(), -100);
         KeyValue adminButtonFinalTranslateY = new KeyValue(adminButton.translateYProperty(), 0);
         KeyValue adminButtonInitialOpacity = new KeyValue(adminButton.opacityProperty(), 0);
         KeyValue adminButtonFinalOpacity = new KeyValue(adminButton.opacityProperty(), 1);
 
-        // Definisci le proprietà iniziali e finali per l'animazione del pulsante "Regolamento"
         KeyValue rulesButtonInitialTranslateY = new KeyValue(rulesButton.translateYProperty(), -100);
         KeyValue rulesButtonFinalTranslateY = new KeyValue(rulesButton.translateYProperty(), 0);
         KeyValue rulesButtonInitialOpacity = new KeyValue(rulesButton.opacityProperty(), 0);
         KeyValue rulesButtonFinalOpacity = new KeyValue(rulesButton.opacityProperty(), 1);
+        
+        //define timeline for every component
 
-        // Definisci la timeline per l'animazione del logo
         Timeline logoTimeline = new Timeline(
                 new KeyFrame(Duration.ZERO, logoInitialTranslateY, logoInitialOpacity),
                 new KeyFrame(Duration.seconds(2), logoFinalTranslateY, logoFinalOpacity)
         );
 
-        // Definisci la timeline per l'animazione del pulsante "Gioca Ora"
         Timeline playButtonTimeline = new Timeline(
                 new KeyFrame(Duration.ZERO, playButtonInitialTranslateY, playButtonInitialOpacity),
                 new KeyFrame(Duration.seconds(2), playButtonFinalTranslateY, playButtonFinalOpacity)
         );
 
-        // Definisci la timeline per l'animazione del pulsante "Login Admin"
         Timeline adminButtonTimeline = new Timeline(
                 new KeyFrame(Duration.ZERO, adminButtonInitialTranslateY, adminButtonInitialOpacity),
                 new KeyFrame(Duration.seconds(2), adminButtonFinalTranslateY, adminButtonFinalOpacity)
         );
 
-        // Definisci la timeline per l'animazione del pulsante "Regolamento"
         Timeline rulesButtonTimeline = new Timeline(
                 new KeyFrame(Duration.ZERO, rulesButtonInitialTranslateY, rulesButtonInitialOpacity),
                 new KeyFrame(Duration.seconds(2), rulesButtonFinalTranslateY, rulesButtonFinalOpacity)
         );
 
-        // Avvia le timeline
+        //play timeline
         logoTimeline.play();
         playButtonTimeline.play();
         adminButtonTimeline.play();
@@ -103,10 +101,7 @@ public class HomeController {
 			stage.setScene(scene);
 			stage.show();
 		} catch (IOException e) {
-			Alert errorAlert=new Alert(AlertType.ERROR);
-			errorAlert.setHeaderText("Si è verificato un errore:");
-			errorAlert.setContentText("Riprova più tardi!");
-			errorAlert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 			e.printStackTrace();
 		}
 		
@@ -120,10 +115,7 @@ public class HomeController {
 			stage.setScene(scene);
 			stage.show();
 		} catch (IOException e) {
-			Alert errorAlert=new Alert(AlertType.ERROR);
-			errorAlert.setHeaderText("Si è verificato un errore:");
-			errorAlert.setContentText("Riprova più tardi!");
-			errorAlert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 			e.printStackTrace();
 		}
 	}
@@ -136,15 +128,19 @@ public class HomeController {
 			stage.setScene(scene);
 			stage.show();
 		} catch (IOException e) {
-			Alert errorAlert=new Alert(AlertType.ERROR);
-			errorAlert.setHeaderText("Si è verificato un errore:");
-			errorAlert.setContentText("Riprova più tardi!");
-			errorAlert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 			e.printStackTrace();
 		}
 		
 	}
-
+	
+	private void showErrorMessage(String header, String content) {
+		Alert alert=new Alert(AlertType.ERROR);
+		alert.setTitle("Errore");
+		alert.setHeaderText(header);
+		alert.setContentText(content);
+		alert.showAndWait();
+	}
 }
 
 

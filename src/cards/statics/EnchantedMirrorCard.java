@@ -7,7 +7,7 @@ public class EnchantedMirrorCard extends StaticCard{
 
 	private static final long serialVersionUID = -4601484984417938718L;
 	
-	public EnchantedMirrorCard() { //quando si viene attaccati,non si subiscono damìnni ma li subisce l'avversario
+	public EnchantedMirrorCard() { //if attacked,striker takes damage
 		super("Specchio Incantato",Seed.HP);
 	}
 	

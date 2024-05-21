@@ -60,10 +60,7 @@ public class SuspendedGamesController implements Initializable{
 				stage.setScene(scene);
 				stage.show();
 			} catch (IOException e) {
-				Alert errorAlert=new Alert(AlertType.ERROR);
-				errorAlert.setHeaderText("Si è verificato un errore:");
-				errorAlert.setContentText("Riprova più tardi!");
-				errorAlert.showAndWait();
+				showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 				e.printStackTrace();
 			}
 			
@@ -78,15 +75,13 @@ public class SuspendedGamesController implements Initializable{
 			stage.setScene(scene);
 			stage.show();
 		} catch (IOException e) {
-			Alert errorAlert=new Alert(AlertType.ERROR);
-			errorAlert.setHeaderText("Si è verificato un errore:");
-			errorAlert.setContentText("Riprova più tardi!");
-			errorAlert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 			e.printStackTrace();
 		}
 		
 	}
 	
+	//delete the selected game 
 	public void deleteGame(ActionEvent event)  {
 		String deletedGame=gameSelection.getSelectionModel().getSelectedItem();
 		deleteGameFromGamesDatasFile(deletedGame);
@@ -95,6 +90,7 @@ public class SuspendedGamesController implements Initializable{
 		gameSelection.getItems().remove(deletedGame);
 	}
 	
+	//get current admin from file 
 	private void getCurrentAdmin() {	
 		try (Scanner scan = new Scanner(new File("./Files/ConfigurationFiles/AdminAttuale.csv"))){
 			
@@ -103,13 +99,12 @@ public class SuspendedGamesController implements Initializable{
 		        	adminUsername=line;
 		        }
 		} catch (FileNotFoundException e) {
-			Alert alert=new Alert(AlertType.ERROR);
-			alert.setHeaderText("Si è verificato un errore:");
-			alert.setContentText("Riprova più tardi!");
-			alert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+			e.printStackTrace();
 		}
 	}
 	
+	//init an arraylist with all admin related games, scanning from GameDatas file
 	private void populateAdminGamesList() {
 		gamesList=new File("./Files/ConfigurationFiles/GamesDatas.csv");
 		adminGamesList=new ArrayList<String>();
@@ -118,20 +113,19 @@ public class SuspendedGamesController implements Initializable{
 			while(scan.hasNextLine()) {
 				String line=scan.nextLine();
 				String[] splittedLine=line.split(",");
-				if(splittedLine[0].equals(adminUsername))
+				if(splittedLine[0].equals(adminUsername))	//add game to arraylist if admin (line[0]) is the same as adminUsername
 					adminGamesList.add(line);
 			}
-			gameSelection.getItems().addAll(adminGamesList);
+			gameSelection.getItems().addAll(adminGamesList);	//add to choiceBox all games related to the admin
 			
 		} catch (FileNotFoundException e) {
-			Alert alert=new Alert(AlertType.ERROR);
-			alert.setHeaderText("Si è verificato un errore:");
-			alert.setContentText("Riprova più tardi!");
-			alert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+			e.printStackTrace();
 		}
 		
 	}
 	
+	//delete game from file
 	private void deleteGameFromGamesDatasFile(String game) {
 	   ArrayList<String> datas=new ArrayList<String>();
 	   try ( Scanner scan=new Scanner(gamesList);
@@ -144,22 +138,29 @@ public class SuspendedGamesController implements Initializable{
 		   }
 		  
 		   for(String line:datas)
-			   pw.println(line);
+			   pw.println(line);	//delete game from file if equals to string in input 
 		 
 	   }
 	   catch(IOException e) {
-		   Alert alert=new Alert(AlertType.ERROR);
-		   alert.setHeaderText("Si è verificato un errore:");
-		   alert.setContentText("Riprova più tardi!");
-		   alert.showAndWait();
+		   showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+			e.printStackTrace();
 	   }
 	}
 	
+	//delete saved game file 
 	private void deleteSerializationFile(String game) {
 	   String[] splittedLine=game.split(",");
 	   String gameCode=splittedLine[2];
 	   File serializationFile= new File("./Files/ConfigurationFiles/"+gameCode+".ser");
 	   if(serializationFile.exists())
 		   serializationFile.delete();
+	}
+	
+	private void showErrorMessage(String header, String content) {
+		Alert alert=new Alert(AlertType.ERROR);
+		alert.setTitle("Errore");
+		alert.setHeaderText(header);
+		alert.setContentText(content);
+		alert.showAndWait();
 	}
 }

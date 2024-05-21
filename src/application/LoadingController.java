@@ -28,6 +28,7 @@ public class LoadingController {
     private ImageView loadingImage;
 
     public void initialize() {
+    	//define the rotate animation for loading
         RotateTransition rotateAnimation = new RotateTransition(Duration.seconds(3), loadingImage);
         rotateAnimation.setByAngle(360);
         rotateAnimation.setCycleCount(RotateTransition.INDEFINITE);

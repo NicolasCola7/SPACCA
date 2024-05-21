@@ -11,7 +11,7 @@ public class HologramCard extends StaticCard {
 		super("Ologramma",Seed.SW);
 	
 	}
-	public boolean getEffect(Player targetPlayer,Deck deck) {// se posizionata e si viene attaccati, pesca una carta dal mazzo, se il seme della carta è uguale a quello del proprio personaggio l'attacco fallisce
+	public boolean getEffect(Player targetPlayer,Deck deck) {// if attacked, draw a card, if card's seem is the same as player's character, attack fail
 		return deck.drawAndCheck(targetPlayer.getCharacter().getSeed());
 	}
 }

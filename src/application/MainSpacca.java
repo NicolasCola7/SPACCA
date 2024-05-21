@@ -14,6 +14,8 @@ import javafx.geometry.Rectangle2D;
 
 public class MainSpacca extends Application {
 	@Override
+	
+	//load home main stage and init proprieties
 	public void start(Stage primaryStage) {
 		try {	
 			

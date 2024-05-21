@@ -44,6 +44,7 @@ public class RulesController implements Initializable{
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
+		//load main tab immediately, others tabs only in case of click  
 		TGenerale.setText("a\na\na\na\naaa\naaa\na\na");
 		tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
 	        if (newTab != null && newTab.equals(tabAzione)) {
@@ -77,6 +78,7 @@ public class RulesController implements Initializable{
 	    });
 	 }
 	
+	//set action cards textArea and images 
 	public void setActions() {
 		TAttacco.setText("Carta che permette di compiere un'attacco\nsemplice contro altri avversari.\nAll'interno di un mazzo sono presenti 27 copie\nNon possiede alcun seme.");
 		TThanos.setText("Carta che permette di scartare una carta\ncasuale nella mano dell'avversario.\nAll'interno di un mazzo sono presenti 5 copie.\nFa parte del seme Marvel (MV)");
@@ -93,6 +95,7 @@ public class RulesController implements Initializable{
 
 	}
 	
+	//set static cards textArea and images 
 	public void setStatics() {
 		TAnello.setText("Carta che permette di aumentare la precisione\nquando si attacca.\nAll'interno di un mazzo sono presenti 5 copie\nFa parte del seme Signore degli Anelli (SA).\n");
 		TSpecchio.setText("Carta che permette se attaccati di far subire \nall'avversario i danni al posto nostro.\nAll'interno di un mazzo sono presenti 5 copie.\nFa parte del seme Harry Potter (HP)\n");
@@ -108,6 +111,7 @@ public class RulesController implements Initializable{
 		COlogramma.setImage(new Image(getClass().getResourceAsStream("game_playing/CardsImages/Ologramma.png")));
 	}
 	
+	//set event cards textArea and images 
 	public void setEvento() {
 		TFurto.setText("Furto d'identità:\nCarta che permette di scambiare il\npersonaggio con quello di un altro giocatore.\nAll'interno di un mazzo ne è presente 1 copia\nNon possiede alcun seme.\n");
 		TGiorno.setText("Giorno del giudizio:\nCarta che permette di eliminare un giocatore\na scelta.\nAll'interno di un mazzo ne è presente 1 copia\nNon possiede alcun seme.\n");
@@ -117,6 +121,7 @@ public class RulesController implements Initializable{
 		CMiracolo.setImage(new Image(getClass().getResourceAsStream("game_playing/CardsImages/Miracolo.png")));
 	}
 	
+	//set weapons cards textArea and images 
 	public void setWeapons() {
 		TBacchetta.setText("Arma che ha una potenza di 15 punti.\nAll'interno di un mazzo sono presenti 2 copie\nFa parte del seme Harry Potter (HP).\n");
 		TSpadaLaser.setText("Arma che ha una potenza di 13 punti.\nAll'interno di un mazzo sono presenti 2 copie\nFa parte del seme Star Wars (SW).\n");
@@ -141,6 +146,7 @@ public class RulesController implements Initializable{
 
 	}
 	
+	//set characters cards textArea and images 
 	public void setCharacters() {
 		THarry.setText("Personaggio di Harry Potter.\nPosiede 8 punti attacco, 85 punti vita, \n6 punti precisione.\nFa parte del seme Harry Potter (HP).\n");
 		TVoldemort.setText("Personaggio di Voldemort.\nPosiede 9 punti attacco, 100 punti vita, \n7 punti precisione.\nFa parte del seme Harry Potter (HP).\n");

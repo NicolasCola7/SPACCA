@@ -8,7 +8,8 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
-
+ 
+//controller of TournamentBracket schema
 public class TournamentBracketController{
 	@FXML private Label quarter1;
 	@FXML private Label quarter2;

@@ -49,19 +49,18 @@ public class LoginAdminController implements Initializable{
 			stage.setScene(scene);
 			stage.show();
 		} catch (IOException e) {
-			Alert errorAlert=new Alert(AlertType.ERROR);
-			errorAlert.setHeaderText("Si è verificato un errore:");
-			errorAlert.setContentText("Riprova più tardi!");
-			errorAlert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 			e.printStackTrace();
 		}
 		
 	}
 	
+	//admin login management
 	public void login(ActionEvent event)  {
 		try(Scanner scan = new Scanner(new File("./Files/ConfigurationFiles/Login.csv"));
 				PrintWriter actualAdmin=new PrintWriter("./Files/ConfigurationFiles/AdminAttuale.csv")) {
-		
+			
+			//check if admin exists from file, if yes load admin interface
 	        while (scan.hasNextLine()) {
 	        	String[] line= scan.nextLine().split(",");
 	        	if(line[0].equals(adminUsername.getText()) && line[1].equals(psw.getText())) {
@@ -78,20 +77,16 @@ public class LoginAdminController implements Initializable{
 	        		errorMsg.setVisible(true);	
 	        }
 		}catch(FileNotFoundException e) {
-			Alert errorAlert=new Alert(AlertType.ERROR);
-			errorAlert.setHeaderText("Si è verificato un errore:");
-			errorAlert.setContentText("Riprova più tardi!");
-			errorAlert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 			e.printStackTrace();
 		}catch(IOException e) {
-			Alert alert=new Alert(AlertType.ERROR);
-			alert.setHeaderText("Si è verificato un errore:");
-			alert.setContentText("Riprova più tardi!");
-			alert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 			e.printStackTrace();
 		}
 	}
 	
+	
+	//go to admin signup interface
 	public void signup(ActionEvent event)  {
 		try {
 			root = FXMLLoader.load(getClass().getResource("AdminSignup.fxml"));
@@ -100,13 +95,17 @@ public class LoginAdminController implements Initializable{
 			stage.setScene(scene);
 			stage.show();
 		} catch (IOException e) {
-			Alert errorAlert=new Alert(AlertType.ERROR);
-			errorAlert.setHeaderText("Si è verificato un errore:");
-			errorAlert.setContentText("Riprova più tardi!");
-			errorAlert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 			e.printStackTrace();
 		}
 		
 	}
 	
+	private void showErrorMessage(String header, String content) {
+		Alert alert=new Alert(AlertType.ERROR);
+		alert.setTitle("Errore");
+		alert.setHeaderText(header);
+		alert.setContentText(content);
+		alert.showAndWait();
+	}
 }

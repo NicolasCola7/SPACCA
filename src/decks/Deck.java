@@ -196,16 +196,17 @@ public class Deck implements Serializable {
 		deck.add(new MiracleCard());
 	}
 
-	public Card drawCard() { // pescare una carta dal deck
+	// draw card from deck
+	public Card drawCard() { 
 		if (!deck.isEmpty()) {
 			return deck.removeFirst();
-		} else { // se il deck è vuoto viene rimpiazzato dalla pila degli scarti
+		} else { // if deck is empty replace with Stockpile
 			this.replaceDeckWithStockpile();
 			return this.drawCard();
 		}
 	}
 
-	// mischia il mazzo
+	// shuffle deck
 	private void shuffle() {
 		Collections.shuffle(deck);
 	}
@@ -223,14 +224,16 @@ public class Deck implements Serializable {
 		}
 	}
 
-	public ArrayList<Card> drawHand() { // metodo per pescare la mano a inizio partita
+	//draw hand when game starts
+	public ArrayList<Card> drawHand() { 
 		ArrayList<Card> hand = new ArrayList<Card>(5);
 		for (int i = 0; i < 5; i++)
 			hand.add(drawCard());
 		return hand;
 	}
 
-	private void replaceDeckWithStockpile() { // rimpiazza il mazzo con la pila degli scarti
+	//replace deck with Stockpile
+	private void replaceDeckWithStockpile() { 
 		if (deck.isEmpty()) {
 			deck.addAll(stockpile);
 			stockpile.removeAll(stockpile);
@@ -238,7 +241,8 @@ public class Deck implements Serializable {
 		}
 	}
 
-	public void addToStockPile(Card c) { // aggiunge una carta alla pila degli scart
+	//add card to stock pile
+	public void addToStockPile(Card c) { 
 		stockpile.add(c);
 	}
 

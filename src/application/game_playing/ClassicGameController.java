@@ -127,14 +127,14 @@ public class ClassicGameController extends GameController implements Initializab
 				game=new ClassicGame(gameCode,adminUsername);
 				currentPlayer=0;
 			}
-			// initializing hand
+			// init hand
 			currentPlayerHand=new ArrayList<ToggleButton>();
 			group=new ToggleGroup();
 			initializeCardsBox(currentPlayer);
 			
-			//initializing stage
+			//init stage
 			primaryStage= (Stage) drawCardButton.getScene().getWindow();
-			//managing window closing
+			//manage window closing
 			primaryStage.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::closeWindowEvent);				
 		    primaryStage.setMaximized(true);
 		    
@@ -166,7 +166,7 @@ public class ClassicGameController extends GameController implements Initializab
 		setBindings();
 		initializePlayersBox();
 		
-		//showing other players actions on current player
+		//show other players actions on current player
 		String toDisplay=game.getActionMessage(currentPlayer);
 		if(toDisplay.length()>0)
 			InformationAlert.display("Messaggio informativo",toDisplay );
@@ -213,7 +213,7 @@ public class ClassicGameController extends GameController implements Initializab
 		}
 	}
 	
-	//setting bindings to disable buttons
+	//set bindings to disable buttons
 	public void setBindings() { 
 		SimpleBooleanProperty hasDrawed=game.getHasDrawed();
 		SimpleBooleanProperty hasAttacked=game.getHasAttacked();
@@ -244,31 +244,31 @@ public class ClassicGameController extends GameController implements Initializab
 		submitCardButton.disableProperty().bind(isSelected.or(hasAttacked.and(isSelectedAttackCard)).or(isFirstTurn.and(isSelectedEventOrActionCard)));
 	}
 	
-	//showing current player's  board
+	//show current player's  board
 	public void seeBoard(ActionEvent event){ 
 		StaticCard[] board=game.getPlayer(currentPlayer).getBoard();
 		showBoard(board);
 	}
 	
-	//showing current player character's info
+	//show current player character's info
 	public void seeCharacterInfos(ActionEvent event){//permette di vedere le informazioni relative al personaggio del giocatore corrente
 		getCharacterInfos(currentPlayer);
 	}
 	
-	//showing current player's equiped weapon
+	//show current player's equiped weapon
 	public void seeEquipedWeapon(ActionEvent event){
 		WeaponCard wc=game.getPlayer(currentPlayer).getEquipedWeapon();
 		showEquipedWeapon(wc);
 	}
 	
-	//drawing a card
+	//draw a card
 	public void drawCard(ActionEvent event) {
 		Card drawedCard=game.drawCard(currentPlayer);
 		ToggleButton btn=new ToggleButton(drawedCard.getName());
 		addToCardsBox(btn); 
 	}
 	
-	//discarding a card
+	//discard a card
 	public void discardCard(ActionEvent event){ 
 		ToggleButton btn=(ToggleButton) group.getSelectedToggle();
 		setLatestPlayedCard(game.getPlayersHand(currentPlayer).get(currentPlayerHand.indexOf(btn)));
@@ -276,7 +276,7 @@ public class ClassicGameController extends GameController implements Initializab
 		removeFromCardsBox(btn);
 	}
 	
-	//submittin a card
+	//submit a card
 	public void submitCard(ActionEvent event){ 
 		ToggleButton btn=(ToggleButton)group.getSelectedToggle(); //selected toggleButton (card)
 		Card submittedCard=game.getPlayersHand(currentPlayer).get(currentPlayerHand.indexOf(btn)); // selcted card
@@ -358,7 +358,7 @@ public class ClassicGameController extends GameController implements Initializab
 			endGame(currentPlayer);
 	}
 	
-	//submitting the turn the next player
+	//submit the turn the next player
 	public void submitPlayer(ActionEvent event){ //passa la giocata al prossimo giocatore
 		updateCurrentPlayer(currentPlayer);
 		game.setHasAttacked(false);
@@ -443,14 +443,14 @@ public class ClassicGameController extends GameController implements Initializab
 	public synchronized void useBotRoutine() {	    
 		Bot bot =(Bot) game.getPlayer(currentPlayer);
 		String botActionsMessage="Il bot ha eseguito le seguenti azioni:\n";
-		//board del bot
+		//bot's board 
 		StaticCard[] board=bot.getBoard();
 		
-		// 1° azione:pesca una carta;
+		// 1°: draw a card;
 		game.drawCard(currentPlayer);
 		botActionsMessage=botActionsMessage+"-Pescato una carta;\n";
 		
-		//2° azione:controllo se ho un'arma equipaggiata, se non ce l'ho ne cerco una nella mano e la equipaggio
+		//2° check if have an equipped weapon, if not find it in the hand and equip
 		if(bot.getEquipedWeapon()==null) {
 			for(Card c:bot.getHand())
 				if(c instanceof WeaponCard) {
@@ -459,9 +459,9 @@ public class ClassicGameController extends GameController implements Initializab
 					break;
 				}
 		}
-		//azioni 3,4 e 5 eseguite solo se il turno è diverso da uno
+		//actions 3,4 e 5 only if turn != 1
 		if(game.getTurn()!=1) {
-			//3° azione: utilizzo una qualsiasi carta azione che non sia Attacco
+			//3° use any card except action card
 			for(Card c:bot.getHand())
 				if(c instanceof ActionCard && !(c instanceof AttackCard)) {
 					int targetPlayer=(currentPlayer==game.getNOfPlayers()-1?0:currentPlayer+1);
@@ -475,7 +475,7 @@ public class ClassicGameController extends GameController implements Initializab
 					game.submitActionCard(bot.getHand().indexOf(c),currentPlayer,targetPlayer);
 					checkElimination(targetPlayer);
 					checkCurrentPlayerElimination(targetPlayer);
-					//controlla se è rimasto solo un giocatore 
+					//check if there is only 1 player left
 					if(game.isGameOver()) {
 						InformationAlert.display("Messaggio informativo",botActionsMessage);
 						endGame(currentPlayer);
@@ -484,11 +484,11 @@ public class ClassicGameController extends GameController implements Initializab
 					break;
 				}
 			
-			//4° azione: controlla se ha carta attacco e la usa
+			//4° check if have an attack card and use it
 			if(bot.hasAttackCard()) {
-				//scelgo un giocatore da attaccare
+				//choose a player to attack
 				int targetPlayer=(currentPlayer==game.getNOfPlayers()-1?0:currentPlayer+1);
-				//cerco posizione carta
+				//search for card position
 				for(Card c:bot.getHand())
 					if(c instanceof AttackCard) {
 						setLatestPlayedCard(c);
@@ -498,7 +498,7 @@ public class ClassicGameController extends GameController implements Initializab
 					}
 				checkElimination(targetPlayer);
 				checkCurrentPlayerElimination(targetPlayer);
-				//controlla se è rimasto solo un giocatore 
+				//check if there is only 1 player left
 				if(game.isGameOver()) {
 					InformationAlert.display("Messaggio informativo",botActionsMessage);
 					endGame(currentPlayer);
@@ -506,7 +506,7 @@ public class ClassicGameController extends GameController implements Initializab
 				}
 			}
 			
-			//5° azione:gestione carte evento, se ne ha una la usa(la carta miracolo solo se ha <= p.ti vita)
+			//5° event card management, use it if you have one(miracle card only if  <= life points)
 			if(bot.hasEventCard()) {
 				int targetPlayer=(currentPlayer==game.getNOfPlayers()-1?0:currentPlayer+1);
 				for(Card c:bot.getHand()) {
@@ -515,7 +515,7 @@ public class ClassicGameController extends GameController implements Initializab
 						game.submitEventCard(bot.getHand().indexOf(c),currentPlayer,targetPlayer);
 						checkElimination(targetPlayer);
 						checkCurrentPlayerElimination(targetPlayer);
-						//controlla se è rimasto solo un giocatore 
+						//check if there is only 1 player left
 						if(game.isGameOver()) {
 							InformationAlert.display("Messaggio informativo",botActionsMessage);
 							endGame(currentPlayer);
@@ -538,7 +538,7 @@ public class ClassicGameController extends GameController implements Initializab
 			}
 		}
 		
-		//6° azione: posiziono tutte le carte statiche che posso nelle posizioni libere
+		//6° place every static card in free positions
 		if(board[0]==null) {
 			for(Card c:bot.getHand())
 				if(c instanceof ShieldCard || c instanceof HologramCard || c instanceof EnchantedMirrorCard) {
@@ -554,7 +554,7 @@ public class ClassicGameController extends GameController implements Initializab
 				}
 		}
 		
-		//7° azione: scarta una carta
+		//7° discard a card
 		if(!bot.getHand().isEmpty()) {
 			int toDiscard=(int)(Math.random()*bot.getHand().size());
 			botActionsMessage=botActionsMessage+"-Scartato una carta;\n";
@@ -562,17 +562,17 @@ public class ClassicGameController extends GameController implements Initializab
 			game.discardCard(currentPlayer,toDiscard);
 		}
 		
-		//mostro le azioni  rilevanti effettuate dal bot
+		//show bot actions 
 		InformationAlert.display("Messaggio informativo",botActionsMessage);
 		
-		//8° azione: passo turno
+		//8° update turn
 		updateCurrentPlayer(currentPlayer);  
 	}
 	
-	
+	//update current player
 	public void updateCurrentPlayer(int currentPlayer) {
 		actualNumberOfPlayers=game.getNOfPlayers();
-		if(currentPlayer>=actualNumberOfPlayers-1) {
+		if(currentPlayer>=actualNumberOfPlayers-1) {	
 			this.currentPlayer=0;
 			game.changeTurn();
 		}
@@ -590,13 +590,15 @@ public class ClassicGameController extends GameController implements Initializab
 		}
 	}
 	
-	private void refreshCardsBox(int currentPlayer) { //aggiorna la UI
+	//refresh user interface
+	private void refreshCardsBox(int currentPlayer) { 
 		cardsBox.getChildren().clear();
 		playersBox.getChildren().clear();
 		initializeCardsBox(currentPlayer);
 	}
 	
-	private void endGame(int currentPlayer) { //termina il gioco
+	//end game
+	private void endGame(int currentPlayer) { 
 		InformationAlert.display("Messaggio informativo","Congratulazioni "+players.get(currentPlayer)+", hai vinto la partita!");
 		assignScore(currentPlayer);
 		deleteGameFromGamesDatasFile();
@@ -606,6 +608,7 @@ public class ClassicGameController extends GameController implements Initializab
 		showLeaderboard();
 	}
 	
+	//disable all butttons
 	private void disableButtons() {
 		game.setHasAttacked(true);
 		game.setHasDiscarded(true);
@@ -621,6 +624,7 @@ public class ClassicGameController extends GameController implements Initializab
 		menu.getItems().get(1).setDisable(true);
 	}
 	
+	//save datas on file 
 	public void serialize(String filename) {
         try (FileOutputStream fileOut = new FileOutputStream(filename);
                 ObjectOutputStream out = new ObjectOutputStream(fileOut)){
@@ -631,14 +635,12 @@ public class ClassicGameController extends GameController implements Initializab
             saveAlert.setContentText("Progressi salvati correttamente!");
             saveAlert.showAndWait();
         } catch (IOException e) {
-        	Alert error = new Alert(AlertType.ERROR);
-        	error.setHeaderText("Si è verificato un errore nel salvataggio:");
-       	 	error.setContentText("Riprova più tardi.");
-       	 	error.showAndWait();
+        	showErrorMessage("Si è verificato un errore nel salvataggio:", "Riprova più tardi!");
+     	   e.printStackTrace();
         }
     }
 	
-    // Static method to deserialize the GameController
+    // Static method to deserialize  GameController
     public  ClassicGame deserialize(String filename) {
     	ClassicGame game = null;
         try ( FileInputStream fileIn = new FileInputStream(filename);
@@ -651,20 +653,20 @@ public class ClassicGameController extends GameController implements Initializab
             loadingProgressAlert.showAndWait();
            
         } catch (IOException | ClassNotFoundException e) {
-        	Alert error = new Alert(AlertType.ERROR);
-        	error.setHeaderText("Si è verificato un errore nel caricamento dei dati salvati:");
-        	error.setContentText("Riprova più tardi.");
-        	error.showAndWait();
+        	showErrorMessage("Si è verificato un errore nel caricamento dei dati salvati:", "Riprova più tardi!");
+        	e.printStackTrace();
         }
         return game;
     }
     
-  
+    
+    //assign score to normal player 
     private void assignScore(int currentPlayer) {
     	if(!(game.getPlayer(currentPlayer) instanceof Bot))
     		game.getLeaderboard().increaseScore(game.getPlayer(currentPlayer).getUsername());
     }
     
+    //window closing management 
     public void closeWindowEvent(WindowEvent event) {
 	   if(!game.isGameOver()) {
 	       Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -681,6 +683,7 @@ public class ClassicGameController extends GameController implements Initializab
 	   }
    }
    
+    //create leaderboard view 
     public TableView<LeaderboardData>  getLeaderboard() {
 	   TableView<LeaderboardData> leaderboard = new TableView<>();
 	
@@ -699,6 +702,7 @@ public class ClassicGameController extends GameController implements Initializab
        return leaderboard;
    }
    
+    //show leaderboard
    public void showLeaderboard(ActionEvent event){
        VBox vbox = new VBox(getLeaderboard());
        Scene scene = new Scene(vbox, 300, 200);
@@ -736,10 +740,8 @@ public class ClassicGameController extends GameController implements Initializab
 		   }
  
        } catch (FileNotFoundException e) {
-    	   Alert alert=new Alert(AlertType.ERROR);
-    	   alert.setHeaderText("Si è verificato un errore:");
-    	   alert.setContentText("Riprova più tardi!");
-    	   alert.showAndWait();
+    	   showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+    	   e.printStackTrace();
        }
 	   return data;
    }
@@ -755,7 +757,7 @@ public class ClassicGameController extends GameController implements Initializab
 		alert.setHeaderText("Stai per uscire dalla partita senza salvare i progressi!");
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
-			backgroundTrack.stop();
+			
 			Stage stage = (Stage) ((MenuItem) event.getTarget()).getParentPopup().getOwnerWindow();
 		    Parent root;
 			try {
@@ -764,12 +766,10 @@ public class ClassicGameController extends GameController implements Initializab
 			    stage.setScene(scene);
 			    stage.show();
 			} catch (IOException e) {
-				Alert errorAlert=new Alert(AlertType.ERROR);
-				errorAlert.setHeaderText("Si è verificato un errore:");
-				errorAlert.setContentText("Riprova più tardi!");
-				errorAlert.showAndWait();
+				showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 				e.printStackTrace();
 			}
+			backgroundTrack.stop();
 		}	
    }	
    
@@ -782,7 +782,6 @@ public class ClassicGameController extends GameController implements Initializab
 		alert.setHeaderText("Stai per uscire dalla partita!");
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
-			backgroundTrack.stop();
 			Stage stage = (Stage) ((MenuItem) event.getTarget()).getParentPopup().getOwnerWindow();
 	        Parent root;
 			try {
@@ -791,13 +790,10 @@ public class ClassicGameController extends GameController implements Initializab
 		        stage.setScene(scene);
 		        stage.show();
 			} catch (IOException e) {
-				Alert errorAlert=new Alert(AlertType.ERROR);
-				errorAlert.setHeaderText("Si è verificato un errore:");
-				errorAlert.setContentText("Riprova più tardi!");
-				errorAlert.showAndWait();
+				showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 				e.printStackTrace();
 			}
-	       
+			backgroundTrack.stop();
 		}
    }
    

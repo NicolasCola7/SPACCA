@@ -41,10 +41,7 @@ public class AdminController{
 				stage.setScene(scene);
 				stage.show();
 			} catch (IOException e) {
-				Alert errorAlert=new Alert(AlertType.ERROR);
-				errorAlert.setHeaderText("Si è verificato un errore:");
-				errorAlert.setContentText("Riprova più tardi!");
-				errorAlert.showAndWait();
+				showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 				e.printStackTrace();
 			}
 			
@@ -60,10 +57,7 @@ public class AdminController{
 			stage.setScene(scene);
 			stage.show();
 		} catch (IOException e) {
-			Alert errorAlert=new Alert(AlertType.ERROR);
-			errorAlert.setHeaderText("Si è verificato un errore:");
-			errorAlert.setContentText("Riprova più tardi!");
-			errorAlert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 			e.printStackTrace();
 		}
 		
@@ -78,10 +72,7 @@ public class AdminController{
 			stage.setScene(scene);
 			stage.show();
 		} catch (IOException e) {
-			Alert errorAlert=new Alert(AlertType.ERROR);
-			errorAlert.setHeaderText("Si è verificato un errore:");
-			errorAlert.setContentText("Riprova più tardi!");
-			errorAlert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 			e.printStackTrace();
 		}
 		
@@ -96,10 +87,7 @@ public class AdminController{
 			stage.setScene(scene);
 			stage.show();
 		} catch (IOException e) {
-			Alert errorAlert=new Alert(AlertType.ERROR);
-			errorAlert.setHeaderText("Si è verificato un errore:");
-			errorAlert.setContentText("Riprova più tardi!");
-			errorAlert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 			e.printStackTrace();
 		}
 	}
@@ -113,14 +101,12 @@ public class AdminController{
 			stage.setScene(scene);
 			stage.show();
 		} catch (IOException e) {
-			Alert errorAlert=new Alert(AlertType.ERROR);
-			errorAlert.setHeaderText("Si è verificato un errore:");
-			errorAlert.setContentText("Riprova più tardi!");
-			errorAlert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 			e.printStackTrace();
 		}
 	}
 	
+	//load suspended games management
 	public void suspendedGames(ActionEvent event)  {
 		try {
 			root = FXMLLoader.load(getClass().getResource("SuspendedGames.fxml"));
@@ -129,13 +115,18 @@ public class AdminController{
 			stage.setScene(scene);
 			stage.show();
 		} catch (IOException e) {
-			Alert errorAlert=new Alert(AlertType.ERROR);
-			errorAlert.setHeaderText("Si è verificato un errore:");
-			errorAlert.setContentText("Riprova più tardi!");
-			errorAlert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 			e.printStackTrace();
 		}
 		
+	}
+	
+	private void showErrorMessage(String header, String content) {
+		Alert alert=new Alert(AlertType.ERROR);
+		alert.setTitle("Errore");
+		alert.setHeaderText(header);
+		alert.setContentText(content);
+		alert.showAndWait();
 	}
 
 }

@@ -21,6 +21,7 @@ public class Leaderboard implements Serializable{
 	private String adminUsername;
 	private ArrayList<String>playersNames;
 	
+	//init leaderboard 
 	public Leaderboard(String adminUsername,GameType gameType) {
 		names=new LinkedList<String>();
 		scores=new LinkedList<Integer>();
@@ -31,6 +32,7 @@ public class Leaderboard implements Serializable{
 		getData();
 	}
 	
+	//get players info from file
 	public void getData() {
 		int score=0;
 		try(Scanner scan=new Scanner(leaderboardFile)) {

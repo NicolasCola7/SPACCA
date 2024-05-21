@@ -49,6 +49,7 @@ public class EditExistingController implements Initializable {
 	private Leaderboard tournamentsLeaderboard;
 	
 	@Override
+	//get info, leaderboard and disable buttons
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		getCurrentAdmin();
 		getPlayersNames();
@@ -74,10 +75,7 @@ public class EditExistingController implements Initializable {
 				stage.setScene(scene);
 				stage.show();
 			} catch (IOException e) {
-				Alert errorAlert=new Alert(AlertType.ERROR);
-				errorAlert.setHeaderText("Si è verificato un errore:");
-				errorAlert.setContentText("Riprova più tardi!");
-				errorAlert.showAndWait();
+				showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 				e.printStackTrace();
 			}
 			
@@ -91,14 +89,12 @@ public class EditExistingController implements Initializable {
 			stage.setScene(scene);
 			stage.show();
 		} catch (IOException e) {
-			Alert errorAlert=new Alert(AlertType.ERROR);
-			errorAlert.setHeaderText("Si è verificato un errore:");
-			errorAlert.setContentText("Riprova più tardi!");
-			errorAlert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 			e.printStackTrace();
 		}
 	}
 	
+	//delete player and remove it from leaderboard
 	public void deletePlayer(ActionEvent event) {
 		String selectedName = selectedPlayer.getSelectionModel().getSelectedItem();
 		alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -115,6 +111,7 @@ public class EditExistingController implements Initializable {
 		}
 	}
 	
+	//rename player and update it from leaderboard
 	public void renamePlayer(ActionEvent event) {
 		String selectedName = selectedPlayer.getSelectionModel().getSelectedItem();
 		 if (!players.contains(newPlayerName.getText())) {
@@ -129,11 +126,7 @@ public class EditExistingController implements Initializable {
         	newPlayerName.clear();
         }
         else {
-        	alert = new Alert(Alert.AlertType.WARNING);
-        	alert.setTitle("Errore");
-        	alert.setHeaderText("Impossibile modificare nome del giocatore selezionato:");
-        	alert.setContentText("Esiste già un giocatore con lo stesso nome!");
-        	alert.showAndWait();
+        	showErrorMessage("Impossibile modificare nome del giocatore selezionato:", "Esiste già un giocatore con lo stesso nome!");
         	newPlayerName.clear();
         }
 	}
@@ -146,10 +139,9 @@ public class EditExistingController implements Initializable {
             }
         	
         } catch (IOException e) {
-        	Alert alert=new Alert(AlertType.ERROR);
-        	alert.setHeaderText("Si è verificato un errore:");
-     	   	alert.setContentText("Riprova più tardi!");
-     	   	alert.showAndWait();        }
+        	showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+        	e.printStackTrace();     
+    	}
     }
 	 
 	private void getCurrentAdmin() {	
@@ -161,10 +153,8 @@ public class EditExistingController implements Initializable {
 		        }
 		
 		} catch (FileNotFoundException e) {
-			Alert alert=new Alert(AlertType.ERROR);
-			alert.setHeaderText("Si è verificato un errore:");
-    	   	alert.setContentText("Riprova più tardi!");
-    	   	alert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+			e.printStackTrace();
 		}
 	}
 	
@@ -178,12 +168,17 @@ public class EditExistingController implements Initializable {
 			}
 		
 		} catch (FileNotFoundException e) {
-			Alert alert=new Alert(AlertType.ERROR);
-			alert.setHeaderText("Si è verificato un errore:");
-			alert.setContentText("Riprova più tardi!");
-			alert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+			e.printStackTrace();
 		}
 	}
 	
+	private void showErrorMessage(String header, String content) {
+		Alert alert=new Alert(AlertType.ERROR);
+		alert.setTitle("Errore");
+		alert.setHeaderText(header);
+		alert.setContentText(content);
+		alert.showAndWait();
+	}
 	
 }

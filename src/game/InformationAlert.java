@@ -14,6 +14,8 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+//set alert UI
+
 public class InformationAlert {
 	
 	public static void display(String title, String message) {

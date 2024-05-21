@@ -45,7 +45,7 @@ public class PlayerController implements Initializable{
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-		playButton.disableProperty().bind(gameCode.textProperty().isEmpty());
+		playButton.disableProperty().bind(gameCode.textProperty().isEmpty());	//check if gamecode textField is empty
 		
 	}
 	
@@ -57,49 +57,43 @@ public class PlayerController implements Initializable{
 			stage.setScene(scene);
 			stage.show();
 		} catch (IOException e) {
-			Alert errorAlert=new Alert(AlertType.ERROR);
-			errorAlert.setHeaderText("Si è verificato un errore:");
-			errorAlert.setContentText("Riprova più tardi!");
-			errorAlert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 			e.printStackTrace();
 		}
 	}
 	
+	//play a new or a suspended game
 	public void play(ActionEvent event)  {
 	    if (checkGameCode(gameCode.getText()) == true) {
 	        try {
+	        	//load loading animation
 				root = FXMLLoader.load(getClass().getResource("Loading.fxml"));
-				 stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-				 scene = new Scene(root);
-				 stage.setScene(scene);
-				 stage.show();
+				stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+				scene = new Scene(root);
+				stage.setScene(scene);
+				stage.show();
 			} catch (IOException e) {
-				Alert errorAlert=new Alert(AlertType.ERROR);
-				errorAlert.setHeaderText("Si è verificato un errore:");
-				errorAlert.setContentText("Riprova più tardi!");
-				errorAlert.showAndWait();
+				showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 				e.printStackTrace();
 			}
 	       
 
-	        // Utilizza un task asincrono per caricare la scena del gioco classico o del torneo
+	     // use an async task for load game after animation
 	        Task<Void> task = new Task<Void>() {
 	            @Override
 	            protected Void call() {
 	                try {
 	                    Thread.sleep(3000); // attendi 3 secondi per mostrare la scena di loading
 	                } catch (InterruptedException e) {
-	                	Alert alert=new Alert(AlertType.ERROR);
-	        			alert.setHeaderText("Si è verificato un errore:");
-	        			alert.setContentText("Riprova più tardi!");
-	        			alert.showAndWait();
+	                	showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+	        			e.printStackTrace();
 	                }
 
 	                Platform.runLater(new Runnable() {
 	                    @Override
 	                    public void run() {
 	                        if (gameType.equals("classic")) {
-	                           
+	                        	//load classic game
 	                            try {
 	                                FXMLLoader loader = new FXMLLoader(getClass().getResource("ClassicGame.fxml"));
 	                                Parent classicGameScene = loader.load();
@@ -110,13 +104,12 @@ public class PlayerController implements Initializable{
 	                                stage.setScene(scene);
 	                                stage.show();
 	                            } catch (IOException e) {
-	                                Alert alert=new Alert(AlertType.ERROR);
-	                    			alert.setHeaderText("Si è verificato un errore:");
-	                    			alert.setContentText("Riprova più tardi!");
-	                    			alert.showAndWait();
+	                            	// error message to user
+	                            	showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+	                    			e.printStackTrace();
 	                            }
 	                        } else {
-	                          
+	                        	//load tournament game
 	                            try {
 	                                FXMLLoader loader = new FXMLLoader(getClass().getResource("Tournament.fxml"));
 	                                Parent tournamentScene = loader.load();
@@ -127,10 +120,9 @@ public class PlayerController implements Initializable{
 	                                stage.setScene(scene);
 	                                stage.show();
 	                            } catch (IOException e) {
-	                            	Alert alert=new Alert(AlertType.ERROR);
-	                    			alert.setHeaderText("Si è verificato un errore:");
-	                    			alert.setContentText("Riprova più tardi!");
-	                    			alert.showAndWait();
+	                            	// error message to user
+	                            	showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+	                    			e.printStackTrace();
 	                            }
 	                        }
 	                    }
@@ -139,42 +131,45 @@ public class PlayerController implements Initializable{
 	            }
 	        };
 
-	        // Esegui il task asincrono
+	        // Run async tasks
 	        new Thread(task).start();
 	    } else {
-	        alert = new Alert(Alert.AlertType.ERROR);
-	        alert.setTitle("Errore");
-	        alert.setHeaderText("Non esiste alcuna partita associata al seguente codice:");
-	        alert.setContentText("Inserisci un nuovo codice partita!");
-	        alert.showAndWait();
+	    	showErrorMessage("Non esiste alcuna partita associata al seguente codice:", "Inserisci un nuovo codice partita!");
 	        gameCode.clear();
 	    }
 	}
 	
+	//check if admin username and gameType are the same as in the file 
 	private boolean checkGameCode(String code) {
 		boolean check=true;
 		File datas=new File("./Files/ConfigurationFiles/GamesDatas.csv");
 		
 		try (Scanner scan = new Scanner(datas)){
 			
-		while(scan.hasNextLine()) {
-			String[] line=scan.nextLine().split(",");
-			if(gameCode.getText().equals(line[2])) {
-				adminUsername=line[0];
-				gameType=line[1];
-				check=true;
-				break;
+			while(scan.hasNextLine()) {
+				String[] line=scan.nextLine().split(",");
+				if(gameCode.getText().equals(line[2])) {
+					adminUsername=line[0];
+					gameType=line[1];
+					check=true;
+					break;
+				}
+				else
+					check=false;
 			}
-			else
-				check=false;
-		}
+			
 		} catch (FileNotFoundException e) {
-			Alert alert=new Alert(AlertType.ERROR);
-			alert.setHeaderText("Si è verificato un errore:");
-			alert.setContentText("Riprova più tardi!");
-			alert.showAndWait();	
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+			e.printStackTrace();
 		}
 		return check;
 	}
 	
+	private void showErrorMessage(String header, String content) {
+		Alert alert=new Alert(AlertType.ERROR);
+		alert.setTitle("Errore");
+		alert.setHeaderText(header);
+		alert.setContentText(content);
+		alert.showAndWait();
+	}
 }

@@ -102,9 +102,10 @@ public class TournamentController extends GameController implements Initializabl
 
 	
 	@Override
-	public void initialize(URL arg0, ResourceBundle arg1) {// inizializza la partita 
+	//init or load game
+	public void initialize(URL arg0, ResourceBundle arg1) {
 	    
-		Platform.runLater(() -> {//serve a ritardare le istruzioni al suo interno dato che quando si passano dati da un altro controller (PlayerController in questo caso)  il metodo initialize viene eseguito prima dei metodi utilizzati nel controller che passa i dati,in guesto caso setGameCode() e setAdminUsername()
+		Platform.runLater(() -> {//delay istructions, setGameCode() e setAdminUsername() need to be executed before init method when called by PlayerController
 			 initTournamentBracketScene();
 			
 			if(isSerialized("./Files/ConfigurationFiles/"+gameCode+".ser")){
@@ -140,7 +141,8 @@ public class TournamentController extends GameController implements Initializabl
 		
 	}
 	
-	public void initializeCardsBox(int currentPlayer) {// inizializza la UI del giocatore corrente
+	//init UI of curent player
+	public void initializeCardsBox(int currentPlayer) {
 		currentPlayerHand.clear();
 		turnLabel.setText(tournament.getTurn()+"° turno");
 		playerUsernameLabel.setText("Username:"+tournament.getPlayer(currentPlayer).getUsername());
@@ -175,6 +177,7 @@ public class TournamentController extends GameController implements Initializabl
 		}
 	}
 	
+	//init player box of current player
 	public void initializePlayersBox() {
 		Player player=tournament.getPlayer(1-currentPlayer);
 		Character ch=player.getCharacter();
@@ -208,7 +211,8 @@ public class TournamentController extends GameController implements Initializabl
 		playersBox.getChildren().add(playerBox);
 	}
 	
-	public void setBindings() { // serve a fare in modo che i bottoni vengano disattivati e attivati  in determinate situazioni
+	//set boolean proprieties for activate/disable buttons  
+	public void setBindings() { 
 		SimpleBooleanProperty hasDrawed=tournament.getHasDrawed();
 		SimpleBooleanProperty hasAttacked=tournament.getHasAttacked();
 		SimpleBooleanProperty hasDiscarded=tournament.getHasDiscarded();
@@ -236,50 +240,58 @@ public class TournamentController extends GameController implements Initializabl
 	            
 	        });
 		
-    	drawCardButton.disableProperty().bind(hasDrawed); //disattiva il bottone per pescare se ha già pescato
-		discardCardButton.disableProperty().bind(hasDiscarded.or(isSelected)); //disattiva il bottone per scartare se il giocatore ha già scartato una carta o non ne ha selezionata alcuna
-		submitCardButton.disableProperty().bind(isSelected.or(hasAttacked.and(isSelectedAttackCard)).or(isFirstTurn.and(isSelectedEventOrActionCard)));//disattiva il bottone per giocare una carta se non c'è alcuna carta selezionata, oppure se il giocatore ha già attaccato e la carta selezionata è una carta attacco
+    	drawCardButton.disableProperty().bind(hasDrawed); //disable draw button if already drawed 
+		discardCardButton.disableProperty().bind(hasDiscarded.or(isSelected)); //disable discard button if player already discarded a card or not selected one
+		submitCardButton.disableProperty().bind(isSelected.or(hasAttacked.and(isSelectedAttackCard)).or(isFirstTurn.and(isSelectedEventOrActionCard)));//disable button for use a card if It is not selected or if player already attacked 
 	}
 	
-	public void seeBoard(ActionEvent event){ // permette di visualizzare le carte presenti nella board del giocatore corrrente
+	//allow to see cards on actual player's board
+	public void seeBoard(ActionEvent event){ 
 		StaticCard[] board=tournament.getPlayer(currentPlayer).getBoard();
 		showBoard(board);
 	}
 	
-	public void seeCharacterInfos(ActionEvent event) {//permette di vedere le informazioni relative al personaggio del giocatore corrente
+	//allows to see info about current player 
+	public void seeCharacterInfos(ActionEvent event) {
 		getCharacterInfos(currentPlayer);
 	}
 	
+	//allows to see equipped weapon
 	public void seeEquipedWeapon(ActionEvent event){
 		WeaponCard wc=tournament.getPlayer(currentPlayer).getEquipedWeapon();
 		showEquipedWeapon(wc);
 	}
 	
-	public void drawCard(ActionEvent event)  { //per pescare una carta 
+	//draw a card
+	public void drawCard(ActionEvent event)  { 
 		Card drawedCard=tournament.drawCard(currentPlayer);
 		ToggleButton btn=new ToggleButton(drawedCard.getName());
-		addToCardsBox(btn); // aggiunge la carta pescata alla UI del giocatore corrente
+		addToCardsBox(btn); // add draw card to current player's UI
 	}
 	
-	public void discardCard(ActionEvent event){ //per scartare una carta
+	//discard a card
+	public void discardCard(ActionEvent event){ 
 		ToggleButton btn=(ToggleButton) group.getSelectedToggle();
 		setLatestPlayedCard(tournament.getPlayersHand(currentPlayer).get(currentPlayerHand.indexOf(btn)));
 		tournament.discardCard(currentPlayer,currentPlayerHand.indexOf(btn));
-		removeFromCardsBox(btn);// rimuove la carta scartata dalla UI del giocatore corrente	
+		removeFromCardsBox(btn);// remove discrad card from current player's UI
 	}
-
-	public void submitCard(ActionEvent event){ // per giocare una carta
-		ToggleButton btn=(ToggleButton)group.getSelectedToggle(); //ottengo il bottone selezionato
-		int submittedCardIndex=currentPlayerHand.indexOf(btn); // ottengo l'indice della carta nella mano del giocatore
-		Card submittedCard=tournament.getPlayer(currentPlayer).getHand().get(submittedCardIndex); // ottengo la carta nella mano del giocatore corrispondente all'indice del bottone
-		String toAttack=actualGamePlayersNames.get(1-currentPlayer); // nome avversario
+	
+	//use a card
+	public void submitCard(ActionEvent event){ 
+		ToggleButton btn=(ToggleButton)group.getSelectedToggle(); //get selected button
+		int submittedCardIndex=currentPlayerHand.indexOf(btn); // get index of card in player's hand
+		Card submittedCard=tournament.getPlayer(currentPlayer).getHand().get(submittedCardIndex); // get card from player's card index 
+		String toAttack=actualGamePlayersNames.get(1-currentPlayer); // get adversary name
 		int targetPlayer=0;
+		
+		//attack with different type of card
 		
 		if(submittedCard instanceof ActionCard ) {
 	        targetPlayer=actualGamePlayersNames.indexOf(toAttack);
         	tournament.submitActionCard(submittedCardIndex, currentPlayer,targetPlayer);
         	removeFromCardsBox(btn);
-	        if(submittedCard instanceof BoardingCard) // in questo caso aggiorno la mano per vedere la carta rubata dalla mano dell'avversario selezionato
+	        if(submittedCard instanceof BoardingCard) // update hand to see stolen card from adversary hand
 	        	refreshCardsBox(currentPlayer);		
 	        
 	        setLatestPlayedCard(submittedCard);
@@ -312,7 +324,7 @@ public class TournamentController extends GameController implements Initializabl
 		checkElimination();
 		checkCurrentPlayerElimination(targetPlayer);
 		
-		if(tournament.isTournamentGameOver()) //controlla se è rimasto solo un giocatore 
+		if(tournament.isTournamentGameOver()) //check if there is only 1 player left
 			endTournament(currentPlayer);
 		
 		else if(tournament.isActualGameOver()) {
@@ -320,10 +332,12 @@ public class TournamentController extends GameController implements Initializabl
 		}
 	}
 	
-	public void submitPlayer(ActionEvent event){ //passa la giocata al prossimo giocatore
+	//pass game to next player
+	public void submitPlayer(ActionEvent event){ 
 		updateCurrentPlayer(currentPlayer);
 	}
 	
+	//check if player is a bot
 	private boolean isBot(int current) {
 		if (tournament.getPlayer(current) instanceof Bot)
 			return true;
@@ -331,6 +345,7 @@ public class TournamentController extends GameController implements Initializabl
 			return false;		
 	}
 	
+	//check if both players are bot
 	private boolean areBothBot() {
 		boolean check=false;
 		for(Player p:tournament.getActualGamePlayers()){
@@ -344,17 +359,18 @@ public class TournamentController extends GameController implements Initializabl
 		return check;
 	}
 	
+	//bot actions
 	public void useBotRoutine() {
 		Bot bot =(Bot) tournament.getPlayer(currentPlayer);
 		String botActionsMessage="Il bot ha eseguito le seguenti azioni:\n";
-		//board del bot
+		//bot's board 
 		StaticCard[] board=bot.getBoard();
 		
-		// 1° azione:pesca una carta;
+		// 1°: draw a card;
 		tournament.drawCard(currentPlayer);
 		botActionsMessage=botActionsMessage+"-Pescato una carta;\n";
 		
-		//2° azione:controllo se ho un'arma equipaggiata, se non ce l'ho ne cerco una nella mano e la equipaggio
+		//2° check if have an equipped weapon, if not find it in the hand and equip
 		if(bot.getEquipedWeapon()==null) {
 			for(Card c:bot.getHand())
 				if(c instanceof WeaponCard) {
@@ -365,7 +381,7 @@ public class TournamentController extends GameController implements Initializabl
 		}
 		
 		if(tournament.getTurn()!=1) {
-			//3° azione: utilizzo una qualsiasi carta azione che non sia Attacco
+			//3° use any  card except action card
 			for(Card c:bot.getHand())
 				if(c instanceof ActionCard && !(c instanceof AttackCard)) {
 					int targetPlayer=1-currentPlayer;
@@ -379,7 +395,7 @@ public class TournamentController extends GameController implements Initializabl
 					checkElimination();
 					checkCurrentPlayerElimination(targetPlayer);
 					
-					//controlla se è rimasto solo un giocatore 
+					//check if there is only 1 player left 
 					if(tournament.isTournamentGameOver()) {
 						InformationAlert.display("Messaggio informativo",botActionsMessage);
 						endTournament(currentPlayer);
@@ -393,11 +409,11 @@ public class TournamentController extends GameController implements Initializabl
 					break;
 				}
 			
-			//4° azione: controlla se ha carta attacco e la usa
+			//4° check if have an attack card and use it
 			if(bot.hasAttackCard()) {
-				//scelgo un giocatore da attaccare
+				//choose a player to attack
 				int targetPlayer=1-currentPlayer;
-				//cerco posizione carta
+				//search for card position
 				for(Card c:bot.getHand())
 					if(c instanceof AttackCard) {
 						botActionsMessage=botActionsMessage+"-Attaccato "+tournament.getPlayer(targetPlayer).getUsername()+";\n";
@@ -407,7 +423,7 @@ public class TournamentController extends GameController implements Initializabl
 					}
 				checkElimination();
 				checkCurrentPlayerElimination(targetPlayer);
-				//controlla se è rimasto solo un giocatore 
+				//check if there is only 1 player left 
 				if(tournament.isTournamentGameOver()) {
 					InformationAlert.display("Messaggio informativo",botActionsMessage);
 					endTournament(currentPlayer);
@@ -420,7 +436,7 @@ public class TournamentController extends GameController implements Initializabl
 				}
 			}
 			
-			//5° azione:gestione carte evento, se ne ha una la usa(la carta miracolo solo se ha <=30 p.ti vita)
+			//5° event card management, use it if you have one(miracle card only if  <= life points)
 			if(bot.hasEventCard()) {
 				int targetPlayer=1-currentPlayer;
 				for(Card c:bot.getHand()) {
@@ -429,7 +445,7 @@ public class TournamentController extends GameController implements Initializabl
 						tournament.submitEventCard(bot.getHand().indexOf(c),currentPlayer,targetPlayer);
 						checkElimination();
 						checkCurrentPlayerElimination(targetPlayer);
-						//controlla se è rimasto solo un giocatore 
+						//check if there is only 1 player left
 						if(tournament.isTournamentGameOver()) {
 							InformationAlert.display("Messaggio informativo",botActionsMessage);
 							endTournament(currentPlayer);
@@ -457,7 +473,7 @@ public class TournamentController extends GameController implements Initializabl
 			}
 		}
 		
-		//6° azione: posiziono tutte le carte statiche che posso nelle posizioni libere
+		//6° place every static card in free positions
 		if(board[0]==null) {
 			for(Card c:bot.getHand())
 				if(c instanceof ShieldCard || c instanceof HologramCard || c instanceof EnchantedMirrorCard) {
@@ -473,7 +489,7 @@ public class TournamentController extends GameController implements Initializabl
 				}
 		}
 		
-		//7° azione: scarta una carta
+		//7° discard a card
 		if(!bot.getHand().isEmpty()) {
 			int toDiscard=(int)(Math.random()*bot.getHand().size());
 			botActionsMessage=botActionsMessage+"-Scartato una carta;\n";
@@ -481,14 +497,14 @@ public class TournamentController extends GameController implements Initializabl
 			tournament.discardCard(currentPlayer,toDiscard);
 		}
 		
-		//mostro le azioni  rilevanti effettuate dal bot
+		//show bot actions 
 		InformationAlert.display("Messaggio informativo",botActionsMessage);
 		
-		//8° azione: passo turno
+		//8° update turn
 		updateCurrentPlayer(currentPlayer);  
 	}
 	
-	//controllo che serve per quando viene eliminato un giocatore che in ordine di giocata è prima del giocatore corrente
+	//check needed if the eliminated player was before current player
 	public void checkElimination() {
 		if(actualGamePlayersNames.size()==1 && currentPlayer==1) {
 			currentPlayer=0;
@@ -496,7 +512,7 @@ public class TournamentController extends GameController implements Initializabl
 		}
 	}
 		
-	 // caso in cui l'attaccate venga eliminato dal veleno di vedova nera o specchio o entrambi
+	// striker hit by veleno di vedova nere,specchio or both
 	public void checkCurrentPlayerElimination(int targetPlayer) {
 		if(tournament.getPlayer(currentPlayer).getCharacter().getCurrentLife()<=0) {
 			String message="";
@@ -524,14 +540,13 @@ public class TournamentController extends GameController implements Initializabl
 		checkConcurrentElimination();
 	}
 	
-	//caso in cui i due giocatori si eliminino a vicenda	
+	//players  eliminate each other
 	public void checkConcurrentElimination() {
 		if(tournament.getActualGamePlayers().size()==0) { 
 			ArrayList<String> latestTwo=tournament.getLatestTwoEliminated();
 			InformationAlert.display("Messaggio informativo", "Vi siete eliminati a vicenda, verrà lanciata una moneta per decretare il vincitore: se esce testa vince "+latestTwo.get(0)+", se esce croce "+latestTwo.get(1));
 			int winner=(int)(Math.random()*2);
 			 
-			// si potrebbe provare a fare un'animazione di una moneta
 			
 			if (winner==0) {
 				InformationAlert.display("Messaggio informativo", "E' uscito TESTA");
@@ -544,6 +559,7 @@ public class TournamentController extends GameController implements Initializabl
 		}
 	}
 	
+	//update current player
 	public void updateCurrentPlayer(int currentPlayer) {
 		tournament.setHasAttacked(false);
 		tournament.setHasDiscarded(false);
@@ -557,13 +573,15 @@ public class TournamentController extends GameController implements Initializabl
 		refreshCardsBox(this.currentPlayer);
 	}
 	
-	private void refreshCardsBox(int currentPlayer) {//aggiorna la UI
+	//update UI
+	private void refreshCardsBox(int currentPlayer) {
 		cardsBox.getChildren().clear();
 		playersBox.getChildren().clear();
 		initializeCardsBox(currentPlayer);
 	}
 	
-	private void endTournament(int currentPlayer) { //termina il gioco
+	//end tournament
+	private void endTournament(int currentPlayer) { 
 		InformationAlert.display("Messaggio informativo","Congratulazioni "+actualGamePlayersNames.get(currentPlayer)+", hai vinto il torneo!");
 		assignScore(actualGamePlayersNames.get(currentPlayer));
 		tournamentBracketController.setWinner(actualGamePlayersNames.get(currentPlayer));
@@ -574,6 +592,7 @@ public class TournamentController extends GameController implements Initializabl
 		
 	}
 	
+	//end current game of tournament
 	private void endCurrentGame(int currentPlayer) {
 		String actualWinner=actualGamePlayersNames.get(currentPlayer);
 		InformationAlert.display("Messaggio informativo","Congratulazioni "+actualWinner+", hai vinto la partita e sei passato alla fase successiva!");
@@ -586,6 +605,7 @@ public class TournamentController extends GameController implements Initializabl
 		refreshCardsBox(tournament.getCurrentPlayer());
 	}
 	
+	//disable all butttons
 	private void disableButtons() {
 		tournament.setHasAttacked(true);
 		tournament.setHasDiscarded(true);
@@ -601,6 +621,7 @@ public class TournamentController extends GameController implements Initializabl
 		menu.getItems().get(1).setDisable(true);
 	}
 	
+	//save datas on file
 	public void serialize(String filename) {
         try (FileOutputStream fileOut = new FileOutputStream(filename);
                 ObjectOutputStream out = new ObjectOutputStream(fileOut)){
@@ -612,14 +633,12 @@ public class TournamentController extends GameController implements Initializabl
             saveAlert.setContentText("Progressi salvati correttamente!");
             saveAlert.showAndWait();
         } catch (IOException e) {
-        	Alert error = new Alert(AlertType.ERROR);
-        	error.setHeaderText("Si è verificato un errore nel salvataggio:");
-       	 	error.setContentText("Riprova più tardi.");
-       	 	error.showAndWait();
+        	showErrorMessage("Si è verificato un errore nel salvataggio:", "Riprova più tardi!");
+        	e.printStackTrace();
         }
     }
     
-	//deserialize the TournamentController
+	//deserialize TournamentController
     public Tournament deserialize(String filename) {
        Tournament tournament = null;
         try (FileInputStream fileIn = new FileInputStream(filename);
@@ -631,20 +650,19 @@ public class TournamentController extends GameController implements Initializabl
             loadingProgressAlert.showAndWait();
            
         } catch (IOException | ClassNotFoundException e) {
-        	 Alert error = new Alert(AlertType.ERROR);
-        	 error.setHeaderText("Si è verificato un errore nel caricamento dei dati salvati:");
-        	 error.setContentText("Riprova più tardi.");
-        	 error.showAndWait();
+        	showErrorMessage("Si è verificato un errore nel caricamento dei dati salvati:", "Riprova più tardi!");
+     	   e.printStackTrace();
         }
         return tournament;
     }
     
+    //assign score to normal player 
     private void assignScore(String currentPlayerName) {
     	if(currentPlayerName!="bot")
     		tournament.getLeaderboard().increaseScore(currentPlayerName);
     }
     
-   
+  //window closing management 
    public void closeWindowEvent(WindowEvent event) {
 	   if(!tournament.isTournamentGameOver()) {
 		   Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -660,6 +678,7 @@ public class TournamentController extends GameController implements Initializabl
 	   }
    }
    
+   //create leaderboard view 
    public TableView<LeaderboardData> getLeaderboard() {
 	   TableView<LeaderboardData> leaderboard = new TableView<>();
        TableColumn<LeaderboardData,Integer> positionColumn = new TableColumn<>("POSIZIONE");
@@ -683,6 +702,7 @@ public class TournamentController extends GameController implements Initializabl
   	   serialize("./Files/ConfigurationFiles/"+gameCode+".ser");
    }		
   
+   //quit game without save
    public void quit(ActionEvent event) {
 		Alert alert=new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Logout");
@@ -690,7 +710,7 @@ public class TournamentController extends GameController implements Initializabl
 		alert.setHeaderText("Stai per uscire dalla partita senza salvare i progressi!");
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
-			backgroundTrack.stop();
+			
 			Stage stage = (Stage) ((MenuItem) event.getTarget()).getParentPopup().getOwnerWindow();
 		    Parent root;
 			try {
@@ -699,13 +719,10 @@ public class TournamentController extends GameController implements Initializabl
 				stage.setScene(scene);
 				stage.show();
 			} catch (IOException e) {
-				Alert errorAlert=new Alert(AlertType.ERROR);
-				errorAlert.setHeaderText("Si è verificato un errore:");
-				errorAlert.setContentText("Riprova più tardi!");
-				errorAlert.showAndWait();
+				showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 				e.printStackTrace();
 			}
-		    
+			backgroundTrack.stop();
 		}	
    }	
    
@@ -718,7 +735,7 @@ public class TournamentController extends GameController implements Initializabl
 		alert.setHeaderText("Stai per uscire dalla partita!");
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
-			backgroundTrack.stop();
+			
 			Stage stage = (Stage) ((MenuItem) event.getTarget()).getParentPopup().getOwnerWindow();
 	        Parent root;
 			try {
@@ -727,13 +744,10 @@ public class TournamentController extends GameController implements Initializabl
 				 stage.setScene(scene);
 				 stage.show();
 			} catch (IOException e) {
-				Alert errorAlert=new Alert(AlertType.ERROR);
-				errorAlert.setHeaderText("Si è verificato un errore:");
-				errorAlert.setContentText("Riprova più tardi!");
-				errorAlert.showAndWait();
+				showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 				e.printStackTrace();
 			}
-	       
+			backgroundTrack.stop();
 		}
    }
    
@@ -775,7 +789,8 @@ public class TournamentController extends GameController implements Initializabl
 		   }
  
        } catch (FileNotFoundException e) {
-           e.printStackTrace(); 
+    	   showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+    	   e.printStackTrace();
        }
 	   return data;
    }
@@ -796,13 +811,13 @@ public class TournamentController extends GameController implements Initializabl
 	   lifeBar.setStyle("-fx-accent:orange;-fx-background-color:purple;-fx-border-color:purple;");
 		
 	   Label lifeLabel = new Label(Integer.toString(character.getCurrentLife()));
-	   lifeLabel.setTextFill(Color.WHITE); // Imposta il colore del testo a bianco
-	   lifeLabel.setFont(Font.font("System", 14)); // Imposta il carattere a bold
-	   // Sovrappone la label sulla progress bar
+	   lifeLabel.setTextFill(Color.WHITE); 
+	   lifeLabel.setFont(Font.font("System", 14)); 
+	   // overlay label on progress bar
        StackPane lifePane = new StackPane();
        lifePane.getChildren().addAll(lifeBar, lifeLabel);
   
-       // Imposta la posizione della label al centro della progress bar
+       // set label position 
 	   StackPane.setMargin(lifeLabel, new Insets(0, 4, 0, 4));
 	   StackPane.setAlignment(lifeLabel, javafx.geometry.Pos.CENTER_LEFT);
 	   lifeBox.getChildren().addAll(txt,lifePane);
@@ -819,8 +834,8 @@ public class TournamentController extends GameController implements Initializabl
 		  attackBar.setStyle("-fx-accent:orange;-fx-background-color:purple;-fx-border-color:purple;"+ "}");
 		 
 		  Label attackLabel = new Label(Integer.toString(attackPower));
-		  attackLabel.setTextFill(Color.WHITE); // Imposta il colore del testo a bianco
-		  attackLabel.setFont(Font.font("System", 14)); // Imposta il carattere a bold
+		  attackLabel.setTextFill(Color.WHITE); 
+		  attackLabel.setFont(Font.font("System", 14)); 
 
 		  StackPane attackPane = new StackPane();
 		  attackPane.getChildren().addAll(attackBar, attackLabel);
@@ -850,11 +865,9 @@ public class TournamentController extends GameController implements Initializabl
 		try {
 			tournamentBracketScene=tournamentBracketLoader.load();
 		} catch (IOException e) {
-			 Alert alert=new Alert(AlertType.ERROR);
-			 alert.setHeaderText("Si è verificato un errore:");
-			 alert.setContentText("Riprova più tardi!");
-			 alert.showAndWait();		
-		   }
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+	    	e.printStackTrace();	
+		}
 		
 		tournamentBracketController=tournamentBracketLoader.getController();
 		

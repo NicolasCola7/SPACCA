@@ -12,7 +12,7 @@ public class IdentityTheftCard extends EventCard {
 		super("Furto Di Identità",Seed.NS);
 	}
 	
-	public static void onUse(Player attackingPlayer,Player targetPlayer,Deck deck) { //scambia il personaggio con quello dell'avversario scelto
+	public static void onUse(Player attackingPlayer,Player targetPlayer,Deck deck) { //swap character with other player
 		Character a=attackingPlayer.getCharacter();
 		Character b=targetPlayer.getCharacter();
 		attackingPlayer.setCharacter(b);

@@ -42,7 +42,7 @@ public class AdminSignupController implements Initializable {
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-		registerButton.disableProperty().bind(adminUsername.textProperty().isEmpty().or(
+		registerButton.disableProperty().bind(adminUsername.textProperty().isEmpty().or(	//disable register button 
 				psw.textProperty().isEmpty().or(
 				confirmPsw.textProperty().isEmpty())));
 	}
@@ -55,15 +55,13 @@ public class AdminSignupController implements Initializable {
 			stage.setScene(scene);
 			stage.show();
 		} catch (IOException e) {
-			Alert errorAlert=new Alert(AlertType.ERROR);
-			errorAlert.setHeaderText("Si è verificato un errore:");
-			errorAlert.setContentText("Riprova più tardi!");
-			errorAlert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 			e.printStackTrace();
 		}
 		
 	}
 	
+	//new admin registration
 	public void signup(ActionEvent event) {
 		boolean checkUser=true;
 		boolean checkPsw=true;
@@ -78,12 +76,11 @@ public class AdminSignupController implements Initializable {
 	        }
 		}
 		catch(FileNotFoundException e) {
-			Alert alert=new Alert(AlertType.ERROR);
-			alert.setHeaderText("Si è verificato un errore:");
-			alert.setContentText("Riprova più tardi!");
-			alert.showAndWait();	
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+			e.printStackTrace();
 		}
 		
+		//check if pw e confirm pw are the same
 		if(!psw.getText().equals(confirmPsw.getText())) {
 			checkPsw=false;
 		}
@@ -92,6 +89,7 @@ public class AdminSignupController implements Initializable {
 			addNewAdmin();
     		createPlayersList();
     		updateCurrentAdmin();
+    		//create the admin leaderboard
     		Leaderboard classicGamesLeaderboard=new Leaderboard(adminUsername.getText(),GameType.CLASSIC);
     		Leaderboard tournamentsLeaderboard=new Leaderboard(adminUsername.getText(),GameType.TOURNAMENT);
     		
@@ -103,10 +101,7 @@ public class AdminSignupController implements Initializable {
 				stage.show();
 				errorMsg.setVisible(false);
 			} catch (IOException e) {
-				Alert errorAlert=new Alert(AlertType.ERROR);
-				errorAlert.setHeaderText("Si è verificato un errore:");
-				errorAlert.setContentText("Riprova più tardi!");
-				errorAlert.showAndWait();
+				showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 				e.printStackTrace();
 			}
 			
@@ -116,28 +111,27 @@ public class AdminSignupController implements Initializable {
 			
 	}
 	
+	//create players list related to the admin 
 	private void createPlayersList() {
-		try {
-			PrintWriter playersList=new PrintWriter("./Files/ConfigurationFiles/"+adminUsername.getText()+"ListaGiocatori.csv");
-			playersList.close();
+		try (PrintWriter playersList=new PrintWriter("./Files/ConfigurationFiles/"+adminUsername.getText()+"ListaGiocatori.csv")){
+		
 		} catch (FileNotFoundException e) {
-			Alert alert=new Alert(AlertType.ERROR);
-			alert.setHeaderText("Si è verificato un errore:");
-			alert.setContentText("Riprova più tardi!");
-			alert.showAndWait();	
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+			e.printStackTrace();
 		}
 	}
 	
+	//update existing admin
 	private void updateCurrentAdmin() {
 		try (PrintWriter actualAdmin= new PrintWriter("./Files/ConfigurationFiles/AdminAttuale.csv")){
 			actualAdmin.println(adminUsername.getText());
 		} catch (FileNotFoundException e) {
-			Alert alert=new Alert(AlertType.ERROR);
-			alert.setHeaderText("Si è verificato un errore:");
-			alert.setContentText("Riprova più tardi!");
-			alert.showAndWait();	
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+			e.printStackTrace();
 		}
 	}
+	
+	//add new admin in Login file 
 	private void addNewAdmin() {
 		try (FileWriter fw = new FileWriter("./Files/ConfigurationFiles/Login.csv", true);
 				PrintWriter pw = new PrintWriter(fw)){
@@ -146,16 +140,18 @@ public class AdminSignupController implements Initializable {
 			pw.println();
 			
 		} catch (FileNotFoundException e) {
-			Alert alert=new Alert(AlertType.ERROR);
-			alert.setHeaderText("Si è verificato un errore:");
-			alert.setContentText("Riprova più tardi!");
-			alert.showAndWait();	
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+			e.printStackTrace();
 		}catch (IOException e) {
-			Alert alert=new Alert(AlertType.ERROR);
-			alert.setHeaderText("Si è verificato un errore:");
-			alert.setContentText("Riprova più tardi!");
-			alert.showAndWait();	
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+			e.printStackTrace();
 		}
 	}
-	
+	private void showErrorMessage(String header, String content) {
+		Alert alert=new Alert(AlertType.ERROR);
+		alert.setTitle("Errore");
+		alert.setHeaderText(header);
+		alert.setContentText(content);
+		alert.showAndWait();
+	}
 }

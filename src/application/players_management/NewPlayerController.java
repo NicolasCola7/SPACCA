@@ -63,10 +63,7 @@ public class NewPlayerController implements Initializable {
 				stage.setScene(scene);
 				stage.show();
 			} catch (IOException e) {
-				Alert errorAlert=new Alert(AlertType.ERROR);
-				errorAlert.setHeaderText("Si è verificato un errore:");
-				errorAlert.setContentText("Riprova più tardi!");
-				errorAlert.showAndWait();
+				showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 				e.printStackTrace();
 			}
 			
@@ -80,16 +77,13 @@ public class NewPlayerController implements Initializable {
 			stage.setScene(scene);
 			stage.show();
 		} catch (IOException e) {
-			Alert errorAlert=new Alert(AlertType.ERROR);
-			errorAlert.setHeaderText("Si è verificato un errore:");
-			errorAlert.setContentText("Riprova più tardi!");
-			errorAlert.showAndWait();
-			e.printStackTrace();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 			e.printStackTrace();
 		}
 		
 	}
 
+	//add player
 	public void addPlayer(ActionEvent event)  {
 		String name=playerUsername.getText().trim();
         playersList=new File("./Files/ConfigurationFiles/"+adminUsername+"ListaGiocatori.csv");
@@ -102,6 +96,7 @@ public class NewPlayerController implements Initializable {
 				players.add(player);	
 			}
 			
+			//if not already exist and isn't a bot
 			if(!players.contains(name)  && (name.length()<3 || !name.substring(0, 3).equalsIgnoreCase("bot"))) {
         		addToPlayersList();
         		addToClassicGamesLeaderboard(name);
@@ -118,15 +113,12 @@ public class NewPlayerController implements Initializable {
 				playerUsername.clear();
         	}
 		} catch (FileNotFoundException e) {
-			Alert errorAlert=new Alert(AlertType.ERROR);
-			errorAlert.setHeaderText("Si è verificato un errore:");
-			errorAlert.setContentText("Riprova più tardi!");
-			errorAlert.showAndWait();
-			e.printStackTrace();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 			e.printStackTrace();
 		}    	
 	}
 	
+	//add player to file
 	private void addToPlayersList()  {
 		try (FileWriter fw = new FileWriter(playersList, true);
 				PrintWriter pw = new PrintWriter(fw)){
@@ -134,17 +126,11 @@ public class NewPlayerController implements Initializable {
 			pw.println(playerUsername.getText());
 	
 		} catch (FileNotFoundException e) {
-			Alert errorAlert=new Alert(AlertType.ERROR);
-			errorAlert.setHeaderText("Si è verificato un errore:");
-			errorAlert.setContentText("Riprova più tardi!");
-			errorAlert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 			e.printStackTrace();
-		} catch (IOException e1) {
-			Alert errorAlert=new Alert(AlertType.ERROR);
-			errorAlert.setHeaderText("Si è verificato un errore:");
-			errorAlert.setContentText("Riprova più tardi!");
-			errorAlert.showAndWait();
-			e1.printStackTrace();
+		} catch (IOException e) {
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+			e.printStackTrace();
 		}
 	}
 	
@@ -156,13 +142,12 @@ public class NewPlayerController implements Initializable {
 		        	adminUsername=line;
 		        }
 		} catch (FileNotFoundException e) {
-			Alert alert=new Alert(AlertType.ERROR);
-			alert.setHeaderText("Si è verificato un errore:");
-			alert.setContentText("Riprova più tardi!");
-			alert.showAndWait();	
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+			e.printStackTrace();
 		}
 	}
 	
+	//add player to classic leaderboard
 	private void addToClassicGamesLeaderboard(String player) {
 		File leaderboard=new File("./Files/ConfigurationFiles/"+adminUsername+"ClassicGamesLeaderboard.csv");
 		try (FileWriter fw = new FileWriter(leaderboard, true);
@@ -171,19 +156,15 @@ public class NewPlayerController implements Initializable {
 			pw.println(player+","+0);
 		
 		} catch (FileNotFoundException e) {
-			Alert errorAlert=new Alert(AlertType.ERROR);
-			errorAlert.setHeaderText("Si è verificato un errore:");
-			errorAlert.setContentText("Riprova più tardi!");
-			errorAlert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 			e.printStackTrace();
 		} catch (IOException e) {
-			Alert alert=new Alert(AlertType.ERROR);
-			alert.setHeaderText("Si è verificato un errore:");
-			alert.setContentText("Riprova più tardi!");
-			alert.showAndWait();		
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+			e.printStackTrace();	
 		}
 	}
 	
+	//add player to tournament leaderboard
 	private void addToTournamentsLeaderboard(String player) {
 		File leaderboard=new File("./Files/ConfigurationFiles/"+adminUsername+"TournamentsLeaderboard.csv");
 		try (FileWriter fw = new FileWriter(leaderboard, true);
@@ -192,17 +173,19 @@ public class NewPlayerController implements Initializable {
 			pw.println(player+","+0);
 		
 		} catch (FileNotFoundException e) {
-			Alert errorAlert=new Alert(AlertType.ERROR);
-			errorAlert.setHeaderText("Si è verificato un errore:");
-			errorAlert.setContentText("Riprova più tardi!");
-			errorAlert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 			e.printStackTrace();
 		} catch (IOException e) {
-			Alert alert=new Alert(AlertType.ERROR);
-			alert.setHeaderText("Si è verificato un errore:");
-			alert.setContentText("Riprova più tardi!");
-			alert.showAndWait();	
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 			e.printStackTrace();
 		}
+	}
+	
+	private void showErrorMessage(String header, String content) {
+		Alert alert=new Alert(AlertType.ERROR);
+		alert.setTitle("Errore");
+		alert.setHeaderText(header);
+		alert.setContentText(content);
+		alert.showAndWait();
 	}
 }

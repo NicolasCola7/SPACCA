@@ -58,40 +58,36 @@ public class TournamentCreationController extends GameCreationController impleme
 		if(alert.showAndWait().get()==ButtonType.OK) {
 			try {
 				root = FXMLLoader.load(new File("src/application/home.fxml").toURI().toURL());
+				stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+				scene=new Scene(root);
+				stage.setScene(scene);
+				stage.show();
 			} catch (IOException e) {
-				Alert errorAlert=new Alert(AlertType.ERROR);
-				errorAlert.setHeaderText("Si è verificato un errore:");
-				errorAlert.setContentText("Riprova più tardi!");
-				errorAlert.showAndWait();
+				showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 				e.printStackTrace();
 			}
-			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-			scene=new Scene(root);
-			stage.setScene(scene);
-			stage.show();
 		}
 	}
 	
 	public void back(ActionEvent event){
 		try {
 			root = FXMLLoader.load(new File("src/application/Admin.fxml").toURI().toURL());
+			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+			scene=new Scene(root);
+			stage.setScene(scene);
+			stage.show();
 		} catch (IOException e) {
-			Alert errorAlert=new Alert(AlertType.ERROR);
-			errorAlert.setHeaderText("Si è verificato un errore:");
-			errorAlert.setContentText("Riprova più tardi!");
-			errorAlert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 			e.printStackTrace();
 		}
-		stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-		scene=new Scene(root);
-		stage.setScene(scene);
-		stage.show();
 	}
 	
+	//confirm button method, create tournament game and init proprieties
 	public void confirm(ActionEvent e) {
 		gamePlayers=new ArrayList<String>(numberOfPlayers);
 		gamePlayers.addAll(playersSelection.getSelectionModel().getSelectedItems());
 		
+		//check if number of players is different than array size and game code is present
 		if(((botCheck.isSelected() && gamePlayers.size()!= numberOfPlayers) || (!botCheck.isSelected() && gamePlayers.size()== numberOfPlayers)) && gameCodeCheck(gameCode.getText())) {
 			
 			for(int i=gamePlayers.size();i< numberOfPlayers;i++)
@@ -106,50 +102,46 @@ public class TournamentCreationController extends GameCreationController impleme
 			if(alert.showAndWait().get()==ButtonType.OK) {
 				try {
 					root = FXMLLoader.load(new File("src/application/home.fxml").toURI().toURL());
+					stage=(Stage)((Node)e.getSource()).getScene().getWindow();
+					scene=new Scene(root);
+					stage.setScene(scene);
+					stage.show();
 				} catch (IOException e1) {
-					Alert errorAlert=new Alert(AlertType.ERROR);
-					errorAlert.setHeaderText("Si è verificato un errore:");
-					errorAlert.setContentText("Riprova più tardi!");
-					errorAlert.showAndWait();
+					showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 					e1.printStackTrace();
 				}
-				stage=(Stage)((Node)e.getSource()).getScene().getWindow();
-				scene=new Scene(root);
-				stage.setScene(scene);
-				stage.show();
 			}
 			
 		}
+		//bot is not selected and players are too much or not enough
 		else if(!botCheck.isSelected() && gamePlayers.size()!= numberOfPlayers) {
-			Alert alert = new Alert(Alert.AlertType.ERROR);
-			alert.setTitle("Errore");
-			alert.setHeaderText("Giocatori selezionati insufficienti o troppi:");
-			alert.setContentText("Seleziona "+numberOfPlayers+" giocatori per continuare!");
-			alert.showAndWait();
+			showErrorMessage("Giocatori selezionati insufficienti o troppi:", "Seleziona "+numberOfPlayers+" giocatori per continuare!");
 		}
+		//check if game code is not insert
 		else if(gameCodeCheck(gameCode.getText())==false) {
-			Alert alert = new Alert(Alert.AlertType.ERROR);
-			alert.setTitle("Errore");
-			alert.setHeaderText("Codice partita già uso:");
-			alert.setContentText("Inserisci un nuovo codice partita!");
-			alert.showAndWait();
+			showErrorMessage("Codice partita già uso:", "Inserisci un nuovo codice partita!");
 			gameCode.clear();
 		}
 	}
 	
+	//save game data on file 
 	public void addToGamesDatasFile()  {
 		try (FileWriter writer = new FileWriter(new File("./Files/ConfigurationFiles/GamesDatas.csv"),true);
 			PrintWriter pw=new PrintWriter(writer)){
 			
 			Collections.shuffle(gamePlayers);
-			String datas=adminUsername+",tournament,"+gameCode.getText()+","+numberOfPlayers+","+gamePlayers.get(0);
+			String datas=adminUsername+",tournament,"+gameCode.getText()+","+numberOfPlayers+","+gamePlayers.get(0);	//set the output string 	
 			for(int i=1;i< numberOfPlayers;i++)
 				datas+=","+gamePlayers.get(i);
 			pw.println(datas);
 			gameCode.clear();
 			botCheck.setSelected(false);
 			playersSelection.getSelectionModel().clearSelection();
+		}catch(FileNotFoundException e) {
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+			e.printStackTrace();
 		} catch (IOException e) {
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
 			e.printStackTrace();
 		}
 	}

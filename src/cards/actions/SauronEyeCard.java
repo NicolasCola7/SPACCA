@@ -11,7 +11,7 @@ public class SauronEyeCard extends ActionCard{
 		super("Occhio Di Sauron",Seed.SA);
 		
 	}
-	public static void onUse(List<Player> players,Player attackingPlayer,Deck deck) {
+	public static void onUse(List<Player> players,Player attackingPlayer,Deck deck) {//decrease 20 life points
 		for(int i=0;i<players.size();i++) {
 			if(players.get(i).getUsername()!=attackingPlayer.getUsername()) 
 				players.get(i).getCharacter().decreaseLife(20);

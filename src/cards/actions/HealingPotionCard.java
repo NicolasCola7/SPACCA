@@ -12,7 +12,7 @@ public class HealingPotionCard extends ActionCard{
 		super("Pozione Curativa",Seed.SA);
 	}
 	
-	public static void onUse(Player attackingPlayer,Deck deck) { //permette di aggiungere 15 p.ti vita
+	public static void onUse(Player attackingPlayer,Deck deck) {  // add 15 life points
 		attackingPlayer.getCharacter().increaseLife(15);
 		deck.addToStockPile(new HealingPotionCard());
 	}

@@ -97,16 +97,16 @@ public class Player implements Serializable{
 		return temp;
 	}
 	
-	public StaticCard removeFromBoardInPosition(int position) { //rimuove dalla board una carta in una determinata posizione
+	public StaticCard removeFromBoardInPosition(int position) { //remove card from board in a specific position
 		StaticCard temp=board[position];
 		board[position]=null;
 		return temp;
 	}
 	
-	public WeaponCard removeEquipedWeapon() { //rimuove l'arma equipaggiata
+	public WeaponCard removeEquipedWeapon() { //remove equipped weapon
 		WeaponCard removed=equipedWeapon;
 		equipedWeapon=null;
-		attackPower=character.getAttack(); //resetta la potenza d'attacco del personaggio
+		attackPower=character.getAttack(); //reset attack power
 		return removed;
 	}
 	
@@ -114,7 +114,7 @@ public class Player implements Serializable{
 		return hand;
 	}
 	
-	//di seguito tutti i metodi per controllare le carte nella board
+	//methods for check cards in the board
 	public boolean hasRing() {
 		if(board[1]!=null && board[1] instanceof RingCard) 
 			return true;

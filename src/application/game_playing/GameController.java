@@ -97,7 +97,7 @@ public abstract class GameController implements GameControllerInterface{
 	public abstract void seeCharacterInfos(ActionEvent event) ;
 	public abstract void seeBoard(ActionEvent event) ;
 	public abstract void drawCard(ActionEvent event) ;
-	public abstract  void discardCard(ActionEvent event);;
+	public abstract void discardCard(ActionEvent event);;
 	public abstract void submitCard(ActionEvent event);;
 	public abstract void submitPlayer(ActionEvent event);;
 	public abstract void useBotRoutine();
@@ -116,17 +116,18 @@ public abstract class GameController implements GameControllerInterface{
 	
 	
 	
-	//setting game code to initialize classic game
+	//set game code to initialize classic game
 	public void setGameCode(String code) { 
 		gameCode=code;
 	}
 	
-	//setting admin username to initialize classic game
-	public void setAdminUsername(String name) { //metodo che viene chiamato dal playerController per settare l'adminUsername
+	//set admin username to initialize classic game
+	public void setAdminUsername(String name) { //method called by playerController to set adminUsername
 		adminUsername=name;
 	}
 	
-	protected void addToCardsBox(ToggleButton btn) { //aggiunge una determinata carta/bottone dalla UI
+	//add card/button to UI
+	protected void addToCardsBox(ToggleButton btn) { 
 		currentPlayerHand.add(btn);
 		group.getToggles().add(btn);	
         btn.setPrefHeight(215);
@@ -135,13 +136,14 @@ public abstract class GameController implements GameControllerInterface{
 		cardsBox.getChildren().add(btn);
 	}
 	
-	protected void removeFromCardsBox(ToggleButton btn) { //rimuove una determinata carta/bottone dalla UI
+	//remove card/button UI
+	protected void removeFromCardsBox(ToggleButton btn) { 
 		currentPlayerHand.remove(btn);
 		cardsBox.getChildren().remove(btn);
 		group.getToggles().remove(btn);
 	}
 	
-	//showing latest played or discarded card
+	//show latest played or discarded card
 	protected void setLatestPlayedCard(Card c) {
 		latestPlayedCardPane.getChildren().clear();
 		ImageView latestPlayedCard=new ImageView(new Image(getClass().getResourceAsStream("CardsImages/"+c.getName().replaceAll("\\s+", "")+".png")));
@@ -150,6 +152,7 @@ public abstract class GameController implements GameControllerInterface{
 		latestPlayedCardPane.getChildren().add(latestPlayedCard);
 	}
 	
+	//set save and close menu style
 	private void setMenuButtonStyle() {
 	   menu.setLayoutX(primaryStage.getX());
        menu.setLayoutY(primaryStage.getY()+20);
@@ -160,6 +163,7 @@ public abstract class GameController implements GameControllerInterface{
        menu.setGraphic(menuImg);
 	}
 	
+	//delete game in filses
 	protected void deleteGameFromGamesDatasFile() {
 	   File file=new File("./Files/ConfigurationFiles/GamesDatas.csv");
 	   ArrayList<String> datas=new ArrayList<String>();
@@ -177,19 +181,19 @@ public abstract class GameController implements GameControllerInterface{
 			   pw.println(line);
 	   }
 	   catch(IOException e) {
-		   Alert alert=new Alert(AlertType.ERROR);
-    	   alert.setHeaderText("Si è verificato un errore:");
-    	   alert.setContentText("Riprova più tardi!");
-    	   alert.showAndWait();
+		   showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+    	   e.printStackTrace();
 	   }
    }
-	   
+	
+	//delete serialization file
 	protected void deleteSerializationFile() {
 	   File serializationFile= new File("./Files/ConfigurationFiles/"+gameCode+".ser");
 		   if(serializationFile.exists())
 			   serializationFile.delete();
 	}		
-	   
+	
+	//set cards image to the board
 	protected void setCardImage(ToggleButton btn) {
 	
        Image icon = new Image(getClass().getResourceAsStream("CardsImages/"+btn.getText().replaceAll("\\s+", "")+".png"));
@@ -203,9 +207,11 @@ public abstract class GameController implements GameControllerInterface{
        setCardStyle(btn);
 	}	
 	   
+	//set card dimension and style
 	protected void setCardStyle(ToggleButton btn) {
 	   btn.setPadding(new Insets(10, 10, 10, 10));
 	   btn.setStyle("-fx-background-color: transparent;");
+	   //set different colors on mouse event
 	   btn.setOnMouseEntered(e -> btn.setStyle("-fx-background-color: orange;"));
 	   btn.setOnMouseExited(e -> {
 	       if (!btn.isFocused()) {
@@ -213,6 +219,7 @@ public abstract class GameController implements GameControllerInterface{
 	       }
 	   });
 	   
+	   //add listener to btn
 	   btn.selectedProperty().addListener((observable, oldValue, newValue) -> {
 	       if (newValue) {
 	    	   btn.setStyle("-fx-background-color:orange;");
@@ -231,6 +238,7 @@ public abstract class GameController implements GameControllerInterface{
         return file.exists();
     }
 	
+	//set style of game board
 	protected void setSceneStyle() {
 	   gameButtonsBox.setLayoutX(primaryStage.getWidth()-(gameButtonsBox.getPrefWidth()));
        infoBox.setLayoutX(0);
@@ -248,7 +256,6 @@ public abstract class GameController implements GameControllerInterface{
        
        nameTurnBox.setLayoutY(primaryStage.getY()+20);
        nameTurnBox.setLayoutX(gameButtonsBox.getLayoutX()-150);
-      // nameTurnBox.setAlignment(Pos.TOP_RIGHT);
        
        ImageView deckImg=new ImageView(new Image(getClass().getResourceAsStream("CardsImages/Deck.png")));
        deckImg.setFitHeight(300);
@@ -272,26 +279,21 @@ public abstract class GameController implements GameControllerInterface{
     	   cardSound=AudioSystem.getClip();
     	   cardSound.open(cardsAudioStream);
        } catch (UnsupportedAudioFileException e) {
-    	   Alert alert=new Alert(AlertType.ERROR);
-    	   alert.setHeaderText("File audio non supportato:");
-    	   alert.setContentText("Riprova più tardi!");
-    	   alert.showAndWait();
+    	   showErrorMessage("Si è verificato un errore nella riproduzione dell'audio:", "Riprova più tardi!");
+    	   e.printStackTrace();
        } catch (IOException e) {
-    	   Alert alert=new Alert(AlertType.ERROR);
-    	   alert.setHeaderText("Si è verificato un errore:");
-    	   alert.setContentText("Riprova più tardi!");
-    	   alert.showAndWait();
+    	   showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+    	   e.printStackTrace();
        }catch(LineUnavailableException e) {
-    	   Alert alert=new Alert(AlertType.ERROR);
-    	   alert.setHeaderText("Si è verificato un errore:");
-    	   alert.setContentText("Riprova più tardi!");
-    	   alert.showAndWait();
+    	   showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+    	   e.printStackTrace();
        }
        
        setMenuButtonStyle();
        setButtonImages();
    }	
    
+	//set buttons style, actions on volume button
 	 private void setButtonImages() {
 		 ImageView chButtonImg= new ImageView(new Image(getClass().getResourceAsStream("GameButtonsImages/Character.png")));
 		 chButtonImg.setFitWidth(50);
@@ -357,6 +359,7 @@ public abstract class GameController implements GameControllerInterface{
 	     });
 	   }
 	
+	 //show board when button is clicked
 	 protected void showBoard(StaticCard[] board) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle("Board");
@@ -384,6 +387,7 @@ public abstract class GameController implements GameControllerInterface{
 		alert.showAndWait();	
 	 }
 	
+	//show weapon when button is clicked
 	 protected void showEquipedWeapon(WeaponCard wc) {
 	 	String fileName=(wc==null?"Vuoto.png":wc.getName().replaceAll("\\s+", "")+".png");
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -403,4 +407,12 @@ public abstract class GameController implements GameControllerInterface{
 		alert.getDialogPane().setPadding(new Insets(10));
 		alert.showAndWait();
 	 }
+	
+	 protected void showErrorMessage(String header, String content) {
+		Alert alert=new Alert(AlertType.ERROR);
+		alert.setTitle("Errore");
+		alert.setHeaderText(header);
+		alert.setContentText(content);
+		alert.showAndWait();
+	}
 }

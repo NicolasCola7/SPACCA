@@ -15,61 +15,62 @@ public class AttackCard extends ActionCard{
 	public AttackCard() {
 		super("Attacco",Seed.NS);	
 	}
+	
+	// 1 check for attack result
 	private static boolean firstCheck(Character aC, Character tC,Player attackingPlayer) {
-		
-		// primo controllo per l'esito dell'attacco
-		if(aC.rollPrecision())  // se la precisione dell'ttaccante è true e la fortuna dell'attaccato è false l'attacco può essere eseguito
+		if(aC.rollPrecision())  // striker precion is true and luck of attacked is false is possible to attack
 			return true;
-		else {// se la precisione è false, l'attacco non è eseguito
+		else {// if precision is false attack is not performed
 			if(!(attackingPlayer instanceof Bot))
 				InformationAlert.display("Messaggio informativo","Hai mancato il bersaglio, attacco fallito!");
 			return false;
 		}
 	}
 	
-	private static boolean secondCheck(Player attackingPlayer, Player targetPlayer,Deck deck) {//secondo controllo per l'esito dell'attacco
+	// 2 check for attack result
+	private static boolean secondCheck(Player attackingPlayer, Player targetPlayer,Deck deck) {
 		HologramCard hologram=new HologramCard();
-		if(targetPlayer.hasShieldCard()) { //se ha lo scudo piazzato l'attacco non va a buon fine
-			deck.addToStockPile(targetPlayer.removeFromBoardInPosition(0)); //rimuovo dalla board dell'attaccato lo scudo usato per parare l'attacco
+		if(targetPlayer.hasShieldCard()) { //if shield is in use attack is failed 
+			deck.addToStockPile(targetPlayer.removeFromBoardInPosition(0)); //remove from attacked board shield
 			
 			if(!(attackingPlayer instanceof Bot))
 				InformationAlert.display("Messaggio informativo","Il tuo attacco è stato fermato dallo Scudo, attacco fallito!");
 			return false;
 		}
-		else if(targetPlayer.hasHologram() && hologram.getEffect(targetPlayer, deck) ) { //se ha l'ologramma dipende dall'esito del suo effetto
+		else if(targetPlayer.hasHologram() && hologram.getEffect(targetPlayer, deck) ) { //if use hologram 
 			
 			if(!(attackingPlayer instanceof Bot))
 				InformationAlert.display("Messaggio informativo","Sei stato distratto dall'ologramma, attacco fallito!");
 			
-			deck.addToStockPile(targetPlayer.removeFromBoardInPosition(0)); //rimuovo dalla board dell'attaccato l'ologramma usato per provare a parare l'attacco
+			deck.addToStockPile(targetPlayer.removeFromBoardInPosition(0)); //remove hologram from board used for fight attack
 			return false;
 		}
 		else
 			return true;
 	}
+	
 	public static void onUse(Player attackingPlayer, Player targetPlayer,Deck deck) {
 		Character aC=attackingPlayer.getCharacter();
 		Character tC=targetPlayer.getCharacter();
 		deck.addToStockPile(new AttackCard()); 
 	
-		 if(attackingPlayer.hasRing() && !targetPlayer.hasAztecCurse()) {//caso in cui l'attaccante ha anello e attaccato non ha maledizione
+		 if(attackingPlayer.hasRing() && !targetPlayer.hasAztecCurse()) {//striker have ring e attacked don't have curse
 			aC.increasePrecision(1);
 			
-			if(firstCheck(aC,tC,attackingPlayer) && secondCheck(attackingPlayer, targetPlayer,deck)) { //eseguo i due controlli, se sono entrambi true, l'attacco parte
-	
+			if(firstCheck(aC,tC,attackingPlayer) && secondCheck(attackingPlayer, targetPlayer,deck)) { // if true execute attack
 				 String message="Attacco eseguito con successo!\n";
 				
-				if(targetPlayer.hasBlackWidowsPoison()) {//se l'attacco è partito e l'attaccato ha il veleno di vedova nera, l'attaccante subisce 5 danni
+				if(targetPlayer.hasBlackWidowsPoison()) {//if attacked have veleno di vedova nera, striker takes 5 demage
 					BlackWidowsPoisonCard.getEffect(attackingPlayer);
 					message=message+"Sei anche stato avvelenato dal veleno di vedova nera, hai perso 5 punti vita.\n";
 				}
-				if(targetPlayer.hasEnchantedMirror()) {//se l'attacco è partito e l'attaccato ha lo specchio incantato, l'attaccante si autocolpisce danni
+				if(targetPlayer.hasEnchantedMirror()) {//if attacked have specchio incantato, striker self-clps 
 					EnchantedMirrorCard.getEffect(attackingPlayer);
 					deck.addToStockPile(targetPlayer.removeFromBoardInPosition(0));
 					message=message+"Sei stato incantato dallo specchio, ti sei autocolpito!";
 				}
 				else 
-					tC.decreaseLife(attackingPlayer.getAttackPower()); //diminusco la vita dell'attaccato
+					tC.decreaseLife(attackingPlayer.getAttackPower()); //decrease attacked life
 				
 				if(!(attackingPlayer instanceof Bot)) {
 					InformationAlert.display("Messaggio informativo",message);
@@ -78,14 +79,14 @@ public class AttackCard extends ActionCard{
 			aC.resetPrecision();
 		}
 		
-		else if(targetPlayer.hasAztecCurse() && !attackingPlayer.hasRing()) {// caso in cui l'attaccato abbia la maledizione azteca nella board e l'attaccante non ha l'anello
-			aC.decreasePrecision(1); //diminuisco la precisione dell'attaccante grazie alla maledizione azteca
+		else if(targetPlayer.hasAztecCurse() && !attackingPlayer.hasRing()) {//striker dont' have ring e attacked has maledizione azteca
+			aC.decreasePrecision(1); //decrease striker precision
 			
 			if(firstCheck(aC,tC,attackingPlayer) && secondCheck(attackingPlayer, targetPlayer,deck)) {
 				
 				 String message="Attacco eseguito con successo!\n";
 				
-				 if(targetPlayer.hasEnchantedMirror()) {//se l'attacco è partito e l'attaccato ha lo specchio incantato, l'attaccante si autocolpisce danni
+				 if(targetPlayer.hasEnchantedMirror()) {
 					 EnchantedMirrorCard.getEffect(attackingPlayer);
 					 deck.addToStockPile(targetPlayer.removeFromBoardInPosition(0));
 					 message=message+"Sei stato incantato dallo specchio, ti sei autocolpito!";
@@ -100,17 +101,17 @@ public class AttackCard extends ActionCard{
 			aC.resetPrecision();
 		}
 	
-		else if(!targetPlayer.hasAztecCurse()){ //caso in cui l'attaccato non ha maledizione azteca e l'attaccante non ha anello
+		else if(!targetPlayer.hasAztecCurse()){ //striker dont' have ring e attacked don't have maledizione azteca
 			
 			if(firstCheck(aC,tC,attackingPlayer) && secondCheck(attackingPlayer, targetPlayer,deck)) {
 				
 				 String message="Attacco eseguito con successo!\n";
 				
-				if(targetPlayer.hasBlackWidowsPoison()) {//se l'attacco è partito e l'attaccato ha il veleno di vedova nera, l'attaccante subisce 5 danni
+				if(targetPlayer.hasBlackWidowsPoison()) {
 					BlackWidowsPoisonCard.getEffect(attackingPlayer);
 					message=message+"Sei anche stato avvelenato dal veleno di vedova nera, hai perso 5 punti vita.\n";
 				}
-				if(targetPlayer.hasEnchantedMirror()) {//se l'attacco è partito e l'attaccato ha lo specchio incantato, l'attaccante si autocolpisce danni
+				if(targetPlayer.hasEnchantedMirror()) {
 					EnchantedMirrorCard.getEffect(attackingPlayer);
 					deck.addToStockPile(targetPlayer.removeFromBoardInPosition(0));
 					message=message+"Sei stato incantato dallo specchio, ti sei autocolpito!";
@@ -124,18 +125,18 @@ public class AttackCard extends ActionCard{
 			}
 		}
 		 
-		else {// caso in cui l'attaccante ha anello e attaccato ha maledizione azteca
+		else {//striker have ring e attacked don't have maledizione azteca
 			
-			if(firstCheck(aC,tC,attackingPlayer) && secondCheck(attackingPlayer, targetPlayer,deck)) { //eseguo i due controlli, se sono entrambi true, l'attacco parte
+			if(firstCheck(aC,tC,attackingPlayer) && secondCheck(attackingPlayer, targetPlayer,deck)) { 
 				 String message="Attacco eseguito con successo!\n";
 			
-				if(targetPlayer.hasEnchantedMirror()) {//se l'attacco è partito e l'attaccato ha lo specchio incantato, l'attaccante si autocolpisce danni
+				if(targetPlayer.hasEnchantedMirror()) {
 					EnchantedMirrorCard.getEffect(attackingPlayer);
 					deck.addToStockPile(targetPlayer.removeFromBoardInPosition(0));
 					message=message+"Ma sei stato incantato dallo specchio, ti sei autocolpito!";
 				}	
 				else 
-					tC.decreaseLife(attackingPlayer.getAttackPower()); //diminusco la vita dell'attaccato
+					tC.decreaseLife(attackingPlayer.getAttackPower()); 
 				
 				if(!(attackingPlayer instanceof Bot)) {
 					InformationAlert.display("Messaggio informativo",message);

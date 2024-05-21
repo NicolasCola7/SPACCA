@@ -32,26 +32,26 @@ public abstract class GameCreationController{
 	protected Stage stage;
 	protected Parent root;
 
-	public abstract void addToGamesDatasFile(); 
+	public abstract void addToGamesDatasFile();  //implemented in GameCreation and TournamentCreation
 	
+	//populate players arrayList and add in listView
 	protected void populatePlayersList() {
 		players=new ArrayList<String>();
-		playersList=new File("./Files/ConfigurationFiles/"+adminUsername+"ListaGiocatori.csv");
+		playersList=new File("./Files/ConfigurationFiles/"+adminUsername+"ListaGiocatori.csv"); //get player list file
 	
 		try (Scanner scan = new Scanner(playersList)){
 			while(scan.hasNextLine()) {
-				players.add(scan.nextLine());
+				players.add(scan.nextLine()); //add players to arrayList
 			}
-			playersSelection.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-			playersSelection.getItems().addAll(players);
+			playersSelection.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE); //allow multiple selection on listView
+			playersSelection.getItems().addAll(players);	//add players to listView
 		} catch (FileNotFoundException e) {
-			Alert alert=new Alert(AlertType.ERROR);
-			alert.setHeaderText("Si è verificato un errore:");
-			alert.setContentText("Riprova più tardi!");
-			alert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+			e.printStackTrace();
 		}
 	}
 	
+	//get Current admin from file
 	protected void getCurrentAdmin() {	
 		try (Scanner scan = new Scanner(new File("./Files/ConfigurationFiles/AdminAttuale.csv"))){
 			  while (scan.hasNextLine()) {
@@ -59,35 +59,39 @@ public abstract class GameCreationController{
 		        	adminUsername=line;
 		        }
 		} catch (FileNotFoundException e) {
-			Alert alert=new Alert(AlertType.ERROR);
-			alert.setHeaderText("Si è verificato un errore:");
-			alert.setContentText("Riprova più tardi!");
-			alert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+			e.printStackTrace();
 		}
 	}
 	
 	protected boolean gameCodeCheck(String code){
 		boolean check=true;
-		File file=new File("./Files/ConfigurationFiles/GamesDatas.csv");
+		File file=new File("./Files/ConfigurationFiles/GamesDatas.csv");	//get gameDatas file
 		
 		if(file.length()!=0) {
 			try(Scanner scan=new Scanner(file)) {
 				while(scan.hasNextLine()) {
 					String[] gameInfos=scan.nextLine().split(",");
 					if(gameInfos[2].equals(code)) {
-						check=false;
+						check=false;	//if game with the same code already exits return false
 						break;
 					}
 					else
 						check=true;
 				}
 			} catch (FileNotFoundException e) {
-				Alert alert=new Alert(AlertType.ERROR);
-				alert.setHeaderText("Si è verificato un errore:");
-				alert.setContentText("Riprova più tardi!");
-				alert.showAndWait();
+				showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+				e.printStackTrace();
 			}
 		}
 		return check;
+	}
+	
+	protected void showErrorMessage(String header, String content) {
+		Alert alert=new Alert(AlertType.ERROR);
+		alert.setTitle("Errore");
+		alert.setHeaderText(header);
+		alert.setContentText(content);
+		alert.showAndWait();
 	}
 }

@@ -31,6 +31,7 @@ public class Tournament extends Game  {
 	private LinkedList<Player> eliminated;
 	private String currentGameMessage;
 	
+	//init a tournament
 	public Tournament(String code, String admin){
 		super(code,admin);
 		semifinalists=new ArrayList<String>(4);
@@ -52,6 +53,7 @@ public class Tournament extends Game  {
 	}
 	
 	@Override
+	//build every player hand 
 	public void buildPlayersHands() {
 		actionMessages.clear();
 		actualGamePlayersNames.clear();
@@ -79,6 +81,7 @@ public class Tournament extends Game  {
 	}
 	
 	@Override
+	//insert players into the game
 	public void insertPlayers() {
 		players=new LinkedList<Player>();
 		try (Scanner scan=new Scanner(datas)){
@@ -132,7 +135,9 @@ public class Tournament extends Game  {
 			return false;
 	}
 	
+	//switch game status from quarter to semifinals
 	public void switchGame() {
+		//from quarter to semifinals
 		if (tournamentPhase.equals(TournamentPhase.QUARTI)) {
 			semifinalists.add(actualGamePlayersNames.get(0));
 			if(gameNumber==4) {
@@ -146,6 +151,7 @@ public class Tournament extends Game  {
 			}
 		}
 		
+		//from semifinals to finals
 		else if(tournamentPhase.equals(TournamentPhase.SEMIFINALI)){
 			finalists.add(actualGamePlayersNames.get(0));
 			if(gameNumber==2) {
@@ -177,7 +183,8 @@ public class Tournament extends Game  {
 	
 	
 	@Override
-	public void submitActionCard(int submittedCard, int currentPlayer, int target) { // per action cards
+	//action card management
+	public void submitActionCard(int submittedCard, int currentPlayer, int target) {
 		Player attackingPlayer=actualGamePlayers.get(currentPlayer);
 		Player targetPlayer=actualGamePlayers.get(target);
 		ActionCard submittedActionCard=(ActionCard)attackingPlayer.getHand().get(submittedCard);
@@ -188,7 +195,7 @@ public class Tournament extends Game  {
 				hasAttackedValue=true;
 				hasAttacked.set(hasAttackedValue);
 				AttackCard.onUse(attackingPlayer,targetPlayer, deck);
-				if(targetPlayer.getCharacter().getCurrentLife()<=0) {// caso in cui con l'attacco si elimina un giocatore
+				if(targetPlayer.getCharacter().getCurrentLife()<=0) {//if using card a player is eliminate
 					this.eliminatePlayer(target);
 					message="Hai eliminato "+targetPlayer.getUsername()+".";
 				}
@@ -199,7 +206,7 @@ public class Tournament extends Game  {
 				SauronEyeCard.onUse(actualGamePlayers, attackingPlayer, deck);
 				int hit=1-currentPlayer;
 
-				if(this.getPlayer(hit).getCharacter().getCurrentLife()<=0){// controllo se ho eliminato l'avversario  utilizzando l'occhio di sauron
+				if(this.getPlayer(hit).getCharacter().getCurrentLife()<=0){// check if a player is eliminate
 					message="Hai inflitto 20 p.ti danno all'avversario e lo hai eliminato!";
 					this.eliminatePlayer(hit);
 				}
@@ -243,12 +250,13 @@ public class Tournament extends Game  {
 	
 	
 	@Override
-	public boolean submitStaticCard(int submittedCard, int player) {// per static cards
+	//static card management
+	public boolean submitStaticCard(int submittedCard, int player) {
 		Player currentPlayer=actualGamePlayers.get(player);  
 		StaticCard submitted=(StaticCard)currentPlayer.getHand().get(submittedCard);
 		boolean check=true;
-		if(currentPlayer.addToBoard(submitted)) { //controlla se la board è vuota per la rispettiva posizione della carta
-			currentPlayer.getHand().remove(submittedCard); //rimuove la carta usata dalla mano
+		if(currentPlayer.addToBoard(submitted)) { //check if board is empty for place the card in correct position
+			currentPlayer.getHand().remove(submittedCard); //remove used card from hand
 			check=true;
 		}
 		else {
@@ -260,9 +268,9 @@ public class Tournament extends Game  {
 			alert.setHeaderText("Hai già una carta statica posizionata!");
 			alert.setContentText("Sei sicuro di volerla sostituire?");
 			if(alert.showAndWait().get()==ButtonType.OK) {
-				deck.addToStockPile(currentPlayer.removeFromBoard(submitted)); // con questo metodo controlla di che carta voglio sostituire, e libera la posizione destinata a quest'ultima
-				currentPlayer.addToBoard(submitted); // ora la board è vuota, aggiungo la carta nella rispettiva posizione
-				currentPlayer.getHand().remove(submittedCard);//rimuovo la carta utilizzata dalla mano
+				deck.addToStockPile(currentPlayer.removeFromBoard(submitted)); // check card to replace and release position
+				currentPlayer.addToBoard(submitted); // board is empty, add card
+				currentPlayer.getHand().remove(submittedCard);
 				check=true;
 			}
 			else
@@ -274,7 +282,8 @@ public class Tournament extends Game  {
 	
 	
 	@Override
-	public boolean submitWeaponCard(int submittedCard, int player) { // per weapon cards
+	//weapon card management
+	public boolean submitWeaponCard(int submittedCard, int player) { 
 		Player currentPlayer=actualGamePlayers.get(player);   
 		WeaponCard submittedWeapon=(WeaponCard)currentPlayer.getHand().get(submittedCard);
 		boolean check=true;
@@ -305,7 +314,8 @@ public class Tournament extends Game  {
 	}
 	
 	@Override
-	public void submitEventCard(int submittedCard, int player, int target) { // per event cards
+	//event card management
+	public void submitEventCard(int submittedCard, int player, int target) { 
 		Player currentPlayer=actualGamePlayers.get(player);
 		Player targetPlayer=actualGamePlayers.get(target);
 		EventCard submittedEventCard=(EventCard)currentPlayer.getHand().get(submittedCard);
@@ -334,22 +344,23 @@ public class Tournament extends Game  {
 	
 	
 	@Override
-	public Card drawCard(int currentPlayer) {//metodo per pescare la carta e aggiungerla alla mano 
+	//draw card and add to hand
+	public Card drawCard(int currentPlayer) {
 		Card c=deck.drawCard();
 		this.currentPlayer=currentPlayer;
 		actualGamePlayers.get(currentPlayer).getHand().add(c);
 		hasDrawedValue=true;
-		hasDrawed.set(hasDrawedValue); // hasDrawed diventa true cosi che il giocatore non possa pescare più di una carta per turno in quanto viene disattivato il bottone per pescare
+		hasDrawed.set(hasDrawedValue);// hasDrawed true allows to disable button and avoid to draw only one time
 		return c;
 	}
 	
 	
 	@Override
-	public void discardCard(int currentPlayer,int selectedCard) { //scarta una carta
+	public void discardCard(int currentPlayer,int selectedCard) { 
 		deck.addToStockPile(actualGamePlayers.get(currentPlayer).getHand().remove(selectedCard));
 		this.currentPlayer=currentPlayer;
 		hasDiscardedValue=true;
-		hasDiscarded.set(hasDiscardedValue); //HasDiscarded diventa true in modo che il giocatore corrente non possa scartare più di una carta
+		hasDiscarded.set(hasDiscardedValue); 
 	}
 	
 		

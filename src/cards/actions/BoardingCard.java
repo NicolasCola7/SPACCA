@@ -8,7 +8,7 @@ import cards.Seed;
 import decks.Deck;
 import player.Player;
 
-public class BoardingCard extends ActionCard{ //permette di rubare una carta casuale dalla mano dell'avversario
+public class BoardingCard extends ActionCard{ //allow to steal a card from other player
 
 	private static final long serialVersionUID = -1012613661486162202L;
 	public BoardingCard() {
