@@ -19,11 +19,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
@@ -54,7 +50,7 @@ public class SuspendedGamesController implements Initializable{
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
 			try {
-				root = FXMLLoader.load(getClass().getResource("home.fxml"));
+				root = FXMLLoader.load((new File("FXML/home.fxml").toURI().toURL()));
 				stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 				scene=new Scene(root);
 				stage.setScene(scene);
@@ -69,7 +65,7 @@ public class SuspendedGamesController implements Initializable{
 	
 	public void back(ActionEvent event)  {
 		try {
-			root = FXMLLoader.load(getClass().getResource("Admin.fxml"));
+			root = FXMLLoader.load((new File("FXML/Admin.fxml").toURI().toURL()));
 			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 			scene=new Scene(root);
 			stage.setScene(scene);

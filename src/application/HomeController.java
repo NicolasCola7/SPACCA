@@ -1,19 +1,17 @@
 package application;
 
 
+import java.io.File;
 import java.io.IOException;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
-import javafx.scene.transform.Translate;
 import javafx.util.Duration;
 
 import javafx.event.ActionEvent;
@@ -95,7 +93,7 @@ public class HomeController {
 	
 	public void goToAdmin(ActionEvent event)  {
 		try {
-			root = FXMLLoader.load(getClass().getResource("LoginAdmin.fxml"));
+			root = FXMLLoader.load((new File("FXML/LoginAdmin.fxml").toURI().toURL()));
 			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 			scene=new Scene(root);
 			stage.setScene(scene);
@@ -109,7 +107,7 @@ public class HomeController {
 	
 	public void goToPlayer(ActionEvent event)  {
 		try {
-			root = FXMLLoader.load(getClass().getResource("Player.fxml"));
+			root = FXMLLoader.load((new File("FXML/Player.fxml").toURI().toURL()));
 			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 			scene=new Scene(root);
 			stage.setScene(scene);
@@ -122,7 +120,7 @@ public class HomeController {
 	
 	public void goToRules(ActionEvent event)  {
 		try {
-			root = FXMLLoader.load(getClass().getResource("Rules.fxml"));
+			root = FXMLLoader.load((new File("FXML/Rules.fxml").toURI().toURL()));
 			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 			scene=new Scene(root);
 			stage.setScene(scene);

@@ -43,44 +43,54 @@ public class Leaderboard implements Serializable{
 				scores.addLast(score);
 			}
 		}catch(IOException e) {
-			 Alert alert=new Alert(AlertType.ERROR);
-			 alert.setHeaderText("Si è verificato un errore:");
-			 alert.setContentText("Riprova più tardi!");
-			 alert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+			e.printStackTrace();
 		}
 	}
 	
+	//order players in leaderbord
 	public void orderLeaderboard() {
 		//insertion sort
 		 for (int i = 1; i < scores.size(); i++) {
-	            int score = scores.get(i);
-	            String name=names.get(i);
-	            int j = i - 1;
+			   // Memorizza l'elemento corrente di scores e il corrispondente elemento di names
+			    int score = scores.get(i);
+			    String name = names.get(i);
+			    
+			    // Inizializza j come l'indice immediatamente precedente a i
+			    int j = i - 1;
 
-	            while (j >= 0 && scores.get(j) < score) {
-	                scores.set(j+1,scores.get(j));
-	                names.set(j+1, names.get(j));
-	                j--;
-	            }
-	            scores.set(j+1,score);
-                names.set(j+1, name);
-	        }
+			    // Ciclo interno che confronta l'elemento corrente con quelli precedenti nella lista ordinata
+			    // Sposta gli elementi che sono minori dell'elemento corrente una posizione avanti per fare spazio
+			    while (j >= 0 && scores.get(j) < score) {
+			        // Sposta l'elemento di scores in avanti
+			        scores.set(j + 1, scores.get(j));
+			        // Sposta l'elemento corrispondente di names in avanti
+			        names.set(j + 1, names.get(j));
+			        // Decrementa j per continuare a controllare gli elementi precedenti
+			        j--;
+			    }
+			    
+			    // Posiziona l'elemento corrente (score) nella posizione corretta nella lista ordinata
+			    scores.set(j + 1, score);
+			    // Posiziona il nome corrispondente nella posizione corretta nella lista ordinata
+			    names.set(j + 1, name);
+			}
         updateLeaderboard();
 	}
 	
+	//update leaderboard file
 	private void updateLeaderboard() {
 		try(PrintWriter pw=new PrintWriter(leaderboardFile)) {
 			for(int i=0;i<names.size();i++) {
 				pw.println(names.get(i)+","+scores.get(i));
 			}
 		}catch(IOException e) {
-			 Alert alert=new Alert(AlertType.ERROR);
-			 alert.setHeaderText("Si è verificato un errore:");
-			 alert.setContentText("Riprova più tardi!");
-			 alert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+			e.printStackTrace();
 		}
 	}
 	
+	//delete a player from leaderbord 
 	public void deleteFromLeaderboard(String player) {
 		if(names.contains(player)) {
 			int position=names.indexOf(player);
@@ -90,6 +100,7 @@ public class Leaderboard implements Serializable{
 		}
 	}
 	
+	//increase the score of a player
 	public void increaseScore(String player) {
 		if(names.contains(player)) {
 			int position=names.indexOf(player);
@@ -99,6 +110,7 @@ public class Leaderboard implements Serializable{
 		}
 	}
 	
+	//rename a player in leaderboard
 	public void renamePlayerInLeaderboard(String oldName,String newName) {
 		if(names.contains(oldName)) {
 			int position=names.indexOf(oldName);
@@ -107,23 +119,22 @@ public class Leaderboard implements Serializable{
 		}
 	}
 	
+	//getting players' names from admin's player list
 	private void getPlayersNames() {
 		playersNames=new ArrayList<String>();
 		File playersList=new File("./Files/ConfigurationFiles/"+adminUsername+"ListaGiocatori.csv");
-		try {
-			Scanner scan = new Scanner(playersList);
+		try (Scanner scan = new Scanner(playersList)){
+			
 			while(scan.hasNextLine()) {
 				playersNames.add(scan.nextLine());
 			}
-			scan.close();
 		} catch (FileNotFoundException e) {
-			 Alert alert=new Alert(AlertType.ERROR);
-			 alert.setHeaderText("Si è verificato un errore:");
-			 alert.setContentText("Riprova più tardi!");
-			 alert.showAndWait();
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+			e.printStackTrace();
 		}
 	}
 	
+	//initialize leaderboard file
 	public void initializeLeaderboardFile() {
 		getPlayersNames();
 		try (PrintWriter pw=new PrintWriter(leaderboardFile)){
@@ -131,10 +142,16 @@ public class Leaderboard implements Serializable{
 				pw.println(name+","+0);
 			}
 		}catch(IOException e) {
-			 Alert alert=new Alert(AlertType.ERROR);
-			 alert.setHeaderText("Si è verificato un errore:");
-			 alert.setContentText("Riprova più tardi!");
-			 alert.showAndWait();	
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+			e.printStackTrace();
 		 }
+	}
+	
+	private void showErrorMessage(String header, String content) {
+		Alert alert=new Alert(AlertType.ERROR);
+		alert.setTitle("Errore");
+		alert.setHeaderText(header);
+		alert.setContentText(content);
+		alert.showAndWait();
 	}
 }

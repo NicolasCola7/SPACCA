@@ -4,15 +4,12 @@ import java.io.File;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.ModuleLayer.Controller;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 
 import application.game_playing.ClassicGameController;
 import application.game_playing.TournamentController;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,8 +21,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
 import javafx.application.Platform;
@@ -36,7 +31,6 @@ public class PlayerController implements Initializable{
 	private Scene scene;
 	private Stage stage;
 	private Parent root;
-	private Alert alert;
 	private String gameType;
 	@FXML private TextField gameCode;
 	@FXML private Button playButton;
@@ -51,7 +45,7 @@ public class PlayerController implements Initializable{
 	
 	public void goToHome(ActionEvent event)  {
 		try {
-			root = FXMLLoader.load(getClass().getResource("home.fxml"));
+			root = FXMLLoader.load((new File("FXML/home.fxml").toURI().toURL()));
 			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 			scene=new Scene(root);
 			stage.setScene(scene);
@@ -67,7 +61,7 @@ public class PlayerController implements Initializable{
 	    if (checkGameCode(gameCode.getText()) == true) {
 	        try {
 	        	//load loading animation
-				root = FXMLLoader.load(getClass().getResource("Loading.fxml"));
+	        	root = FXMLLoader.load((new File("FXML/Loading.fxml").toURI().toURL()));
 				stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 				scene = new Scene(root);
 				stage.setScene(scene);
@@ -95,7 +89,7 @@ public class PlayerController implements Initializable{
 	                        if (gameType.equals("classic")) {
 	                        	//load classic game
 	                            try {
-	                                FXMLLoader loader = new FXMLLoader(getClass().getResource("ClassicGame.fxml"));
+	                            	FXMLLoader loader = new FXMLLoader((new File("FXML/ClassicGame.fxml").toURI().toURL()));
 	                                Parent classicGameScene = loader.load();
 	                                Scene scene = new Scene(classicGameScene);
 	                                ClassicGameController classicGameController = loader.getController();
@@ -111,7 +105,7 @@ public class PlayerController implements Initializable{
 	                        } else {
 	                        	//load tournament game
 	                            try {
-	                                FXMLLoader loader = new FXMLLoader(getClass().getResource("Tournament.fxml"));
+	                            	FXMLLoader loader = new FXMLLoader((new File("FXML/Tournament.fxml").toURI().toURL()));
 	                                Parent tournamentScene = loader.load();
 	                                Scene scene = new Scene(tournamentScene);
 	                                TournamentController tournamentController = loader.getController();

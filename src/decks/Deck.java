@@ -190,7 +190,6 @@ public class Deck implements Serializable {
 	}
 
 	private void buildEventCards() {
-		for(int i=0;i<100;i++)
 		deck.add(new DoomsdayCard());	
 		deck.add(new IdentityTheftCard());
 		deck.add(new MiracleCard());

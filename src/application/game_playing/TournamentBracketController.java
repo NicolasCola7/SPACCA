@@ -1,12 +1,7 @@
 package application.game_playing;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import game.TournamentPhase;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
  
 //controller of TournamentBracket schema

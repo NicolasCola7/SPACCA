@@ -110,7 +110,9 @@ public class ClassicGame extends Game {
 					this.eliminatePlayer(target);
 					message="Hai eliminato "+targetPlayer.getUsername()+".";
 				}
-				actionMessages.set(target, actionMessages.get(target)+ "-Sei stato attaccato da "+ attackingPlayer.getUsername()+"\n");
+				else 
+					actionMessages.set(target, actionMessages.get(target)+ "-Sei stato attaccato da "+ attackingPlayer.getUsername()+"\n");
+				
 				break;	
 			}
 			case "Occhio Di Sauron":{
@@ -139,16 +141,26 @@ public class ClassicGame extends Game {
 			case "Guanto Di Thanos":{
 				Card discarded=GauntletCard.onUse(attackingPlayer,targetPlayer, deck);
 				targetPlayer.getHand().remove(discarded);
-				message="La carta '"+discarded.getName()+"' è stata scartata dalla mano di "+targetPlayer.getUsername();
-				actionMessages.set(target,actionMessages.get(target)+"-"+attackingPlayer.getUsername()+" ti ha scartato la carta "+discarded.getName()+"\n");
+				if(discarded!=null) {
+					message="La carta '"+discarded.getName()+"' è stata scartata dalla mano di "+targetPlayer.getUsername();
+					actionMessages.set(target,actionMessages.get(target)+"-"+attackingPlayer.getUsername()+" ti ha scartato la carta "+discarded.getName()+"\n");
+				}
+				else
+					message="Non è stata scartata nessuna carta dalla mano di "+targetPlayer.getUsername() + " in quanto è vuota!";
+				
 				break;
 			}
 			case "Arrembaggio":{
 				Card stolen=BoardingCard.onUse(attackingPlayer,players.get(target) , deck);
-				attackingPlayer.getHand().add(stolen);
-				targetPlayer.getHand().remove(stolen);
-				message="La carta '"+stolen.getName()+"' è stata rubata dalla mano di "+targetPlayer.getUsername();
-				actionMessages.set(target,actionMessages.get(target)+"-"+attackingPlayer.getUsername()+" ti ha rubato la carta "+stolen.getName()+"\n");
+				if(stolen!=null) {
+					attackingPlayer.getHand().add(stolen);
+					targetPlayer.getHand().remove(stolen);
+					message="La carta '"+stolen.getName()+"' è stata rubata dalla mano di "+targetPlayer.getUsername();
+					actionMessages.set(target,actionMessages.get(target)+"-"+attackingPlayer.getUsername()+" ti ha rubato la carta "+stolen.getName()+"\n");
+				}
+				else
+					message="Non è stata rubata nessuna carta dalla mano di "+ targetPlayer.getUsername() + " in quanto è vuota!";
+				
 				break;
 			}
 			case "Pozione Curativa":{
@@ -184,7 +196,7 @@ public class ClassicGame extends Game {
 			Alert alert=new Alert(AlertType.CONFIRMATION);
 			alert.setGraphic(null);
 			alert.getDialogPane().getStyleClass().add("game-alert");
-			alert.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
+			alert.getDialogPane().getScene().getStylesheets().add("application/game_playing/GameAlertStyle.css");
 			alert.setTitle("Conferma");
 			alert.setHeaderText("Hai già una carta statica posizionata!");
 			alert.setContentText("Sei sicuro di volerla sostituire?");
@@ -216,7 +228,7 @@ public class ClassicGame extends Game {
 			Alert alert=new Alert(AlertType.CONFIRMATION);
 			alert.setGraphic(null);
 			alert.getDialogPane().getStyleClass().add("game-alert");
-			alert.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
+			alert.getDialogPane().getScene().getStylesheets().add("application/game_playing/GameAlertStyle.css");
 			alert.setTitle("Conferma");
 			alert.setHeaderText("Hai già un'arma equipaggiata!");
 			alert.setContentText("Sei sicuro di volerla sostituire?");
@@ -269,7 +281,7 @@ public class ClassicGame extends Game {
 		this.currentPlayer=currentPlayer;
 		players.get(currentPlayer).getHand().add(c);
 		hasDrawedValue=true;
-		hasDrawed.set(hasDrawedValue); // hasDrawed true allows to disable button and avoid to draw only one time
+		hasDrawed.set(hasDrawedValue); // hasDrawed true allows to disable button and permits to draw only one time
 		return c;
 	}
 	

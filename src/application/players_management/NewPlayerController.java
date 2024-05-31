@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 
-import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,10 +22,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
@@ -57,7 +52,7 @@ public class NewPlayerController implements Initializable {
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
 			try {
-				root = FXMLLoader.load((new File("src/application/home.fxml").toURI().toURL()));
+				root = FXMLLoader.load((new File("FXML/home.fxml").toURI().toURL()));
 				stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 				scene=new Scene(root);
 				stage.setScene(scene);
@@ -71,7 +66,7 @@ public class NewPlayerController implements Initializable {
 	}
 	public void back(ActionEvent event)  {
 		try {
-			root = FXMLLoader.load((new File("src/application/Admin.fxml").toURI().toURL()));
+			root = FXMLLoader.load((new File("FXML/Admin.fxml").toURI().toURL()));
 			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 			scene=new Scene(root);
 			stage.setScene(scene);

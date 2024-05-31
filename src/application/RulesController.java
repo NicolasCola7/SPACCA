@@ -1,5 +1,6 @@
 package application;
 
+import java.io.File;
 import java.io.IOException;
 
 import java.net.URL;
@@ -38,14 +39,46 @@ public class RulesController implements Initializable{
 	@FXML private ImageView CFurto, CGiorno, CMiracolo;
 	@FXML private TextArea TBacchetta, TSpadaLaser, TSpadaRe,TSciabola,TPistola,TMjolnir,TSpadaSemplice,TBacchettaPrinc,TSpadaOscura,TScettro;
 	@FXML private ImageView CBacchetta, CSpadaLaser, CSpadaRe,CSciabola,CPistola,CMjolnir,CSpadaSemplice,CBacchettaPrinc,CSpadaOscura,CScettro;
-	@FXML private TextArea THarry, TVoldemort, TDarthVader,TYoda,TFrodo,TSauronp,TThor,TTahnos,TJack,TDavy;
-	@FXML private ImageView CHarry, CVoldemort, CDarthVader,CYoda,CFrodo,CSauronp,CThor,CTahnos,CJack,CDavy;
+	@FXML private TextArea THarry, TVoldemort, TDarthVader,TYoda,TFrodo,TSauronp,TThor,TCThanos,TJack,TDavy;
+	@FXML private ImageView CHarry, CVoldemort, CDarthVader,CYoda,CFrodo,CSauronp,CThor,CCThanos,CJack,CDavy;
 
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		//load main tab immediately, others tabs only in case of click  
-		TGenerale.setText("a\na\na\na\naaa\naaa\na\na");
+		TGenerale.setText("Spacca è un gioco stand-alone di carte fantasy, utilizzabile in modalità multiplayer con giocatori umani e bot. \n\n"
+				+ "Si basa su personaggi principali di differenti saghe (Marvel, Harry Potter, Signore degli Anelli, Star Wars e Pirati dei Caraibi) che rappresentano i semi delle carte. Tali semi non sono vincolanti per il loro utilizzo. Alcune carte non hanno un seme perchè generali e non rappresentative delle saghe. \n\n"
+				+ "L'obiettivo del gioco è eliminare gli avversari e resistere come ultimo giocatore rimasto e vincere. \n\n"
+				+ "E' possiile giocare in modalità \"Partita classica\" ovvero 1 contro tutti, con un minimo di 2 e un massimo di 5 giocatori. Oppure \"Torneo\", composto da 8 giocatori che si sfidano in partite 1 vs 1."
+				+ "\n\n"
+				+ "-----------------------------------------------------------------------------------------------\n"
+				+ "COME SI GIOCA?"
+				+ "\n\n"
+				+ "All'inizio della partita verrà assegnato casualmente un personaggio ad ogni giocatore. Informazioni sugli avversari possono essere visionate tramite i tasti in alto. \n"
+				+ "Il giocatore troverà nella parte inferiore una serie di carte utilizzabili tramite i bottoni presenti sulla destra. \n"
+				+ "Dopo aver selezionato una carta sarà possibile utilizzarla (eventulalmente su uno specifico giocatore) oppure scartarla. Una volta terminate le azioni il giocatore deve passare il turno tramite l'apposito bottone. \n"
+				+ "E' possibile pescare una nuova carta oppure scartarla solamente una volta per turno. \n"
+				+ "Nel primo turno di gioco non è possibile utilizzare carte azione ed evento. Le carte attacco possono essere utlizzate solo una volta per turno. \n"
+				+ "In caso di vittoria di una partita classica o torneo da parte di un bot non verrà assegnato nessun punto alla leaderboard. \n"
+				+ "Sulla sinistra è possibile visualizzare le informazioni sul proprio personaggio, l'arma equipaggiata e la board. \n"
+				+ "La board è necessaria per il posizionamento di carte statiche. \n"
+				+ "-1^ posizione: carte che evtano un attacco(scudo, ologramma, specchio incantato), se usate vengono scartate in automatico.\n"
+				+ "-2^ posizione: carte che permettono di aumentare/diminuire un attributo(anello, maledizione azteca e veleno di vedova nera), la loro gestione spetta al giocatore.\n"
+				+ "Attraverso il menu in alto a sinstra è possibile uscire, salvare, visualizzare la leaderboard o il regolamento."
+				+ "\n\n"
+				+ "-----------------------------------------------------------------------------------------------\n"
+				+ "PARTITA CLASSICA\n\n"
+				+ "E' composta da un minimo di 2 fino ad un massimo di 5 giocatori, che si scontreranno in modalità uno vs tutti. \n\n"
+				+ "Vince l'ultimo giocatore che rimane, a cui verrà assegnato un punto.\n\n"
+				+ "Se gli ultimi giocatori si eliminano a vicenda la partita termina in pareggio e non viene assegnato nessun punto nella leaderboard. "
+				+ "\n\n"
+				+ "-----------------------------------------------------------------------------------------------\n"
+				+ "TORNEO\n\n"
+				+ "E' obbligatoriamente composto da 8 giocatori, che si scontreranno in modalità 1 vs 1, per raggiungere la vetta del torneo.\n\n"
+				+ "Si compone da quarti di finale (4 partite da 2 giocatori ad eliminazione diretta), semifinali e finale. \n\n"
+				+ "In una singola partita il vincitore rimarrà in gioco per scalare la vetta, il perdente verrà escluso. In caso di eliminazione a vicenda viene lanciata una moneta per decretare vincitore.\n \n"
+				+ "Attraverso il tasto bracket possiamo visualizzare l'andamento del torneo.");
+				
 		tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
 	        if (newTab != null && newTab.equals(tabAzione)) {
 	            setActions();
@@ -155,7 +188,7 @@ public class RulesController implements Initializable{
 		TFrodo.setText("Personaggio di Frodo Baggins.\nPosiede 5 punti attacco, 80 punti vita, \n4 punti precisione.\nFa parte del seme Signori degli Anelli (SA).\n");
 		TSauronp.setText("Personaggio di Sauron.\nPosiede 10 punti attacco, 110 punti vita, \n7 punti precisione.\nFa parte del seme Signore degli Anelli (SA).\n");
 		TThor.setText("Personaggio di Thor.\nPosiede 8 punti attacco, 110 punti vita, \n7 punti precisione.\nFa parte del seme Marvel (MV).\n");
-		TThanos.setText("Personaggio di Thanos.\nPosiede 10 punti attacco, 80 punti vita, \n6 punti precisione.\nFa parte del seme Marvel (MV).\n");
+		TCThanos.setText("Personaggio di Thanos.\nPosiede 10 punti attacco, 80 punti vita, \n6 punti precisione.\nFa parte del seme Marvel (MV).\n");
 		TJack.setText("Personaggio di Jack Sparrow.\nPosiede 6 punti attacco, 90 punti vita, \n9 punti precisione.\nFa parte del seme Pirati dei Caraibi (PC).\n");
 		TDavy.setText("Personaggio di Davy Jones.\nPosiede 8 punti attacco, 90 punti vita, \n9 punti precisione.\nFa parte del seme Pirati dei Caraibi (PC).\n");
 		CHarry.setImage(new Image(getClass().getResourceAsStream("game_playing/CharactersCardsImages/HarryPotterCh.png")));
@@ -165,7 +198,7 @@ public class RulesController implements Initializable{
 		CFrodo.setImage(new Image(getClass().getResourceAsStream("game_playing/CharactersCardsImages/FrodoCh.png")));
 		CSauronp.setImage(new Image(getClass().getResourceAsStream("game_playing/CharactersCardsImages/SauronCh.png")));
 		CThor.setImage(new Image(getClass().getResourceAsStream("game_playing/CharactersCardsImages/ThorCh.png")));
-		CThanos.setImage(new Image(getClass().getResourceAsStream("game_playing/CharactersCardsImages/ThanosCh.png")));
+		CCThanos.setImage(new Image(getClass().getResourceAsStream("game_playing/CharactersCardsImages/ThanosCh.png")));
 		CJack.setImage(new Image(getClass().getResourceAsStream("game_playing/CharactersCardsImages/JackSparrowCh.png")));
 		CDavy.setImage(new Image(getClass().getResourceAsStream("game_playing/CharactersCardsImages/DavyJonesCh.png")));
 		
@@ -173,7 +206,7 @@ public class RulesController implements Initializable{
 	
 	public void goToHome(ActionEvent event)  {
 		try {
-			root = FXMLLoader.load(getClass().getResource("home.fxml"));
+			root = FXMLLoader.load((new File("FXML/home.fxml").toURI().toURL()));
 			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 			scene=new Scene(root);
 			stage.setScene(scene);
@@ -185,6 +218,11 @@ public class RulesController implements Initializable{
 			errorAlert.showAndWait();
 			e.printStackTrace();
 		}
+		
+	}
+
+	public void hideHomeButton() {
+		homeButton.setVisible(false);
 		
 	}
 	

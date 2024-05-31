@@ -12,45 +12,27 @@ import cards.*;
 import cards.actions.*;
 import cards.events.*;
 import cards.statics.*;
-import cards.characters.*;
 import cards.characters.Character;
-import game.GameType;
 import game.InformationAlert;
 import game.ClassicGame;
-import leaderboard.Leaderboard;
 import game.NoWinnerException;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
-import javafx.geometry.Rectangle2D;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceDialog;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
-import javafx.scene.control.Labeled;
-import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.control.ScrollBar;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Slider;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.ToggleButton;
@@ -59,30 +41,19 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.media.AudioClip;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
-import javafx.util.Duration;
 import leaderboard.LeaderboardData;
 import player.Bot;
 import player.Player;
 
-import java.beans.EventHandler;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -90,22 +61,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
-import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
+import application.RulesController;
 
 
 public class ClassicGameController extends GameController implements Initializable {
@@ -139,12 +101,7 @@ public class ClassicGameController extends GameController implements Initializab
 		    primaryStage.setMaximized(true);
 		    
 		    Card latest=(game.getDeck().getStockpile().size()==0?null:game.getDeck().getStockpile().getLast());
-		    String latestName=(latest==null?"Vuoto":latest.getName().replaceAll("\\s+", ""));
-	     
-		    ImageView latestPlayedCard=new ImageView(new Image(getClass().getResourceAsStream("CardsImages/"+latestName+".png")));
-		    latestPlayedCard.setFitHeight(200);
-		    latestPlayedCard.setFitWidth(140);
-		    latestPlayedCardPane.getChildren().add(latestPlayedCard);
+		    setLatestPlayedCard(latest);
 		    
 		    setSceneStyle();
 	    });  
@@ -487,7 +444,7 @@ public class ClassicGameController extends GameController implements Initializab
 			//4° check if have an attack card and use it
 			if(bot.hasAttackCard()) {
 				//choose a player to attack
-				int targetPlayer=(currentPlayer==game.getNOfPlayers()-1?0:currentPlayer+1);
+				int targetPlayer=(currentPlayer==game.getNOfPlayers()-1? 0 : currentPlayer+1);
 				//search for card position
 				for(Card c:bot.getHand())
 					if(c instanceof AttackCard) {
@@ -715,6 +672,25 @@ public class ClassicGameController extends GameController implements Initializab
        popupLeaderboard.show();;
    }
    
+   public void showRules(ActionEvent event){
+		try {
+			FXMLLoader loader = new FXMLLoader(new File("FXML/Rules.fxml").toURI().toURL());
+	        Parent root = loader.load();
+			
+			RulesController controller = loader.getController();
+	 		controller.hideHomeButton(); //hide home button in the rules stage
+	 		
+			Stage popupStage = new Stage();
+			popupStage.initModality(Modality.APPLICATION_MODAL);
+			popupStage.setTitle("Regolamento");
+			popupStage.setScene(new Scene(root));
+			popupStage.showAndWait();
+		} catch (IOException e) {
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+			e.printStackTrace();
+		}
+   }
+   
    public void showLeaderboard() {
 	   VBox vbox = new VBox(getLeaderboard());
        Scene scene = new Scene(vbox, 300, 200);
@@ -761,7 +737,7 @@ public class ClassicGameController extends GameController implements Initializab
 			Stage stage = (Stage) ((MenuItem) event.getTarget()).getParentPopup().getOwnerWindow();
 		    Parent root;
 			try {
-				root = FXMLLoader.load(new File("src/application/home.fxml").toURI().toURL());
+				root = FXMLLoader.load(new File("FXML/home.fxml").toURI().toURL());
 				Scene scene = new Scene(root);
 			    stage.setScene(scene);
 			    stage.show();
@@ -785,7 +761,8 @@ public class ClassicGameController extends GameController implements Initializab
 			Stage stage = (Stage) ((MenuItem) event.getTarget()).getParentPopup().getOwnerWindow();
 	        Parent root;
 			try {
-				root = FXMLLoader.load(new File("src/application/home.fxml").toURI().toURL());
+				
+				root = FXMLLoader.load(new File("FXML/home.fxml").toURI().toURL());
 				Scene scene = new Scene(root);
 		        stage.setScene(scene);
 		        stage.show();

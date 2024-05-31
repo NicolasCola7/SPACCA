@@ -2,7 +2,6 @@ package application.players_management;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
@@ -11,8 +10,6 @@ import java.util.ResourceBundle;
 import java.util.Scanner;
 
 import game.GameType;
-import javafx.beans.binding.Binding;
-import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -25,8 +22,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import leaderboard.Leaderboard;
@@ -69,7 +64,7 @@ public class EditExistingController implements Initializable {
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
 			try {
-				root = FXMLLoader.load((new File("src/application/home.fxml").toURI().toURL()));
+				root = FXMLLoader.load((new File("FXML/home.fxml").toURI().toURL()));
 				stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 				scene=new Scene(root);
 				stage.setScene(scene);
@@ -83,7 +78,7 @@ public class EditExistingController implements Initializable {
 	}
 	public void back(ActionEvent event)  {
 		try {
-			root = FXMLLoader.load((new File("src/application/Admin.fxml").toURI().toURL()));
+			root = FXMLLoader.load((new File("FXML/Admin.fxml").toURI().toURL()));
 			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 			scene=new Scene(root);
 			stage.setScene(scene);
@@ -114,19 +109,20 @@ public class EditExistingController implements Initializable {
 	//rename player and update it from leaderboard
 	public void renamePlayer(ActionEvent event) {
 		String selectedName = selectedPlayer.getSelectionModel().getSelectedItem();
-		 if (!players.contains(newPlayerName.getText())) {
+		String newName=newPlayerName.getText();
+		 if (!players.contains(newName) && (newName.length()<3 || !newName.substring(0, 3).equalsIgnoreCase("bot"))) {
 		 	selectedPlayer.getSelectionModel().clearSelection();
             players.remove(selectedName);
             selectedPlayer.getItems().remove(selectedName);  
-        	players.add(newPlayerName.getText());
-        	selectedPlayer.getItems().add(newPlayerName.getText());
+        	players.add(newName);
+        	selectedPlayer.getItems().add(newName);
         	updatePlayersList();
-        	classicGamesLeaderboard.renamePlayerInLeaderboard(selectedName,newPlayerName.getText());
-            tournamentsLeaderboard.renamePlayerInLeaderboard(selectedName,newPlayerName.getText());
+        	classicGamesLeaderboard.renamePlayerInLeaderboard(selectedName,newName);
+            tournamentsLeaderboard.renamePlayerInLeaderboard(selectedName,newName);
         	newPlayerName.clear();
         }
         else {
-        	showErrorMessage("Impossibile modificare nome del giocatore selezionato:", "Esiste già un giocatore con lo stesso nome!");
+        	showErrorMessage("Impossibile modificare nome del giocatore selezionato:", "Esiste già un giocatore con lo stesso nome o il nome è invalido!");
         	newPlayerName.clear();
         }
 	}

@@ -10,7 +10,6 @@ import java.util.ResourceBundle;
 import java.util.Scanner;
 
 import game.GameType;
-import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -23,8 +22,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import leaderboard.Leaderboard;
@@ -49,7 +46,7 @@ public class AdminSignupController implements Initializable {
 	
 	public void goToHome(ActionEvent event)  {
 		try {
-			root = FXMLLoader.load(getClass().getResource("home.fxml"));
+			root = FXMLLoader.load((new File("FXML/home.fxml").toURI().toURL()));
 			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 			scene=new Scene(root);
 			stage.setScene(scene);
@@ -94,7 +91,7 @@ public class AdminSignupController implements Initializable {
     		Leaderboard tournamentsLeaderboard=new Leaderboard(adminUsername.getText(),GameType.TOURNAMENT);
     		
 			try {
-				root = FXMLLoader.load(getClass().getResource("Admin.fxml"));
+				root = FXMLLoader.load((new File("FXML/Admin.fxml").toURI().toURL()));
 				stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 				scene=new Scene(root);
 				stage.setScene(scene);

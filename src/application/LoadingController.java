@@ -12,11 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
-import javafx.scene.Node;
+import java.io.File;
 import java.io.IOException;
 
 public class LoadingController {
@@ -37,7 +33,7 @@ public class LoadingController {
     
     public void goToPlay(ActionEvent event)  {
 		try {
-			root = FXMLLoader.load(getClass().getResource("Player.fxml"));
+			root = FXMLLoader.load((new File("FXML/Player.fxml").toURI().toURL()));
 			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 			scene=new Scene(root);
 			stage.setScene(scene);

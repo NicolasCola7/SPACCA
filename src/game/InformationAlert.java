@@ -2,10 +2,15 @@ package game;
 
 
 
+import java.io.File;
+import java.net.MalformedURLException;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -54,7 +59,16 @@ public class InformationAlert {
 		layout.setPadding(new Insets(8,12,0,8));
         
 		Scene scene=new Scene(layout);
-		scene.getStylesheets().add("application/game_playing/SceneStyle.css");
+		File css =new File("FXML/SceneStyle.css");
+		try {
+			scene.getStylesheets().add(css.toURI().toURL().toExternalForm());
+		} catch (MalformedURLException e1) {
+			 Alert alert=new Alert(AlertType.ERROR);
+			 alert.setHeaderText("Si è verificato un errore:");
+			 alert.setContentText("Riprova più tardi!");
+			 alert.showAndWait();
+			 e1.printStackTrace();
+		}
 		window.setScene(scene);
 		window.showAndWait();
 	}

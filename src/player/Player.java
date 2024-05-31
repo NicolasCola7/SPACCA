@@ -158,7 +158,8 @@ public class Player implements Serializable{
 	}
 	
 	public void resetAll() {
-		board=new StaticCard[2];
+		board[0]=null;
+		board[1]=null;
 		this.removeEquipedWeapon();
 		hand.clear();
 		character.resetLife();

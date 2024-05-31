@@ -16,10 +16,14 @@ public class BoardingCard extends ActionCard{ //allow to steal a card from other
 	}
 	public static Card onUse(Player attackingPlayer,Player targetPlayer, Deck deck) {
 		ArrayList<Card> tH=targetPlayer.getHand();
-		 Random random = new Random();
-	     int i=random.nextInt(tH.size());
-	     Card stolen=tH.get(i);
-	     deck.addToStockPile(new BoardingCard());
-		return stolen;
+		if(tH.size()>0) {
+			Random random = new Random();
+		    int i=random.nextInt(tH.size());
+		    Card stolen=tH.get(i);
+		    deck.addToStockPile(new BoardingCard());
+			return stolen;
+		}
+		else
+			return null;
 	}
 }

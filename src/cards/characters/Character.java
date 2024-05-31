@@ -13,7 +13,6 @@ public class Character implements Serializable {
 	private int currentLife;
 	private int attack;
 	private int precision;
-	private int luck;
 	private Seed seed;
 	private int currentPrecision;
 
@@ -52,10 +51,6 @@ public class Character implements Serializable {
 
 	public int getInitialPrecision() {
 		return precision;
-	}
-
-	public int getInitialLuck() {
-		return luck;
 	}
 
 	public void decreaseLife(int l) {

@@ -1,7 +1,8 @@
 package application;
 	
+import java.io.File;
+
 import javafx.application.Application;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.scene.Parent;
@@ -9,7 +10,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Rectangle2D;
 
 
 public class MainSpacca extends Application {
@@ -19,7 +19,7 @@ public class MainSpacca extends Application {
 	public void start(Stage primaryStage) {
 		try {	
 			
-			Parent root =FXMLLoader.load(getClass().getResource("home.fxml"));
+			Parent root = FXMLLoader.load((new File("FXML/home.fxml").toURI().toURL()));
 		    
 			Scene scene = new Scene(root);
 			primaryStage.setScene(scene);

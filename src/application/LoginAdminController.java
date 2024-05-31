@@ -8,7 +8,6 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 
-import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -21,8 +20,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -43,7 +40,7 @@ public class LoginAdminController implements Initializable{
 	
 	public void goToHome(ActionEvent event)  {
 		try {
-			root = FXMLLoader.load(getClass().getResource("home.fxml"));
+			root = FXMLLoader.load((new File("FXML/home.fxml").toURI().toURL()));
 			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 			scene=new Scene(root);
 			stage.setScene(scene);
@@ -67,7 +64,7 @@ public class LoginAdminController implements Initializable{
 	        		String username=adminUsername.getText();
 	        		actualAdmin.println(username);
 	      
-					root = FXMLLoader.load(getClass().getResource("Admin.fxml"));
+	        		root = FXMLLoader.load((new File("FXML/Admin.fxml").toURI().toURL()));
 					stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 					scene=new Scene(root);
 					stage.setScene(scene);
@@ -89,7 +86,7 @@ public class LoginAdminController implements Initializable{
 	//go to admin signup interface
 	public void signup(ActionEvent event)  {
 		try {
-			root = FXMLLoader.load(getClass().getResource("AdminSignup.fxml"));
+			root = FXMLLoader.load((new File("FXML/AdminSignup.fxml").toURI().toURL()));
 			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 			scene=new Scene(root);
 			stage.setScene(scene);

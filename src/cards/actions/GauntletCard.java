@@ -15,11 +15,15 @@ public class GauntletCard extends ActionCard{
 	}
 	public static Card onUse(Player attackingPlayer,Player targetPlayer, Deck deck) { //allow to discard a card from other player
 		ArrayList<Card> tH=targetPlayer.getHand();
-		Random random = new Random();
-	     int i=random.nextInt(tH.size());
-	     Card discarded=tH.get(i);
-		deck.addToStockPile(discarded);
-		deck.addToStockPile(new GauntletCard());
-		return discarded;
+		if (tH.size()>0) {
+			Random random = new Random();
+			int i=random.nextInt(tH.size());
+			Card discarded=tH.get(i);
+			deck.addToStockPile(discarded);
+			deck.addToStockPile(new GauntletCard());
+			return discarded;
+		}
+		else
+			return null;
 	}
 }

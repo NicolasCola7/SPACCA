@@ -1,13 +1,9 @@
 package game;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Scanner;
 
-import application.game_playing.TournamentBracketController;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
@@ -181,7 +177,6 @@ public class Tournament extends Game  {
 		return actualGamePlayers.get(player);
 	}
 	
-	
 	@Override
 	//action card management
 	public void submitActionCard(int submittedCard, int currentPlayer, int target) {
@@ -219,16 +214,25 @@ public class Tournament extends Game  {
 			case "Guanto Di Thanos":{
 				Card discarded=GauntletCard.onUse(attackingPlayer,targetPlayer, deck);
 				targetPlayer.getHand().remove(discarded);
-				message="La carta '"+discarded.getName()+"' è stata scartata dalla mano di "+targetPlayer.getUsername();
-				actionMessages.set(target,actionMessages.get(target)+"-"+attackingPlayer.getUsername()+" ti ha scartato la carta "+discarded.getName()+"\n");
+				if(discarded!=null) {
+					message="La carta '"+discarded.getName()+"' è stata scartata dalla mano di "+targetPlayer.getUsername();
+					actionMessages.set(target,actionMessages.get(target)+"-"+attackingPlayer.getUsername()+" ti ha scartato la carta "+discarded.getName()+"\n");
+				}
+				else
+					message="Non è stata scartata nessuna carta dalla mano di "+targetPlayer.getUsername() + " in quanto è vuota!";
 				break;
 			}
 			case "Arrembaggio":{
 				Card stolen=BoardingCard.onUse(attackingPlayer,players.get(target) , deck);
-				attackingPlayer.getHand().add(stolen);
-				targetPlayer.getHand().remove(stolen);
-				message="La carta '"+stolen.getName()+"' è stata rubata dalla mano di "+targetPlayer.getUsername();
-				actionMessages.set(target,actionMessages.get(target)+"-"+attackingPlayer.getUsername()+" ti ha rubato la carta "+stolen.getName()+"\n");
+				if(stolen!=null) {
+					attackingPlayer.getHand().add(stolen);
+					targetPlayer.getHand().remove(stolen);
+					message="La carta '"+stolen.getName()+"' è stata rubata dalla mano di "+targetPlayer.getUsername();
+					actionMessages.set(target,actionMessages.get(target)+"-"+attackingPlayer.getUsername()+" ti ha rubato la carta "+stolen.getName()+"\n");
+				}
+				else
+					message="Non è stata rubata nessuna carta dalla mano di "+ targetPlayer.getUsername() + " in quanto è vuota!";
+				
 				break;
 			}
 			case "Pozione Curativa":{
@@ -263,7 +267,7 @@ public class Tournament extends Game  {
 			Alert alert=new Alert(AlertType.CONFIRMATION);
 			alert.setGraphic(null);
 			alert.getDialogPane().getStyleClass().add("game-alert");
-			alert.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
+			alert.getDialogPane().getScene().getStylesheets().add("application/game_playing/GameAlertStyle.css");
 			alert.setTitle("Conferma");
 			alert.setHeaderText("Hai già una carta statica posizionata!");
 			alert.setContentText("Sei sicuro di volerla sostituire?");
@@ -296,7 +300,7 @@ public class Tournament extends Game  {
 			Alert alert=new Alert(AlertType.CONFIRMATION);
 			alert.setGraphic(null);
 			alert.getDialogPane().getStyleClass().add("game-alert");
-			alert.getDialogPane().getScene().getStylesheets().add("./application/GameAlertStyle.css");
+			alert.getDialogPane().getScene().getStylesheets().add("application/game_playing/GameAlertStyle.css");
 			alert.setTitle("Conferma");
 			alert.setHeaderText("Hai già un'arma equipaggiata!");
 			alert.setContentText("Sei sicuro di volerla sostituire?");

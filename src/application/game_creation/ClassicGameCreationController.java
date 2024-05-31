@@ -6,35 +6,20 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.Array;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.ResourceBundle;
-import java.util.Scanner;
-
 import game.GameType;
-import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TextField;
-import javafx.scene.control.cell.CheckBoxListCell;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import leaderboard.Leaderboard;
 
@@ -66,7 +51,7 @@ public class ClassicGameCreationController extends GameCreationController implem
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
 			try {
-				root = FXMLLoader.load(new File("src/application/home.fxml").toURI().toURL());
+				root = FXMLLoader.load(new File("FXML/home.fxml").toURI().toURL());
 				stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 				scene=new Scene(root);
 				stage.setScene(scene);
@@ -80,7 +65,7 @@ public class ClassicGameCreationController extends GameCreationController implem
 	
 	public void back(ActionEvent event){
 		try {
-			root = FXMLLoader.load((new File("src/application/Admin.fxml").toURI().toURL()));
+			root = FXMLLoader.load((new File("FXML/Admin.fxml").toURI().toURL()));
 			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 			scene=new Scene(root);
 			stage.setScene(scene);
@@ -107,7 +92,7 @@ public class ClassicGameCreationController extends GameCreationController implem
 				alert.setContentText("Vuoi tornare alla home?");
 				if(alert.showAndWait().get()==ButtonType.OK) {
 					try {
-						root = FXMLLoader.load(new File("src/application/home.fxml").toURI().toURL());
+						root = FXMLLoader.load(new File("FXML/home.fxml").toURI().toURL());
 						stage=(Stage)((Node)e.getSource()).getScene().getWindow();
 						scene=new Scene(root);
 						stage.setScene(scene);

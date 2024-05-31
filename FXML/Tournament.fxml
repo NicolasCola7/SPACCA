@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane fx:id="backGround" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" prefHeight="627.0" prefWidth="601.0" stylesheets="@game_playing/SceneStyle.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.game_playing.TournamentController">
+<AnchorPane fx:id="backGround" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" prefHeight="627.0" prefWidth="601.0" stylesheets="@SceneStyle.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.game_playing.TournamentController">
    <children>
       <MenuButton fx:id="menu" layoutX="14.0" layoutY="14.0" maxHeight="30.0" maxWidth="40.0" minHeight="30.0" minWidth="40.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="40.0" text="Menu">
          <items>
@@ -20,6 +20,7 @@
             <MenuItem mnemonicParsing="false" onAction="#saveAndQuit" text="Salva ed Esci" />
             <MenuItem mnemonicParsing="false" onAction="#quit" text="Esci" />
             <MenuItem mnemonicParsing="false" onAction="#showLeaderboard" text="Leaderboard" />
+            <MenuItem mnemonicParsing="false" onAction="#showRules" text="Regolamento" />
          </items>
       </MenuButton>
       <VBox fx:id="infoBox" layoutX="17.0" layoutY="125.0" prefHeight="219.0" prefWidth="74.0" styleClass="button-container">

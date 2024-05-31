@@ -9,27 +9,15 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ResourceBundle;
-import java.util.Scanner;
-
 import game.GameType;
-import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import leaderboard.Leaderboard;
 
@@ -57,7 +45,7 @@ public class TournamentCreationController extends GameCreationController impleme
 		alert.setContentText("Sei sicuro di voler continuare?");
 		if(alert.showAndWait().get()==ButtonType.OK) {
 			try {
-				root = FXMLLoader.load(new File("src/application/home.fxml").toURI().toURL());
+				root = FXMLLoader.load(new File("FXML/home.fxml").toURI().toURL());
 				stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 				scene=new Scene(root);
 				stage.setScene(scene);
@@ -71,7 +59,7 @@ public class TournamentCreationController extends GameCreationController impleme
 	
 	public void back(ActionEvent event){
 		try {
-			root = FXMLLoader.load(new File("src/application/Admin.fxml").toURI().toURL());
+			root = FXMLLoader.load((new File("FXML/Admin.fxml").toURI().toURL()));
 			stage=(Stage)((Node)event.getSource()).getScene().getWindow();
 			scene=new Scene(root);
 			stage.setScene(scene);
@@ -101,7 +89,7 @@ public class TournamentCreationController extends GameCreationController impleme
 			alert.setContentText("Vuoi tornare alla home?");
 			if(alert.showAndWait().get()==ButtonType.OK) {
 				try {
-					root = FXMLLoader.load(new File("src/application/home.fxml").toURI().toURL());
+					root = FXMLLoader.load(new File("FXML/home.fxml").toURI().toURL());
 					stage=(Stage)((Node)e.getSource()).getScene().getWindow();
 					scene=new Scene(root);
 					stage.setScene(scene);

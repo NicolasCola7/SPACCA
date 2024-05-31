@@ -1,9 +1,7 @@
 package application.game_playing;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -17,25 +15,16 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import cards.Card;
 import cards.WeaponCard;
 import cards.statics.StaticCard;
-import game.ClassicGame;
-import game.Game;
-import game.InformationAlert;
-import game.Tournament;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableView;
 import javafx.scene.control.ToggleButton;
@@ -50,8 +39,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import leaderboard.LeaderboardData;
-import player.Bot;
-import player.Player;
 
 public abstract class GameController implements GameControllerInterface{
 	protected String gameCode;
@@ -146,7 +133,12 @@ public abstract class GameController implements GameControllerInterface{
 	//show latest played or discarded card
 	protected void setLatestPlayedCard(Card c) {
 		latestPlayedCardPane.getChildren().clear();
-		ImageView latestPlayedCard=new ImageView(new Image(getClass().getResourceAsStream("CardsImages/"+c.getName().replaceAll("\\s+", "")+".png")));
+		ImageView latestPlayedCard;
+		if(c!=null)
+				latestPlayedCard=new ImageView(new Image(getClass().getResourceAsStream("CardsImages/"+c.getName().replaceAll("\\s+", "")+".png")));
+		else 
+			latestPlayedCard=new ImageView(new Image(getClass().getResourceAsStream("CardsImages/Vuoto.png")));
+			
 		latestPlayedCard.setFitHeight(200);
 		latestPlayedCard.setFitWidth(140);
 		latestPlayedCardPane.getChildren().add(latestPlayedCard);

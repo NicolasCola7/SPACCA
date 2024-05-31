@@ -20,12 +20,10 @@ import cards.statics.StaticCard;
 import game.InformationAlert;
 import game.Tournament;
 import game.TournamentPhase;
-import leaderboard.Leaderboard;
 import leaderboard.LeaderboardData;
 import player.Bot;
 import player.Player;
 import javafx.application.Platform;
-import javafx.beans.property.BooleanPropertyBase;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -34,18 +32,14 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.ToggleButton;
@@ -54,9 +48,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -73,18 +65,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
+import application.RulesController;
 
 
 public class TournamentController extends GameController implements Initializable{
@@ -130,7 +116,9 @@ public class TournamentController extends GameController implements Initializabl
 			primaryStage.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::closeWindowEvent);				
 		    primaryStage.setMaximized(true);
 		   
-		    initLatestPlayedCardSpot();
+		    Card latest=(tournament.getDeck().getStockpile().size()==0?null:tournament.getDeck().getStockpile().getLast());
+		    setLatestPlayedCard(latest);
+		    
 		    setBracketButtonImage();
 		    setSceneStyle();
 		    
@@ -600,6 +588,7 @@ public class TournamentController extends GameController implements Initializabl
 		TournamentPhase phase=(tournament.getTournamentPhase().equals(TournamentPhase.QUARTI) ? TournamentPhase.SEMIFINALI : TournamentPhase.FINALE );
 		tournamentBracketController.setPlayer(actualWinner, tournament.getGameNumber(), phase);
 		tournament.switchGame();
+		setLatestPlayedCard(null);
 		
 		actualGamePlayersNames=tournament.getActualGamePlayersNames();
 		refreshCardsBox(tournament.getCurrentPlayer());
@@ -714,7 +703,7 @@ public class TournamentController extends GameController implements Initializabl
 			Stage stage = (Stage) ((MenuItem) event.getTarget()).getParentPopup().getOwnerWindow();
 		    Parent root;
 			try {
-				root = FXMLLoader.load(new File("src/application/home.fxml").toURI().toURL());
+				root = FXMLLoader.load(new File("FXML/home.fxml").toURI().toURL());
 				Scene scene = new Scene(root);
 				stage.setScene(scene);
 				stage.show();
@@ -739,7 +728,7 @@ public class TournamentController extends GameController implements Initializabl
 			Stage stage = (Stage) ((MenuItem) event.getTarget()).getParentPopup().getOwnerWindow();
 	        Parent root;
 			try {
-				root = FXMLLoader.load(new File("src/application/home.fxml").toURI().toURL());
+				root = FXMLLoader.load(new File("FXML/home.fxml").toURI().toURL());
 				 Scene scene = new Scene(root);
 				 stage.setScene(scene);
 				 stage.show();
@@ -774,6 +763,25 @@ public class TournamentController extends GameController implements Initializabl
        popupLeaderboard.setScene(scene);
        popupLeaderboard.show();
    }
+   
+   public void showRules(ActionEvent event){
+		try {
+			FXMLLoader loader = new FXMLLoader(new File("FXML/Rules.fxml").toURI().toURL());
+	        Parent root = loader.load();
+			
+			RulesController controller = loader.getController();
+	 		controller.hideHomeButton(); //hide home button in the rules stage
+	 		
+			Stage popupStage = new Stage();
+			popupStage.initModality(Modality.APPLICATION_MODAL);
+			popupStage.setTitle("Regolamento");
+			popupStage.setScene(new Scene(root));
+			popupStage.showAndWait();
+		} catch (IOException e) {
+			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
+			e.printStackTrace();
+		}
+  }
    
    public  ObservableList<LeaderboardData> getDataFromLeaderboardFile() {
 	   ObservableList<LeaderboardData> data = FXCollections.observableArrayList();
@@ -860,9 +868,10 @@ public class TournamentController extends GameController implements Initializabl
    }
    
    private void initTournamentBracketScene() {
-		tournamentBracketLoader = new FXMLLoader(getClass().getResource("TournamentBracket.fxml"));
-		
+	   File fxmlFile = new File("FXML/TournamentBracket.fxml");
+	
 		try {
+			tournamentBracketLoader = new FXMLLoader(fxmlFile.toURI().toURL());
 			tournamentBracketScene=tournamentBracketLoader.load();
 		} catch (IOException e) {
 			showErrorMessage("Si è verificato un errore:", "Riprova più tardi!");
@@ -888,15 +897,6 @@ public class TournamentController extends GameController implements Initializabl
 		for(int i=0;i<tournament.getFinalists().size();i++) {
 			tournamentBracketController.setPlayer(tournament.getFinalists().get(i), i+1, TournamentPhase.FINALE);
 		}
-	}
-	
-	private void initLatestPlayedCardSpot() {
-		Card latest=(tournament.getDeck().getStockpile().size()==0?null:tournament.getDeck().getStockpile().getLast());
-	    String latestName=(latest==null?"Vuoto":latest.getName().replaceAll("\\s+", ""));
-	    ImageView latestPlayedCard=new ImageView(new Image(getClass().getResourceAsStream("CardsImages/"+latestName+".png")));
-	    latestPlayedCard.setFitHeight(200);
-	    latestPlayedCard.setFitWidth(140);
-	    latestPlayedCardPane.getChildren().add(latestPlayedCard);
 	}
 	
 	private void setBracketButtonImage() {
